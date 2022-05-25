@@ -1,7 +1,7 @@
 {
     "input_dir": "INPUT",
     "json": "JSON",
-    "filename_metadata": ["frame", "other"],
+    "filename_metadata": ["plantbarcode", "id","other"],
     "workflow": "WORKFLOW",
     "img_outdir": "OUTDIR",
     "tmp_dir": null,
