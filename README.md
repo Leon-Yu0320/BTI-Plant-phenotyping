@@ -1,2 +1,2 @@
-# BTI_PLant-phenotyping
+# BTI Plant-phenotyping
 Computational pipeline for phenotyping data analysis
