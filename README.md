@@ -12,15 +12,15 @@ All photos will be collected by Raspberry Pi camera along with light-weight faci
 plant leaf rosettes phenotyping, plant side-view phenotyping, and tomato root phenotyping. See details about the [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).  
 To ensure the correct metadata fetching including camera ID, plant ID, year, date, month, hour, minute and experiments related information from name of each photo in subsequent of data processing. The data collections will be initiated by three individual shell scripts with respective fixed naming criteria. Photo name examples from per experiment setup were listed as follow:
 
-**plant leaf rosettes:**\
+**plant leaf rosettes:**
 ```
-**format:** RASPI_cameraID.YYYY.MM.DD-HH.MM.SS.jpg
-**example:** raspiU_cameraA.2021.09.07-09.00.01.jpg
+format: RASPI_cameraID.YYYY.MM.DD-HH.MM.SS.jpg
+example: raspiU_cameraA.2021.09.07-09.00.01.jpg
 ```
-**plant sideview:**\
+**plant sideview:**
 ```
-**format:** RASPI_side.NO_YYYY.MM.DD-HH.MM.SS.jpg\
-**example:** RaspiZ_side1_2022.04.17-11.07.01.jpg\
+format: RASPI_side.NO_YYYY.MM.DD-HH.MM.SS.jpg
+example: RaspiZ_side1_2022.04.17-11.07.01.jpg
 ```
 
 ### 2. Image-processing parameter selection
@@ -28,6 +28,8 @@ Phenotypic data extraction from images will be processed by PlantCV software wit
 
 ### 3.Image batch processes
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
+
+**NOTE: The column names of databse can be customized and is required for completing the database**
 
 #### Example database of MULTI_PLANT pipeline
 | raspiID | cameraID | WX | WY | WW | WH | degree | s1_size | s1_dir| s2_size | s2_dir| Cutoff | RX | RY | RW | RH | PX | PY | Radius | BATCH |
@@ -61,8 +63,8 @@ After initial selection of parameters, users will save these data into databases
 |Column (20) | The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 #### Example database of SIDE_VIEW pipeline
-| Frame |Degree | WX | WY | WW | WH | cutoff1 | cutoff2 | RX | RY | RW | RH | RX | BATCH |
-| ----- | ----- | -- | -- | -- | -- | ------- | ------- | -- | -- | -- | -- | -- | ----- | 
+| Frame |Degree | WX | WY | WW | WH | cutoff1 | cutoff2 | RX | RY | RW | RH | BATCH |
+| ----- | ----- | -- | -- | -- | -- | ------- | ------- | -- | -- | -- | -- | ----- | 
 | raspiX | 0 | 450 | 1250 | 100 | 100 | 95 | 113 | 350 | 200 | 1300 | 1300 | DEMO |
 | raspiY | 0 | 350 | 1300 | 100 | 90 | 180 | 135 | 500 | 400 | 1000 | 1120 | Round2 |
 | raspiZ | 5 | 400 | 1350 | 100 | 90 | 220 | 105 | 450 | 400 | 1000 | 1120 | Round1 |
