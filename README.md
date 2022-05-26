@@ -101,4 +101,36 @@ bash 3_SIDE_VIEW.sh
 Based on selected time period of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in log file), warning message will be sent if images were missed from desired time period specified under certain folders. After parsing parameters from database, these sample images will be processed by batch processing function from [**PlantCV**](https://plantcv.readthedocs.io/en/stable/). 
 
 
-Users are able to check quality of images either using pop-in window (Xming or similar software is required) or local image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA). 
+Users are able to check quality of images either using pop-in window ([**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
+
+After quality control of sample images been processed, users will be asked if they decide to process rest images or if parameters should be modified for quality improvement. Update of database and relaunch of analysis will be followed after adjustment. 
+
+#### OPTION 2: bulk analysis for multiple experiments	
+When tackling with multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see below example). In this pipeline, three arguments will be provided by users, including experimental design table containing metadata, the type of experiments (options: "MULTI_PLANT","SIDE_VIEW","ROOT_PHENOTYPE"), and mode of analysis regarding inclusion of one random image per day (sample images) or all images (option: "SAMPLE","ALL" DEFAULT: ALL) as shown from the attached picture. To start with program, a tabular design table is required with restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT, SIDE_VIEW, and ROOT_PHENOTYPE type of experiments. In addition, without providing mode option (-m argument), all images under the image folder will be used for analysis. 
+
+Type in the following command to check the help page
+```
+bash 1_BULK_IMAGES.sh -help 
+```
+Help page will be displayed as folow:
+```
+*************************************** WELCOME TO USE BULK ANALYSIS FOR IMAGES ***************************************
+
+use -help argument to show usage information
+
+Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
+
+
+  -d [Table] < /path/to/experimental design table stored, refer manual for details of each type of experiments>
+
+  -t [String] < type in one of the three experiment types: "MULTI_PLANT","SIDE_VIEW","ROOT_PHENOTYPE" >
+
+  -m [String] < type in one of the two modes: "SAMPLE","ALL" DEFAULT: ALL>
+
+  -h Show this usage information
+```
+
+
+
+
+
