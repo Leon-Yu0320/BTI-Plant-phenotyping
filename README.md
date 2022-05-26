@@ -120,8 +120,6 @@ What is the time when the light off for your experiments (Hour and minute, FORMA
 Please provide the directory where results to be saved after analysis /data/results
 ```
 
-
-
 ```
 bash 3_SIDE_VIEW.sh
 ```
@@ -129,12 +127,12 @@ bash 3_SIDE_VIEW.sh
 Based on selected time period of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in log file), warning message will be sent if images were missed from desired time period specified under certain folders. After parsing parameters from database, these sample images will be processed by batch processing function from [**PlantCV**](https://plantcv.readthedocs.io/en/stable/). 
 
 
-Users are able to check quality of images either using pop-in window ([**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
+Users are able to check quality of images either using pop-up window (Intallation of [**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
 
 After quality control of sample images been processed, users will be asked if they decide to process rest images or if parameters should be modified for quality improvement. Update of database and relaunch of analysis will be followed after adjustment. 
 
 #### OPTION 2: bulk analysis for multiple experiments	
-When tackling with multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see below example). In this pipeline, three arguments will be provided by users, including experimental design table containing metadata, the type of experiments (options: "MULTI_PLANT","SIDE_VIEW","ROOT_PHENOTYPE"), and mode of analysis regarding inclusion of one random image per day (sample images) or all images (option: "SAMPLE","ALL" DEFAULT: ALL) as shown from the attached picture. To start with program, a tabular design table is required with restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT, SIDE_VIEW, and ROOT_PHENOTYPE type of experiments. In addition, without providing mode option (-m argument), all images under the image folder will be used for analysis. 
+When tackling with multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see below example). In this pipeline, three arguments will be provided by users, including experimental design table containing metadata, the type of experiments (options: "MULTI_PLANT","SIDE_VIEW","ROOT_PHENOTYPE"), and mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with program, a tabular design table is required with restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT, SIDE_VIEW, and ROOT_PHENOTYPE type of experiments. In addition, without providing mode option (**-m argument**), all images under the image folder will be used for analysis. 
 
 **Type in the following command to check the help page**
 ```
@@ -162,9 +160,9 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 #### Example design table when using "MULTI_PLANT" type for bulk analysis
 | CODE |IMAGE | RIG | CAMERA |BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | OUTPUT_DIR |
 | ---- | ---- | ----| ------ | ---- | ---------- | -------- | ----------- | --------- | ---------- | -------- | ---------- |
-| /home/User/code | home/image | raspiZ | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | /data/results |
-| /home/User/code | home/image | raspiX | Nick | 2021 | 2022 | 12 | 01 | 18 | 07 | /data/results |
-| /home/User/code | home/image | raspiX | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | /data/results |
+| /home/User/code | home/image | raspiU | cameraA | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | 09.00 | 21.00 | /data/results |
+| /home/User/code | home/image | raspiK | cameraA | Nick | 2021 | 2022 | 12 | 01 | 18 | 07 | 12.00 | 18.00 | /data/results |
+| /home/User/code | home/image | raspiN | cameraB | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | 09.00 | 21.00 | /data/results |
 
 #### Format of design table when using "MULTI_PLANT" type for bulk analysis (14 columns)
 | Column Numbers | Description |
@@ -187,9 +185,9 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 #### Example design table when using "SIDE_VIEW" type for bulk analysis
 | CODE |IMAGE | FRAME | BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | OUTPUT_DIR |
 | ---- | ---- | ----- | ----- | ---------- | -------- | ----------- | --------- | ---------- | -------- | ---------- | 
-| /home/User/code | home/image | raspiU | cameraA | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | 09.00 | 21.00 | /data/results |
-| /home/User/code | home/image | raspiK | cameraA | Nick | 2021 | 2022 | 12 | 01 | 18 | 07 | 12.00 | 18.00 | /data/results |
-| /home/User/code | home/image | raspiN | cameraB | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | 09.00 | 21.00 | /data/results |
+| /home/User/code | home/image | raspiZ | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | /data/results |
+| /home/User/code | home/image | raspiX | Nick | 2021 | 2022 | 12 | 01 | 18 | 07 | /data/results |
+| /home/User/code | home/image | raspiX | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | /data/results |
 
 #### Format of design table when using "SIDE_VIEW" type for bulk analysis (11 columns)
 | Column Numbers | Description |
