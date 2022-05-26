@@ -26,7 +26,7 @@ Phenotypic data extraction from images will be processed by PlantCV software wit
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
 
 #### Example database of MULTI_PLANT pipeline
-| raspiID | cameraID | white_X | white_Y | white_W | white_H | degree | s1_size | s1_dir| s2_size | s_dir| Cutoff | ROI_X | ROI_Y | ROI_W | ROI_H | PlantX| PlantY | Radius | BATCH |
+| raspiID | cameraID | white_X | white_Y | white_W | white_H | degree | s1_size | s1_dir| s2_size | s_dir| Cutoff | ROI_X | ROI_Y | ROI_W | ROI_H | PlantX| PlantY | Radius | BATCH |\
 | ------- | -------- | ------- | ------- | ------- | ------- | ------ | ------- | ----- | ------- |------| ------ | ----- | ----- | ----- | ----- | ----- | ------ | 
 ------ | ----- |
 
