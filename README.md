@@ -2,7 +2,7 @@
 Computational pipeline for phenotyping data analysis
 
 ## Introduction
-Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic background in responses to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as three sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively paired with the light-weight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied to screen mutants, teaching, and etc with high-throughput manner and low cost. 
+Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic background in responses to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as three sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively paired with the light-weight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with high-throughput manner and low cost. 
 
 ## General overview of pipeline
 To realize the high-throughput manner of data processing, advantages of parallel data processing function from the PlantCV was adopted in pipeline and four major steps from plant growth to final downstream analysis will be performed. Detailed steps were described as follow:
@@ -94,6 +94,56 @@ In this option, pipelines for multiple-plants, side-view images, and root phenot
 ```
 bash 2_MULTI_PLANT.sh
 ```
+**Type in the answers for each questions to launch analysis**
+```
+*********************************** WELCOME TO USE MULTI_PLANTS PIPELINE FOR IMAGES ***********************************
+*******************************Please answer the following questions to launch analysis********************************
+
+
+Please provide the directory where source codes were saved: /home/Users/code
+Please provide the directory where images for analysis were saved: /mnt/Knives/image_factory/Raspis
+Which plant rig ID is for those images been saved ? (Example: raspiA): raspiU
+Which camera ID is for those images been saved ? (Please type in cameraA or cameraB): cameraA
+Are different parameters been used for plants under raspiU cameraA across different batches ? (Type in Yes or No) Yes
+What is the name for this pairticular batch (Warning: The name of batch should be identical to the name in meta-table, eg: BATCH1): CER
+
+What is the year when experiment started (FORMAT: YYYY, eg: 2022): 2021
+What is the year when experiment ended (FORMAT: YYYY, eg: 2022): 2021
+What is the month when experiment started (FORMAT: MM, eg: 08): 09
+What is the month when experiment ended (FORMAT: MM, eg: 08): 09
+What is the date when experiment started (FORMAT: DD, eg: 01): 07
+What is the date when experiment end (FORMAT: DD, eg: 01): 10
+
+What is the time when the light on for your experiments (Hour and minute, FORMAT: HH.MM, 09.30): 09.00
+What is the time when the light off for your experiments (Hour and minute, FORMAT: HH.MM, 20.30): 21.00
+
+Please provide the directory where results to be saved after analysis /data/results
+```
+
+```
+*** STEP 1 Images for experiments will be loaded ***
+
+
+Images during night from 21.00 to 09.00 will be removed
+
+One random image per day from 2021.09.06 to 2021.09.10 will be selected to validate parameter information......
+
+
+The paramters of CER for raspiU under the cameraA were loaded
+
+The following parameter will be applied for image analysis
+
+Range for white balance calibration is: x=995, y=400, w=55, h=55
+rotation degree is: 0
+threshold for masking is: 104
+pixels to be shifted left is: 20
+pixels to be shifted Top is: 20
+region of interest (ROI) is: x=75, y=95, w=1875, h=1870
+coordinate of the the first plant to be analyzed is: x=330, y=250
+radius for each plant is: 180
+```
+
+
 ```
 bash 3_SIDE_VIEW.sh
 ```
