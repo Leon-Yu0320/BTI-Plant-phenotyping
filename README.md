@@ -95,30 +95,10 @@ In this option, pipelines for multiple-plants, side-view images, and root phenot
 bash 2_MULTI_PLANT.sh
 ```
 **Type in the answers for each questions to launch analysis**
-```
-*********************************** WELCOME TO USE MULTI_PLANTS PIPELINE FOR IMAGES ***********************************
-*******************************Please answer the following questions to launch analysis********************************
+![image](https://user-images.githubusercontent.com/69836931/170578414-ff1e621c-f06c-4d6d-8df7-2c2a758e844b.png)
 
-
-Please provide the directory where source codes were saved: /home/Users/code
-Please provide the directory where images for analysis were saved: /mnt/Knives/image_factory/Raspis
-Which plant rig ID is for those images been saved ? (Example: raspiA): raspiU
-Which camera ID is for those images been saved ? (Please type in cameraA or cameraB): cameraA
-Are different parameters been used for plants under raspiU cameraA across different batches ? (Type in Yes or No) Yes
-What is the name for this pairticular batch (Warning: The name of batch should be identical to the name in meta-table, eg: BATCH1): CER
-
-What is the year when experiment started (FORMAT: YYYY, eg: 2022): 2021
-What is the year when experiment ended (FORMAT: YYYY, eg: 2022): 2021
-What is the month when experiment started (FORMAT: MM, eg: 08): 09
-What is the month when experiment ended (FORMAT: MM, eg: 08): 09
-What is the date when experiment started (FORMAT: DD, eg: 01): 07
-What is the date when experiment end (FORMAT: DD, eg: 01): 10
-
-What is the time when the light on for your experiments (Hour and minute, FORMAT: HH.MM, 09.30): 09.00
-What is the time when the light off for your experiments (Hour and minute, FORMAT: HH.MM, 20.30): 21.00
-
-Please provide the directory where results to be saved after analysis /data/results
-```
+**Type in the answers for each questions to launch analysis**
+![image](https://user-images.githubusercontent.com/69836931/170578508-5de35a5c-0711-477c-a788-0e73a9b6c358.png)
 
 ```
 bash 3_SIDE_VIEW.sh
