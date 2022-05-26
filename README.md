@@ -25,15 +25,19 @@ Phenotypic data extraction from images will be processed by PlantCV software wit
 ### 3.Image batch processes
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
 
+Example database of MULTI_PLANT pipeline
+| raspiID | cameraID | white_X | white_Y | white_W | white_H | degree | shift1_size | shift1_dir| shift2_size | shift2_dir| Cutoff | ROI_X | ROI_Y | ROI_W | ROI_H PlantX| PlantY | Radius | BATCH |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |--- | --- |
+
 #### Database format of MULTI_PLANT pipeline (20 columns)
 | Column Numbers | Description |
 | --------------------- | ----------- |
 |Column (1)| The identifier of planting trays for plants|
 |Column (2)| The camera ID (camera A and camera B) under the dual camera mode of raspberry Pi computer|
-|Column (3)| The horizontal coordinate of white balance box used for color corrections|
-|Column (4)| The vertical coordinate of white balance box used for color corrections|
-|Column (5)| The width of white balance box used for color corrections|
-|Column (6)| The height of white balance box used for color corrections|
+|Column (3)| The horizontal coordinate of white balance box used for white balance corrections|
+|Column (4)| The vertical coordinate of white balance box used for white balance corrections|
+|Column (5)| The width of white balance box used for white balance corrections|
+|Column (6)| The height of white balance box used for white balance corrections|
 |Column (7)| The rotation degree of image|
 |Column (8)| Pixel numbers of image to be shifted on left (right) direction|
 |Column (9)| Direction of image shift (left or right)|
