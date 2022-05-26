@@ -13,11 +13,15 @@ plant leaf rosettes phenotyping, plant side-view phenotyping, and tomato root ph
 To ensure the correct metadata fetching including camera ID, plant ID, year, date, month, hour, minute and experiments related information from name of each photo in subsequent of data processing. The data collections will be initiated by three individual shell scripts with respective fixed naming criteria. Photo name examples from per experiment setup were listed as follow:
 
 **plant leaf rosettes:**\
-**format:** RASPI_cameraID.YYYY.MM.DD-HH.MM.SS.jpg\
-**example:** raspiU_cameraA.2021.09.07-09.00.01.jpg\
+```
+**format:** RASPI_cameraID.YYYY.MM.DD-HH.MM.SS.jpg
+**example:** raspiU_cameraA.2021.09.07-09.00.01.jpg
+```
 **plant sideview:**\
+```
 **format:** RASPI_side.NO_YYYY.MM.DD-HH.MM.SS.jpg\
 **example:** RaspiZ_side1_2022.04.17-11.07.01.jpg\
+```
 
 ### 2. Image-processing parameter selection
 Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. Basically, one sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among rest images which derived from the same batch of experiment. Examples of parameter settings can be referred from house-hold [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA). 
@@ -57,11 +61,11 @@ After initial selection of parameters, users will save these data into databases
 |Column (20) | The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 #### Example database of SIDE_VIEW pipeline
-| Frame |craID | WX | WY | WW | WH | degree | s1_size | s1_dir| s2_size | s2_dir| Cutoff | RX | RY | RW | RH | PX | PY | Radius | BATCH |
-| ------- | -------- | -- | -- | -- | -- | ------ | ------- | ----- | ------- |------| ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
-| raspiN | cameraA | 950 | 950 | 100 | 100 | 0 | 1 | Right | 1 |Bottom| 108 | 150 | 150 | 1870 | 1930 | 350 | 350 | 100 | NA |
-| raspiK | cameraB | 950 | 850 | 100 | 90 | 5 | 20 | Left | 1 |Bottom| 108 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Mike |
-| raspiU | cameraB | 100 | 500 | 100 | 90 | 0 | 1 | Left | 1 |Bottom| 134 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Nick |
+| Frame |Degree | WX | WY | WW | WH | cutoff1 | cutoff2 | RX | RY | RW | RH | RX | BATCH |
+| ----- | ----- | -- | -- | -- | -- | ------- | ------- | -- | -- | -- | -- | -- | ----- | 
+| raspiX | 0 | 450 | 1250 | 100 | 100 | 95 | 113 | 350 | 200 | 1300 | 1300 | DEMO |
+| raspiY | 0 | 350 | 1300 | 100 | 90 | 180 | 135 | 500 | 400 | 1000 | 1120 | Round2 |
+| raspiZ | 5 | 400 | 1350 | 100 | 90 | 220 | 105 | 450 | 400 | 1000 | 1120 | Round1 |
 
 #### Database format of MULTI_PLANT pipeline (13 columns)
 | Column Numbers | Description |
