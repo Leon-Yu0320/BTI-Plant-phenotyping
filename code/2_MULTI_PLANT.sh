@@ -50,6 +50,7 @@ then
     echo ""
     echo ""
     echo -e "${BLUE}WARNING: Directory ${OUTPUT_DIR}/$PROJECT exists. Results will be overwritten${NC}"
+    echo ""
     rm -r ${OUTPUT_DIR}/$PROJECT
 fi
 
@@ -182,7 +183,7 @@ else
         echo ""
         echo ""
         #ECHO ALL PARAMETERS FOR CHECK
-        echo "${BLUE}The following parameter will be applied for image analysis${NC}"
+        echo -e "${BLUE}The following parameter will be applied for image analysis${NC}"
         echo ""
         echo -e "${BLUE}Range for white balance calibration is:${NC} x=$white_X, y=$white_Y, w=$white_W, h=$white_H"
         echo -e "${BLUE}rotation degree is:${NC} $deg" 
@@ -264,7 +265,7 @@ else
                 --json ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.json \
                 --csv ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.csv
             echo ""
-            echo "${GREEN}*** Image analysis finished ! Please check results under the ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.csv..... ***${NC}"
+            echo -e "${GREEN}*** Image analysis finished ! Please check results under the ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.csv..... ***${NC}"
             echo ""
             echo -e "${GREEN}*************************************** Thanks for using MULTI_PLANTS PIPELINES ***************************************${NC}"
             echo ""

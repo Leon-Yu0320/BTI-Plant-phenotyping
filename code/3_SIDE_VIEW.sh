@@ -117,20 +117,18 @@ then
 else
     echo ""
     echo ""
-    echo "The paramters of $BATCH_NAME for $RIG_ID under the $CAMERA were loaded" 
+    echo "The paramters of $FRAME_ID for $BATCH_NAME were loaded" 
     grep $FRAME_ID $CODE_DIR/SIDEVIEW_database | grep $BATCH_NAME > ${OUTPUT_DIR}/$PROJECT/Configure/SIDEVIEW_parameter
 fi
 
-
-
 ROW_NUMBER=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/SIDEVIEW_parameter | wc -l)
-if [[ $ROW_NUMBER == 0]]
+if [[ $ROW_NUMBER == 0 ]]
 then
     echo ""
     echo -e "${RED}ERROR: No record of parameter found from SIDEVIEW_parameter! Please check if $BATCH_NAME for $RIG_ID under the $CAMERA matched the SIDEVIEW_parameter......${NC}"
 else
-    COLUMN_NUMBER=$(awk '{print NF}' ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | sort -nu | tail -n 1)
-    if [[ $COLUMN_NUMBER -ne 20 ]]
+    COLUMN_NUMBER=$(awk '{print NF}' ${OUTPUT_DIR}/$PROJECT/Configure/SIDEVIEW_parameter | sort -nu | tail -n 1)
+    if [[ $COLUMN_NUMBER -ne 13 ]]
     then
         echo ""
         echo -e "${RED}ERROR: Incorrect column(s) numbers from SIDEVIEW_parameter! Please check the format and re-launch analysis......${NC}"
