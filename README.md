@@ -9,7 +9,7 @@ To realize the high-throughput manner of data processing, advantages of parallel
 
 ### 1. Experimental setup and photo collections
 All photos will be collected by Raspberry Pi camera along with light-weight facilities developed for 
-plant leaf rosettes phenotyping, plant side-view phenotyping, and tomato root phenotyping. See details about the [**facilities **](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).  
+plant leaf rosettes phenotyping, plant side-view phenotyping, and tomato root phenotyping. See details about the [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).  
 To ensure the correct metadata fetching including camera ID, plant ID, year, date, month, hour, minute and experiments related information from name of each photo in subsequent of data processing. The data collections will be initiated by three individual shell scripts with respective fixed naming criteria. Photo name examples from per experiment setup were listed as follow:
 
 **plant leaf rosettes:**\
@@ -37,17 +37,17 @@ After initial selection of parameters, users will save these data into databases
 |Column (7)| The rotation degree of image|
 |Column (8)| Pixel numbers of image to be shifted on left (right) direction|
 |Column (9)| Direction of image shift (left or right)|
-|Column (10)| Pixel numbers of image to be shifted on up (down) direction|
-|Column (11)| Direction of image shift (Top or Bottom)|
-|Column (12)| Cutoff used for image masking from RGB into binary image (See part I for details)|
-|Column (13)| The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
-|Column (14)| The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
-|Column (15)| The width of cropping regions of interests (ROIs) used for mapping|
-|Column (16)| The height of cropping regions of interests (ROIs) used for mapping|
-|Column (17)| The horizontal coordinate of the first plant fell into ROIs|
-|Column (18)| The vertical coordinate of the first plant fell into ROIs|
-|Column (19)| Radius numbers (pixel) used for cropping individual plant|
-|Column (20)| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
+|Column (10) | Pixel numbers of image to be shifted on up (down) direction|
+|Column (11) | Direction of image shift (Top or Bottom)|
+|Column (12) | Cutoff used for image masking from RGB into binary image (See part I for details)|
+|Column (13) | The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
+|Column (14) | The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
+|Column (15) | The width of cropping regions of interests (ROIs) used for mapping|
+|Column (16) | The height of cropping regions of interests (ROIs) used for mapping|
+|Column (17) | The horizontal coordinate of the first plant fell into ROIs|
+|Column (18) | The vertical coordinate of the first plant fell into ROIs|
+|Column (19) | Radius numbers (pixel) used for cropping individual plant|
+|Column (20) | The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 #### Database format of MULTI_PLANT pipeline (13 columns)
 
