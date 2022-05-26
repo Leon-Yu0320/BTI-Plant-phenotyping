@@ -8,9 +8,8 @@ Image-based phenotyping provides a powerful avenue to characterize plant growth 
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV was adopted in pipeline and four major steps from plant growth to final downstream analysis will be performed. Detailed steps were described as follow:
 
 ### 1. Experimental setup and photo collections
-All photos will be collected by Raspberry Pi camera along with light-weight facilities developed for 
-plant leaf rosettes phenotyping, plant side-view phenotyping, and tomato root phenotyping. See details about the [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).  
-To ensure the correct metadata fetching including camera ID, plant ID, year, date, month, hour, minute and experiments related information from name of each photo in subsequent of data processing. The data collections will be initiated by three individual shell scripts with respective fixed naming criteria. Photo name examples from per experiment setup were listed as follow:
+All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA) developed for MULTI_PLANT IMAGES phenotyping, plant SIDE_VIEW IMAGES phenotyping, and ROOT_PHENOTYPE IMAGES phenotyping.
+To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute and experiments related information** from name of each photo in subsequent data processing. The data collections will be initiated by **three individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follow:
 
 **MULTI_PLANT IMAGES:**
 ```
