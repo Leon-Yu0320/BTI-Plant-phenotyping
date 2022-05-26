@@ -9,7 +9,7 @@ To realize the high-throughput manner of data processing, advantages of parallel
 
 ### 1. Experimental setup and photo collections
 All photos will be collected by Raspberry Pi camera along with light-weight facilities developed for 
-plant leaf rosettes phenotyping, plant side-view phenotyping, and tomato root phenotyping. See details about the facilities (LINK to protocol IO).  
+plant leaf rosettes phenotyping, plant side-view phenotyping, and tomato root phenotyping. See details about the [**facilities **](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).  
 To ensure the correct metadata fetching including camera ID, plant ID, year, date, month, hour, minute and experiments related information from name of each photo in subsequent of data processing. The data collections will be initiated by three individual shell scripts with respective fixed naming criteria. Photo name examples from per experiment setup were listed as follow:
 
 **plant leaf rosettes:**\
@@ -19,9 +19,55 @@ To ensure the correct metadata fetching including camera ID, plant ID, year, dat
 **format:** RASPI_side.NO_YYYY.MM.DD-HH.MM.SS.jpg\
 **example:** RaspiZ_side1_2022.04.17-11.07.01.jpg\
 
-### 2. Image parameter preprocessing
-Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. Basically, one sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among rest images which derived from the same batch of experiment. Examples of parameter settings can be referred from house-hold [protocols](dx.doi.org/10.17504/protocols.io.eq2lynp7pvx9/v2). 
+### 2. Image-processing parameter selection
+Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. Basically, one sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among rest images which derived from the same batch of experiment. Examples of parameter settings can be referred from house-hold [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA). 
 
-### 3. Analysis of images
+### 3.Image batch processes
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
+
+#### Database format of MULTI_PLANT pipeline (20 columns)
+
+Column (1): The identifier of planting trays for plants\
+Column (2): The camera ID (camera A and camera B) under the dual camera mode of raspberry Pi computer\
+Column (3): The horizontal coordinate of white balance box used for color corrections \
+Column (4): The vertical coordinate of white balance box used for color corrections\
+Column (5): The width of white balance box used for color corrections\
+Column (6): The height of white balance box used for color corrections \
+Column (7): The rotation degree of image\
+Column (8): Pixel numbers of image to be shifted on left (right) direction\
+Column (9): Direction of image shift (left or right)\
+Column (10): Pixel numbers of image to be shifted on up (down) direction\
+Column (11): Direction of image shift (Top or Bottom)\
+Column (12): Cutoff used for image masking from RGB into binary image (See part I for details)\
+Column (13): The horizontal coordinate of cropping regions of interests (ROIs) used for mapping\
+Column (14): The vertical coordinate of cropping regions of interests (ROIs) used for mapping\
+Column (15): The width of cropping regions of interests (ROIs) used for mapping\
+Column (16): The height of cropping regions of interests (ROIs) used for mapping\
+Column (17): The horizontal coordinate of the first plant fell into ROIs\
+Column (18): The vertical coordinate of the first plant fell into ROIs\
+Column (19): Radius numbers (pixel) used for cropping individual plant\
+Column (20): The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays.\
+
+#### Database format of MULTI_PLANT pipeline (13 columns)
+
+Column (1): The identifier of facility for image capturing
+Column (2): The rotation degree of image
+Column (3): The horizontal coordinate of white balance box used for color corrections 
+Column (4): The vertical coordinate of white balance box used for color corrections
+Column (5): The width of white balance box used for color corrections
+Column (6): The height of white balance box used for color corrections 
+Column (7): Cutoff used for image masking from RGB into LAB channel (L channel)
+Column (8): Cutoff used for image masking from RGB into HAV channel (V channel)
+Column (9): The horizontal coordinate of cropping regions of interests (ROIs) used for mapping
+Column (10): The vertical coordinate of cropping regions of interests (ROIs) used for mapping
+Column (11): The width of cropping regions of interests (ROIs) used for mapping
+Column (12): The height of cropping regions of interests (ROIs) used for mapping
+Column (13): The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays.
+
+After the copy of parameters to databases with one of the three experimental types, users will be able to launch the analysis of images based on parameters applied to single test image. Please place all files under the **code** directory into the **same folder** when during configuration. There are two options provided to process images as details from following descriptions:
+
+#### OPTION 1: single experiment analysis
+In this option, pipelines for multiple-plants, side-view images, and root phenotyping pipelines will be executed by users respectively to launch analysis. Here, few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following commend and see outputs screeshot as below.
+
+```bash 2_MULTI_PLANT.sh  ```
 
