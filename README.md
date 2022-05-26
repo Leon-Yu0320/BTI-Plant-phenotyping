@@ -12,15 +12,21 @@ All photos will be collected by Raspberry Pi camera along with light-weight faci
 plant leaf rosettes phenotyping, plant side-view phenotyping, and tomato root phenotyping. See details about the [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).  
 To ensure the correct metadata fetching including camera ID, plant ID, year, date, month, hour, minute and experiments related information from name of each photo in subsequent of data processing. The data collections will be initiated by three individual shell scripts with respective fixed naming criteria. Photo name examples from per experiment setup were listed as follow:
 
-**plant leaf rosettes:**
+**MULTI_PLANT IMAGES:**
 ```
 format: RASPI_cameraID.YYYY.MM.DD-HH.MM.SS.jpg
 example: raspiU_cameraA.2021.09.07-09.00.01.jpg
 ```
-**plant sideview:**
+**SIDE_VIEW IMAGES:**
 ```
 format: RASPI_side.NO_YYYY.MM.DD-HH.MM.SS.jpg
 example: RaspiZ_side1_2022.04.17-11.07.01.jpg
+```
+
+**ROOT_PHENOTYPE IMAGES:**
+```
+format: RASPI_root.NO_YYYY.MM.DD-HH.MM.SS.jpg
+example: RaspiZ_root1_2022.04.17-11.07.01.jpg
 ```
 
 ### 2. Image-processing parameter selection
