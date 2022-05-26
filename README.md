@@ -26,13 +26,13 @@ Phenotypic data extraction from images will be processed by PlantCV software wit
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
 
 #### Database format of MULTI_PLANT pipeline (20 columns)
-| Column NO. | Description |
+| Column Nunmers | Description |
 | --------------------- | ----------- |
-|Column (1)| The identifier of planting trays for plants|
-|Column (2)| The camera ID (camera A and camera B) under the dual camera mode of raspberry Pi computer|
-|Column (3)| The horizontal coordinate of white balance box used for color corrections|
-|Column (4)| The vertical coordinate of white balance box used for color corrections|
-|Column (5)| The width of white balance box used for color corrections|
+|1| The identifier of planting trays for plants|
+|2| The camera ID (camera A and camera B) under the dual camera mode of raspberry Pi computer|
+|3| The horizontal coordinate of white balance box used for color corrections|
+|4| The vertical coordinate of white balance box used for color corrections|
+|5| The width of white balance box used for color corrections|
 |Column (6)| The height of white balance box used for color corrections|
 |Column (7)| The rotation degree of image|
 |Column (8)| Pixel numbers of image to be shifted on left (right) direction|
