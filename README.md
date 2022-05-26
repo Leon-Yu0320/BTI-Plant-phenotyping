@@ -38,8 +38,8 @@ After initial selection of parameters, users will save these data into databases
 **NOTE: The column names of databse can be customized and is required for completing the database**
 
 #### Example database of MULTI_PLANT pipeline
-| raspiID | cameraID | WX | WY | WW | WH | degree | s1_size | s1_dir| s2_size | s2_dir| Cutoff | RX | RY | RW | RH | PX | PY | Radius | BATCH |
-| ------- | -------- | -- | -- | -- | -- | ------ | ------- | ----- | ------- |------| ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
+| RASPIID | CAMERAID | WX | WY | WW | WH | DEGREE | S1_SIZE | S1_DIR | S2_SIZE | S2_DIR | CUTOFF | RX | RY | RW | RH | PX | PY | RADIUS | BATCH |
+| ------- | -------- | -- | -- | -- | -- | ------ | ------- | ------ | ------- |------- | ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
 | raspiN | cameraA | 950 | 950 | 100 | 100 | 0 | 1 | Right | 1 |Bottom| 108 | 150 | 150 | 1870 | 1930 | 350 | 350 | 100 | NA |
 | raspiK | cameraB | 950 | 850 | 100 | 90 | 5 | 20 | Left | 1 |Bottom| 108 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Mike |
 | raspiU | cameraB | 100 | 500 | 100 | 90 | 0 | 1 | Left | 1 |Bottom| 134 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Nick |
@@ -47,29 +47,29 @@ After initial selection of parameters, users will save these data into databases
 #### Database format of MULTI_PLANT pipeline (20 columns)
 | Column Numbers | Description |
 | --------------------- | ----------- |
-|Column (1)| The identifier of planting trays for plants|
-|Column (2)| The camera ID (camera A and camera B) under the dual camera mode of raspberry Pi computer|
-|Column (3)| The horizontal coordinate of white balance box used for white balance corrections|
-|Column (4)| The vertical coordinate of white balance box used for white balance corrections|
-|Column (5)| The width of white balance box used for white balance corrections|
-|Column (6)| The height of white balance box used for white balance corrections|
-|Column (7)| The rotation degree of image|
-|Column (8)| Pixel numbers of image to be shifted on left (right) direction|
-|Column (9)| Direction of image shift (left or right)|
-|Column (10) | Pixel numbers of image to be shifted on up (down) direction|
-|Column (11) | Direction of image shift (Top or Bottom)|
-|Column (12) | Cutoff used for image masking from RGB into binary image (See part I for details)|
-|Column (13) | The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
-|Column (14) | The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
-|Column (15) | The width of cropping regions of interests (ROIs) used for mapping|
-|Column (16) | The height of cropping regions of interests (ROIs) used for mapping|
-|Column (17) | The horizontal coordinate of the first plant fell into ROIs|
-|Column (18) | The vertical coordinate of the first plant fell into ROIs|
-|Column (19) | Radius numbers (pixel) used for cropping individual plant|
-|Column (20) | The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
+|RASPIID| The identifier of planting trays for plants|
+|CAMERAID| The camera ID (camera A and camera B) under the dual camera mode of raspberry Pi computer|
+|WX| The horizontal coordinate of white balance box used for white balance corrections|
+|WY| The vertical coordinate of white balance box used for white balance corrections|
+|WW| The width of white balance box used for white balance corrections|
+|WH| The height of white balance box used for white balance corrections|
+|DEGREE| The rotation degree of image|
+|S1_SIZE| Pixel numbers of image to be shifted on left (right) direction|
+|S1_DIR| Direction of image shift (left or right)|
+|S2_SIZE| Pixel numbers of image to be shifted on up (down) direction|
+|S2_DIR| Direction of image shift (Top or Bottom)|
+|CUTOFF| Cutoff used for image masking from RGB into binary image (See part I for details)|
+|RX| The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
+|RY| The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
+|RW| The width of cropping regions of interests (ROIs) used for mapping|
+|RH| The height of cropping regions of interests (ROIs) used for mapping|
+|PX| The horizontal coordinate of the first plant fell into ROIs|
+|PY| The vertical coordinate of the first plant fell into ROIs|
+|RADIUS| Radius number (pixel) used for cropping individual plant|
+|BATCH| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 #### Example database of SIDE_VIEW pipeline
-| Frame |Degree | WX | WY | WW | WH | cutoff1 | cutoff2 | RX | RY | RW | RH | BATCH |
+| FRAME |DEGREE | WX | WY | WW | WH | CUTOFF1 | CUTOFF2 | RX | RY | RW | RH | BATCH |
 | ----- | ----- | -- | -- | -- | -- | ------- | ------- | -- | -- | -- | -- | ----- | 
 | raspiX | 0 | 450 | 1250 | 100 | 100 | 95 | 113 | 350 | 200 | 1300 | 1300 | DEMO |
 | raspiY | 0 | 350 | 1300 | 100 | 90 | 180 | 135 | 500 | 400 | 1000 | 1120 | Round2 |
@@ -78,19 +78,19 @@ After initial selection of parameters, users will save these data into databases
 #### Database format of MULTI_PLANT pipeline (13 columns)
 | Column Numbers | Description |
 | -------------- | ----------- |
-|Column (1)| The identifier of facility for image capturing|
-|Column (2)| The rotation degree of image|
-|Column (3)| The horizontal coordinate of white balance box used for color corrections|
-|Column (4)| The vertical coordinate of white balance box used for color corrections|
-|Column (5)| The width of white balance box used for color corrections|
-|Column (6)| The height of white balance box used for color corrections|
-|Column (7)| Cutoff used for image masking from RGB into LAB channel (L channel)|
-|Column (8)| Cutoff used for image masking from RGB into HAV channel (V channel)|
-|Column (9)| The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
-|Column (10)| The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
-|Column (11)| The width of cropping regions of interests (ROIs) used for mapping|
-|Column (12)| The height of cropping regions of interests (ROIs) used for mapping|
-|Column (13)| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
+|FRAME | The identifier of facility for image capturing|
+|DEGREE| The rotation degree of image|
+|WX| The horizontal coordinate of white balance box used for color corrections|
+|WY| The vertical coordinate of white balance box used for color corrections|
+|WW| The width of white balance box used for color corrections|
+|WH| The height of white balance box used for color corrections|
+|CUTOFF1| Cutoff used for image masking from RGB into LAB channel (L channel)|
+|CUTOFF2| Cutoff used for image masking from RGB into HAV channel (V channel)|
+|RX| The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
+|RY| The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
+|RW| The width of cropping regions of interests (ROIs) used for mapping|
+|RH| The height of cropping regions of interests (ROIs) used for mapping|
+|BATCH| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 After the copy of parameters to databases with one of the three experimental types, users will be able to launch the analysis of images based on parameters applied to single test image. Please place all files under the **code** directory into the **same folder** when during configuration. There are two options provided to process images as details from following descriptions:
 
@@ -158,8 +158,8 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 **Refer the following information to prepare experimental design table for differnet types of analysis**
 
 #### Example design table when using "MULTI_PLANT" type for bulk analysis
-| CODE |IMAGE | RIG | CAMERA |BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | OUTPUT_DIR |
-| ---- | ---- | ----| ------ | ---- | ---------- | -------- | ----------- | --------- | ---------- | -------- | ---------- |
+| CODE |IMAGE | RIG | CAMERA |BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | LIGHTS_ON | LIGHTS_OFF | OUTPUT_DIR |
+| ---- | ---- | ----| ------ | ---- | ---------- | -------- | ----------- | --------- | ---------- | -------- | --------- | ---------- | ---------- |
 | /home/User/code | home/image | raspiU | cameraA | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | 09.00 | 21.00 | /data/results |
 | /home/User/code | home/image | raspiK | cameraA | Nick | 2021 | 2022 | 12 | 01 | 18 | 07 | 12.00 | 18.00 | /data/results |
 | /home/User/code | home/image | raspiN | cameraB | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | 09.00 | 21.00 | /data/results |
@@ -167,20 +167,20 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 #### Format of design table when using "MULTI_PLANT" type for bulk analysis (14 columns)
 | Column Numbers | Description |
 | -------------- | ----------- |
-|Column (1)|  The directory where code been saved |
-|Column (2)| The directory where source images been saved |
-|Column (3)| The identifier of facility used for phenotyping |
-|Column (4)| The camera ID which anchors to the facility |
-|Column (5)| The unique identifier of experiment name |
-|Column (6)| Start **year (YYYY)** of the experiment |
-|Column (7)| End **year (YYYY)** of the experiment |
-|Column (8)| Start **month (MM)** of the experiment |
-|Column (9)| End **month (MM)** of the experiment |
-|Column (10)| Start **date (DD)** of the experiment |
-|Column (11)| End **date (DD)** of the experiment |
-|Column (12)| Hour **and minute (HH.MM)** of lights-on for experiments |
-|Column (13)| Hour **and minute (HH.MM)** of lights-off for experiments |
-|Column (14)| The directory where results to be saved |
+|CODE|  The directory where code been saved |
+|IMAGE| The directory where source images been saved |
+|RIF| The identifier of facility used for phenotyping |
+|CAMERA| The camera ID which anchors to the facility |
+|BATCH| The unique identifier of experiment name |
+|START_YEAR| Start **year (YYYY)** of the experiment |
+|END_YEAR| End **year (YYYY)** of the experiment |
+|START_MONTH| Start **month (MM)** of the experiment |
+|END_MONTH| End **month (MM)** of the experiment |
+|START_DATE| Start **date (DD)** of the experiment |
+|END_DATE| End **date (DD)** of the experiment |
+|LIGHTS_ON| Hour **and minute (HH.MM)** of lights-on for experiments |
+|LIGHTS_OFF| Hour **and minute (HH.MM)** of lights-off for experiments |
+|OUTPUT_DIR| The directory where results to be saved |
 
 #### Example design table when using "SIDE_VIEW" type for bulk analysis
 | CODE |IMAGE | FRAME | BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | OUTPUT_DIR |
@@ -192,17 +192,17 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 #### Format of design table when using "SIDE_VIEW" type for bulk analysis (11 columns)
 | Column Numbers | Description |
 | -------------- | ----------- |
-|Column (1)| The directory where code been saved |
-|Column (2)| The directory where source images been saved |
-|Column (3)| The identifier of facility used for phenotyping |
-|Column (4)| The unique identifier of experiment name |
-|Column (5)| Start **year (YYYY)** of the experiment |
-|Column (6)| End **year (YYYY)** of the experiment |
-|Column (7)| Start **month (MM)** of the experiment|
-|Column (8)| End **month (MM)** of the experiment |
-|Column (9)| Start **date (DD)** of the experiment |
-|Column (10)| End **date (DD)** of the experiment |
-|Column (11)| The directory where results to be saved |
+|CODE| The directory where code been saved |
+|IMAGE| The directory where source images been saved |
+|FRAME| The identifier of facility used for phenotyping |
+|BATCH| The unique identifier of experiment name |
+|START_YEAR| Start **year (YYYY)** of the experiment |
+|END_YEAR| End **year (YYYY)** of the experiment |
+|START_MONTH| Start **month (MM)** of the experiment|
+|CEND_MONTH| End **month (MM)** of the experiment |
+|START_DATE| Start **date (DD)** of the experiment |
+|END_DATE| End **date (DD)** of the experiment |
+|OUTPUT_DIR| The directory where results to be saved |
 
 
 
