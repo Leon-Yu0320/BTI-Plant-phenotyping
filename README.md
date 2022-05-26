@@ -26,27 +26,28 @@ Phenotypic data extraction from images will be processed by PlantCV software wit
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
 
 #### Database format of MULTI_PLANT pipeline (20 columns)
-
-Column (1): The identifier of planting trays for plants\
-Column (2): The camera ID (camera A and camera B) under the dual camera mode of raspberry Pi computer\
-Column (3): The horizontal coordinate of white balance box used for color corrections \
-Column (4): The vertical coordinate of white balance box used for color corrections\
-Column (5): The width of white balance box used for color corrections\
-Column (6): The height of white balance box used for color corrections \
-Column (7): The rotation degree of image\
-Column (8): Pixel numbers of image to be shifted on left (right) direction\
-Column (9): Direction of image shift (left or right)\
-Column (10): Pixel numbers of image to be shifted on up (down) direction\
-Column (11): Direction of image shift (Top or Bottom)\
-Column (12): Cutoff used for image masking from RGB into binary image (See part I for details)\
-Column (13): The horizontal coordinate of cropping regions of interests (ROIs) used for mapping\
-Column (14): The vertical coordinate of cropping regions of interests (ROIs) used for mapping\
-Column (15): The width of cropping regions of interests (ROIs) used for mapping\
-Column (16): The height of cropping regions of interests (ROIs) used for mapping\
-Column (17): The horizontal coordinate of the first plant fell into ROIs\
-Column (18): The vertical coordinate of the first plant fell into ROIs\
-Column (19): Radius numbers (pixel) used for cropping individual plant\
-Column (20): The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays
+| Column NO. | Description |
+| --------------------- | ----------- |
+|Column (1)| The identifier of planting trays for plants|
+|Column (2)| The camera ID (camera A and camera B) under the dual camera mode of raspberry Pi computer|
+|Column (3)| The horizontal coordinate of white balance box used for color corrections|
+|Column (4)| The vertical coordinate of white balance box used for color corrections|
+|Column (5)| The width of white balance box used for color corrections|
+|Column (6)| The height of white balance box used for color corrections|
+|Column (7)| The rotation degree of image|
+|Column (8)| Pixel numbers of image to be shifted on left (right) direction|
+|Column (9)| Direction of image shift (left or right)|
+|Column (10)| Pixel numbers of image to be shifted on up (down) direction|
+|Column (11)| Direction of image shift (Top or Bottom)|
+|Column (12)| Cutoff used for image masking from RGB into binary image (See part I for details)|
+|Column (13)| The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
+|Column (14)| The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
+|Column (15)| The width of cropping regions of interests (ROIs) used for mapping|
+|Column (16)| The height of cropping regions of interests (ROIs) used for mapping|
+|Column (17)| The horizontal coordinate of the first plant fell into ROIs|
+|Column (18)| The vertical coordinate of the first plant fell into ROIs|
+|Column (19)| Radius numbers (pixel) used for cropping individual plant|
+|Column (20)| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 #### Database format of MULTI_PLANT pipeline (13 columns)
 
@@ -62,12 +63,21 @@ Column (9): The horizontal coordinate of cropping regions of interests (ROIs) us
 Column (10): The vertical coordinate of cropping regions of interests (ROIs) used for mapping\
 Column (11): The width of cropping regions of interests (ROIs) used for mapping\
 Column (12): The height of cropping regions of interests (ROIs) used for mapping\
-Column (13): The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays.\
+Column (13): The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays
 
 After the copy of parameters to databases with one of the three experimental types, users will be able to launch the analysis of images based on parameters applied to single test image. Please place all files under the **code** directory into the **same folder** when during configuration. There are two options provided to process images as details from following descriptions:
 
 #### OPTION 1: single experiment analysis
 In this option, pipelines for multiple-plants, side-view images, and root phenotyping pipelines will be executed by users respectively to launch analysis. Here, few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following commend and see outputs screeshot as below.
 
-`bash 2_MULTI_PLANT.sh`
+```
+bash 2_MULTI_PLANT.sh
+```
+```
+bash 3_SIDE_VIEW.sh
+```
 
+Based on selected time period of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in log file), warning message will be sent if images were missed from desired time period specified under certain folders. After parsing parameters from database, these sample images will be processed by batch processing function from [**PlantCV**](https://plantcv.readthedocs.io/en/stable/). 
+
+
+Users are able to check quality of images either using pop-in window (Xming or similar software is required) or local image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA). 
