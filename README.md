@@ -109,11 +109,11 @@ bash 3_SIDE_VIEW.sh
 **Parameters used for analysis will be displayed here**
 ![image](https://user-images.githubusercontent.com/69836931/170578823-b774752e-8328-49e7-a3a5-0e5ce3976e04.png)
 
-Based on selected time period of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in log file), warning message will be sent if images were missed from desired time period under certain folders. After parsing parameters from database, these sample images will be processed by batch processing function from [**PlantCV**](https://plantcv.readthedocs.io/en/stable/). 
+Based on selected time period of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in log file), warning message will be sent if images were missed from desired time period under certain folders. After parsing parameters from database, these sample images will be processed by [**batch processing function from PlantCV**]((https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) 
 
 ![image](https://user-images.githubusercontent.com/69836931/170578867-2eb55c69-735e-4895-88af-78566aa6c167.png)
 
-Users are able to check quality of images either using pop-up window (Intallation of [**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
+Users are able to check quality of images either using pop-up window (Intallation of [**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local laptop image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
 
 ![image](https://user-images.githubusercontent.com/69836931/170578910-e0f0c643-5a45-4475-a46c-48845053e898.png)
 
