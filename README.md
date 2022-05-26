@@ -120,28 +120,6 @@ What is the time when the light off for your experiments (Hour and minute, FORMA
 Please provide the directory where results to be saved after analysis /data/results
 ```
 
-```
-*** STEP 1 Images for experiments will be loaded ***
-
-
-Images during night from 21.00 to 09.00 will be removed
-
-One random image per day from 2021.09.06 to 2021.09.10 will be selected to validate parameter information......
-
-
-The paramters of CER for raspiU under the cameraA were loaded
-
-The following parameter will be applied for image analysis
-
-Range for white balance calibration is: x=995, y=400, w=55, h=55
-rotation degree is: 0
-threshold for masking is: 104
-pixels to be shifted left is: 20
-pixels to be shifted Top is: 20
-region of interest (ROI) is: x=75, y=95, w=1875, h=1870
-coordinate of the the first plant to be analyzed is: x=330, y=250
-radius for each plant is: 180
-```
 
 
 ```
@@ -158,11 +136,11 @@ After quality control of sample images been processed, users will be asked if th
 #### OPTION 2: bulk analysis for multiple experiments	
 When tackling with multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see below example). In this pipeline, three arguments will be provided by users, including experimental design table containing metadata, the type of experiments (options: "MULTI_PLANT","SIDE_VIEW","ROOT_PHENOTYPE"), and mode of analysis regarding inclusion of one random image per day (sample images) or all images (option: "SAMPLE","ALL" DEFAULT: ALL) as shown from the attached picture. To start with program, a tabular design table is required with restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT, SIDE_VIEW, and ROOT_PHENOTYPE type of experiments. In addition, without providing mode option (-m argument), all images under the image folder will be used for analysis. 
 
-Type in the following command to check the help page
+**Type in the following command to check the help page**
 ```
 bash 1_BULK_IMAGES.sh -help 
 ```
-Help page will be displayed as folow:
+**Help page will be displayed as folow:**
 ```
 *************************************** WELCOME TO USE BULK ANALYSIS FOR IMAGES ***************************************
 
@@ -179,6 +157,54 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 
   -h Show this usage information
 ```
+**Refer the following information to prepare experimental design table for differnet types of analysis**
+
+#### Example design table when using "MULTI_PLANT" type for bulk analysis
+| CODE |IMAGE | RIG | CAMERA |BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | OUTPUT_DIR |
+| ---- | ---- | ----| ------ | ---- | ---------- | -------- | ----------- | --------- | ---------- | -------- | ---------- |
+| /home/User/code | home/image | raspiZ | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | /data/results |
+| /home/User/code | home/image | raspiX | Nick | 2021 | 2022 | 12 | 01 | 18 | 07 | /data/results |
+| /home/User/code | home/image | raspiX | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | /data/results |
+
+#### Format of design table when using "MULTI_PLANT" type for bulk analysis (14 columns)
+| Column Numbers | Description |
+| -------------- | ----------- |
+|Column (1)|  The directory where code been saved |
+|Column (2)| The directory where source images been saved |
+|Column (3)| The identifier of facility used for phenotyping |
+|Column (4)| The camera ID which anchors to the facility |
+|Column (5)| The unique identifier of experiment name |
+|Column (6)| Start **year (YYYY)** of the experiment |
+|Column (7)| End **year (YYYY)** of the experiment |
+|Column (8)| Start **month (MM)** of the experiment |
+|Column (9)| End **month (MM)** of the experiment |
+|Column (10)| Start **date (DD)** of the experiment |
+|Column (11)| End **date (DD)** of the experiment |
+|Column (12)| Hour **and minute (HH.MM)** of lights-on for experiments |
+|Column (13)| Hour **and minute (HH.MM)** of lights-off for experiments |
+|Column (14)| The directory where results to be saved |
+
+#### Example design table when using "SIDE_VIEW" type for bulk analysis
+| CODE |IMAGE | FRAME | BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | OUTPUT_DIR |
+| ---- | ---- | ----- | ----- | ---------- | -------- | ----------- | --------- | ---------- | -------- | ---------- | 
+| /home/User/code | home/image | raspiU | cameraA | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | 09.00 | 21.00 | /data/results |
+| /home/User/code | home/image | raspiK | cameraA | Nick | 2021 | 2022 | 12 | 01 | 18 | 07 | 12.00 | 18.00 | /data/results |
+| /home/User/code | home/image | raspiN | cameraB | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | 09.00 | 21.00 | /data/results |
+
+#### Format of design table when using "SIDE_VIEW" type for bulk analysis (11 columns)
+| Column Numbers | Description |
+| -------------- | ----------- |
+|Column (1)| The directory where code been saved |
+|Column (2)| The directory where source images been saved |
+|Column (3)| The identifier of facility used for phenotyping |
+|Column (4)| The unique identifier of experiment name |
+|Column (5)| Start **year (YYYY)** of the experiment |
+|Column (6)| End **year (YYYY)** of the experiment |
+|Column (7)| Start **month (MM)** of the experiment|
+|Column (8)| End **month (MM)** of the experiment |
+|Column (9)| Start **date (DD)** of the experiment |
+|Column (10)| End **date (DD)** of the experiment |
+|Column (11)| The directory where results to be saved |
 
 
 
