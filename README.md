@@ -26,7 +26,7 @@ Phenotypic data extraction from images will be processed by PlantCV software wit
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
 
 #### Example database of MULTI_PLANT pipeline
-| raspiID | cameraID | WX | WY | WW | WH | degree | s1_size | s1_dir| s2_size | s_dir| Cutoff | RX | RY | RW | RH | PX | PY | Radius | BATCH |
+| raspiID | cameraID | WX | WY | WW | WH | degree | s1_size | s1_dir| s2_size | s2_dir| Cutoff | RX | RY | RW | RH | PX | PY | Radius | BATCH |
 | ------- | -------- | -- | -- | -- | -- | ------ | ------- | ----- | ------- |------| ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
 | raspiN | cameraA | 950 | 950 | 100 | 100 | 0 | 1 | Right | 1 |Bottom| 108 | 150 | 150 | 1870 | 1930 | 350 | 350 | 100 | NA |
 | raspiK | cameraB | 950 | 850 | 100 | 90 | 5 | 20 | Left | 1 |Bottom| 108 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Mike |
@@ -56,21 +56,29 @@ After initial selection of parameters, users will save these data into databases
 |Column (19) | Radius numbers (pixel) used for cropping individual plant|
 |Column (20) | The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
-#### Database format of MULTI_PLANT pipeline (13 columns)
+#### Example database of SIDE_VIEW pipeline
+| Frame |craID | WX | WY | WW | WH | degree | s1_size | s1_dir| s2_size | s2_dir| Cutoff | RX | RY | RW | RH | PX | PY | Radius | BATCH |
+| ------- | -------- | -- | -- | -- | -- | ------ | ------- | ----- | ------- |------| ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
+| raspiN | cameraA | 950 | 950 | 100 | 100 | 0 | 1 | Right | 1 |Bottom| 108 | 150 | 150 | 1870 | 1930 | 350 | 350 | 100 | NA |
+| raspiK | cameraB | 950 | 850 | 100 | 90 | 5 | 20 | Left | 1 |Bottom| 108 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Mike |
+| raspiU | cameraB | 100 | 500 | 100 | 90 | 0 | 1 | Left | 1 |Bottom| 134 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Nick |
 
-Column (1): The identifier of facility for image capturing\
-Column (2): The rotation degree of image\
-Column (3): The horizontal coordinate of white balance box used for color corrections \
-Column (4): The vertical coordinate of white balance box used for color corrections\
-Column (5): The width of white balance box used for color corrections\
-Column (6): The height of white balance box used for color corrections \
-Column (7): Cutoff used for image masking from RGB into LAB channel (L channel)\
-Column (8): Cutoff used for image masking from RGB into HAV channel (V channel)\
-Column (9): The horizontal coordinate of cropping regions of interests (ROIs) used for mapping\
-Column (10): The vertical coordinate of cropping regions of interests (ROIs) used for mapping\
-Column (11): The width of cropping regions of interests (ROIs) used for mapping\
-Column (12): The height of cropping regions of interests (ROIs) used for mapping\
-Column (13): The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays
+#### Database format of MULTI_PLANT pipeline (13 columns)
+| Column Numbers | Description |
+| -------------- | ----------- |
+|Column (1)| The identifier of facility for image capturing|
+|Column (2)| The rotation degree of image|
+|Column (3)| The horizontal coordinate of white balance box used for color corrections|
+|Column (4)| The vertical coordinate of white balance box used for color corrections|
+|Column (5)| The width of white balance box used for color corrections|
+|Column (6)| The height of white balance box used for color corrections|
+|Column (7)| Cutoff used for image masking from RGB into LAB channel (L channel)|
+|Column (8)| Cutoff used for image masking from RGB into HAV channel (V channel)|
+|Column (9)| The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
+|Column (10)| The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
+|Column (11)| The width of cropping regions of interests (ROIs) used for mapping|
+|Column (12)| The height of cropping regions of interests (ROIs) used for mapping|
+|Column (13)| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 After the copy of parameters to databases with one of the three experimental types, users will be able to launch the analysis of images based on parameters applied to single test image. Please place all files under the **code** directory into the **same folder** when during configuration. There are two options provided to process images as details from following descriptions:
 
