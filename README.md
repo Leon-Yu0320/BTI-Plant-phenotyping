@@ -109,16 +109,17 @@ bash 3_SIDE_VIEW.sh
 **Parameters used for analysis will be displayed here**
 ![image](https://user-images.githubusercontent.com/69836931/170578823-b774752e-8328-49e7-a3a5-0e5ce3976e04.png)
 
-Based on selected time period of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in log file), warning message will be sent if images were missed from desired time period specified under certain folders. After parsing parameters from database, these sample images will be processed by batch processing function from [**PlantCV**](https://plantcv.readthedocs.io/en/stable/). 
+Based on selected time period of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in log file), warning message will be sent if images were missed from desired time period under certain folders. After parsing parameters from database, these sample images will be processed by batch processing function from [**PlantCV**](https://plantcv.readthedocs.io/en/stable/). 
 
 ![image](https://user-images.githubusercontent.com/69836931/170578867-2eb55c69-735e-4895-88af-78566aa6c167.png)
 
 Users are able to check quality of images either using pop-up window (Intallation of [**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
+
 ![image](https://user-images.githubusercontent.com/69836931/170578910-e0f0c643-5a45-4475-a46c-48845053e898.png)
 
 ![image](https://user-images.githubusercontent.com/69836931/170578942-9b76ec96-e4b6-46c6-b9e7-58cf320cf13c.png)
 
-After quality control of sample images been processed, users will be asked if they decide to process rest images or if parameters should be modified for quality improvement. Update of database and relaunch of analysis will be followed after adjustment. 
+After quality control of sample images been processed, users will be asked if they decide to process rest images or if parameters should be modified for quality improvement. After adjustment of parameter, users should update database and re-launch the analysis
 ![image](https://user-images.githubusercontent.com/69836931/170578992-be8ded75-37bb-4974-977f-1e80bed060e8.png)
 
 ![image](https://user-images.githubusercontent.com/69836931/170579002-1fe36861-fd46-4db6-8273-816c31316700.png)
