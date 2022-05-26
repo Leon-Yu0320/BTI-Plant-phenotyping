@@ -95,21 +95,34 @@ In this option, pipelines for multiple-plants, side-view images, and root phenot
 bash 2_MULTI_PLANT.sh
 ```
 **Type in the answers for each questions to launch analysis**
-![image](https://user-images.githubusercontent.com/69836931/170578414-ff1e621c-f06c-4d6d-8df7-2c2a758e844b.png)
+![image](https://user-images.githubusercontent.com/69836931/170578689-aa2de6ae-22bd-4b67-bf39-4895de0fab0d.png)
 
-**Type in the answers for each questions to launch analysis**
-![image](https://user-images.githubusercontent.com/69836931/170578508-5de35a5c-0711-477c-a788-0e73a9b6c358.png)
+**Parameters used for analysis will be displayed here**
+![image](https://user-images.githubusercontent.com/69836931/170578770-a78b1328-097a-4075-a144-d4b00b9007e3.png)
 
 ```
 bash 3_SIDE_VIEW.sh
 ```
+**Type in the answers for each questions to launch analysis**
+![image](https://user-images.githubusercontent.com/69836931/170578807-0224e5fa-5aa9-4b81-a8c8-26d70e3bdf12.png)
+
+**Parameters used for analysis will be displayed here**
+![image](https://user-images.githubusercontent.com/69836931/170578823-b774752e-8328-49e7-a3a5-0e5ce3976e04.png)
 
 Based on selected time period of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in log file), warning message will be sent if images were missed from desired time period specified under certain folders. After parsing parameters from database, these sample images will be processed by batch processing function from [**PlantCV**](https://plantcv.readthedocs.io/en/stable/). 
 
+![image](https://user-images.githubusercontent.com/69836931/170578867-2eb55c69-735e-4895-88af-78566aa6c167.png)
 
 Users are able to check quality of images either using pop-up window (Intallation of [**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
+![image](https://user-images.githubusercontent.com/69836931/170578910-e0f0c643-5a45-4475-a46c-48845053e898.png)
+
+![image](https://user-images.githubusercontent.com/69836931/170578942-9b76ec96-e4b6-46c6-b9e7-58cf320cf13c.png)
 
 After quality control of sample images been processed, users will be asked if they decide to process rest images or if parameters should be modified for quality improvement. Update of database and relaunch of analysis will be followed after adjustment. 
+![image](https://user-images.githubusercontent.com/69836931/170578992-be8ded75-37bb-4974-977f-1e80bed060e8.png)
+
+![image](https://user-images.githubusercontent.com/69836931/170579002-1fe36861-fd46-4db6-8273-816c31316700.png)
+
 
 #### OPTION 2: bulk analysis for multiple experiments	
 When tackling with multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see below example). In this pipeline, three arguments will be provided by users, including experimental design table containing metadata, the type of experiments (options: "MULTI_PLANT","SIDE_VIEW","ROOT_PHENOTYPE"), and mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with program, a tabular design table is required with restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT, SIDE_VIEW, and ROOT_PHENOTYPE type of experiments. In addition, without providing mode option (**-m argument**), all images under the image folder will be used for analysis. 
