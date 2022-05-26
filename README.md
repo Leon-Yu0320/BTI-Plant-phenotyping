@@ -28,7 +28,9 @@ After initial selection of parameters, users will save these data into databases
 #### Example database of MULTI_PLANT pipeline
 | raspiID | cameraID | WX | WY | WW | WH | degree | s1_size | s1_dir| s2_size | s_dir| Cutoff | RX | RY | RW | RH | PX | PY | Radius | BATCH |
 | ------- | -------- | -- | -- | -- | -- | ------ | ------- | ----- | ------- |------| ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
-
+| raspiN | cameraA | 950 | 950 | 100 | 100 | 0 | 1 | Right | 1 |Bottom| 108 | 150 | 150 | 1870 | 1930 | 350 | 350 | 100 | NA |
+| raspiK | cameraB | 950 | 850 | 100 | 90 | 5 | 20 | Left | 1 |Bottom| 108 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Mike |
+| raspiU | cameraB | 100 | 500 | 100 | 90 | 0 | 1 | Left | 1 |Bottom| 134 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Nick |
 
 #### Database format of MULTI_PLANT pipeline (20 columns)
 | Column Numbers | Description |
