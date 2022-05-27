@@ -34,14 +34,7 @@ Phenotypic data extraction from images will be processed by PlantCV software wit
 ### 3.Image batch processes
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
 
-**NOTE: The column names of databse can be customized and is required for completing the database**
-
-#### Example database of MULTI_PLANT pipeline
-| RASPIID | CAMERAID | WX | WY | WW | WH | DEGREE | S1_SIZE | S1_DIR | S2_SIZE | S2_DIR | CUTOFF | RX | RY | RW | RH | PX | PY | RADIUS | BATCH |
-| ------- | -------- | -- | -- | -- | -- | ------ | ------- | ------ | ------- |------- | ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
-| raspiN | cameraA | 950 | 950 | 100 | 100 | 0 | 1 | Right | 1 |Bottom| 108 | 150 | 150 | 1870 | 1930 | 350 | 350 | 100 | NA |
-| raspiK | cameraB | 950 | 850 | 100 | 90 | 5 | 20 | Left | 1 |Bottom| 108 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Mike |
-| raspiU | cameraB | 100 | 500 | 100 | 90 | 0 | 1 | Left | 1 |Bottom| 134 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Nick |
+**NOTE: The column names of database is required and certain characters used for name is customizable**
 
 #### Database format of MULTI_PLANT pipeline (20 columns)
 | Column Numbers | Description |
@@ -67,12 +60,13 @@ After initial selection of parameters, users will save these data into databases
 |RADIUS| Radius number (pixel) used for cropping individual plant|
 |BATCH| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
-#### Example database of SIDE_VIEW pipeline
-| FRAME |DEGREE | WX | WY | WW | WH | CUTOFF1 | CUTOFF2 | RX | RY | RW | RH | BATCH |
-| ----- | ----- | -- | -- | -- | -- | ------- | ------- | -- | -- | -- | -- | ----- | 
-| raspiX | 0 | 450 | 1250 | 100 | 100 | 95 | 113 | 350 | 200 | 1300 | 1300 | DEMO |
-| raspiY | 0 | 350 | 1300 | 100 | 90 | 180 | 135 | 500 | 400 | 1000 | 1120 | Round2 |
-| raspiZ | 5 | 400 | 1350 | 100 | 90 | 220 | 105 | 450 | 400 | 1000 | 1120 | Round1 |
+An example is attached:
+#### Example database of MULTI_PLANT pipeline
+| RASPIID | CAMERAID | WX | WY | WW | WH | DEGREE | S1_SIZE | S1_DIR | S2_SIZE | S2_DIR | CUTOFF | RX | RY | RW | RH | PX | PY | RADIUS | BATCH |
+| ------- | -------- | -- | -- | -- | -- | ------ | ------- | ------ | ------- |------- | ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
+| raspiN | cameraA | 950 | 950 | 100 | 100 | 0 | 1 | Right | 1 |Bottom| 108 | 150 | 150 | 1870 | 1930 | 350 | 350 | 100 | NA |
+| raspiK | cameraB | 950 | 850 | 100 | 90 | 5 | 20 | Left | 1 |Bottom| 108 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Mike |
+| raspiU | cameraB | 100 | 500 | 100 | 90 | 0 | 1 | Left | 1 |Bottom| 134 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Nick |
 
 #### Database format of MULTI_PLANT pipeline (13 columns)
 | Column Numbers | Description |
@@ -90,6 +84,14 @@ After initial selection of parameters, users will save these data into databases
 |RW| The width of cropping regions of interests (ROIs) used for mapping|
 |RH| The height of cropping regions of interests (ROIs) used for mapping|
 |BATCH| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
+
+An example is attached:
+#### Example database of SIDE_VIEW pipeline
+| FRAME |DEGREE | WX | WY | WW | WH | CUTOFF1 | CUTOFF2 | RX | RY | RW | RH | BATCH |
+| ----- | ----- | -- | -- | -- | -- | ------- | ------- | -- | -- | -- | -- | ----- | 
+| raspiX | 0 | 450 | 1250 | 100 | 100 | 95 | 113 | 350 | 200 | 1300 | 1300 | DEMO |
+| raspiY | 0 | 350 | 1300 | 100 | 90 | 180 | 135 | 500 | 400 | 1000 | 1120 | Round2 |
+| raspiZ | 5 | 400 | 1350 | 100 | 90 | 220 | 105 | 450 | 400 | 1000 | 1120 | Round1 |
 
 After the copy of parameters to databases with one of the three experimental types, users will be able to launch the analysis of images based on parameters applied to single test image. Please place all files under the **code** directory into the **same folder** when during configuration. There are two options provided to process images as details from following descriptions:
 
