@@ -8,7 +8,7 @@ Image-based phenotyping provides a powerful avenue to characterize plant growth 
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis will be performed. Detailed steps were described as follow:
 
 ### 1. Experimental setup and photo collections
-All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA) developed for MULTI_PLANT IMAGES phenotyping, plant SIDE_VIEW IMAGES phenotyping, and ROOT_PHENOTYPE IMAGES phenotyping.
+All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA) developed for MULTI_PLANT IMAGES phenotyping and SIDE_VIEW IMAGES phenotyping.
 To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute, and other experiments related information** from the name of each photo in subsequent data processing. The data collection will be initiated by **two individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follow:
 
 **MULTI_PLANT IMAGES:**
@@ -90,7 +90,7 @@ An example is attached:
 After the copy of parameters to databases with one of the three experimental types, users will be able to launch the analysis of images based on parameters applied to a single test image. Please place all files under the **code** directory into the **same folder** when during configuration. There are two options provided to process images as details from the following descriptions:
 
 #### OPTION 1: single experiment analysis
-In this option, pipelines for MULTI_PLANT, SIDE_VIEW, and ROOT_PHENOTYING pipelines will be executed by users respectively to launch analysis. Here, a few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of the experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following commeand line and see outputs screenshot as below.
+In this option, pipelines for MULTI_PLANT and SIDE_VIEW pipelines will be executed by users respectively to launch analysis. Here, a few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of the experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following commeand line and see outputs screenshot as below.
 
 ```
 bash 2_MULTI_PLANT.sh
@@ -127,7 +127,7 @@ After quality control of sample images been processed, users will be asked if th
 
 
 #### OPTION 2: bulk analysis for multiple experiments	
-When tackling multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see the below example). In this pipeline, three arguments will be provided by users, including an experimental design table containing metadata, the type of experiments (**options: "MULTI_PLANT", "SIDE_VIEW", "ROOT_PHENOTYPE"**), and mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with the program, a tabular design table is required with restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT, SIDE_VIEW, and ROOT_PHENOTYPE types of experiments. In addition, without providing the mode option (**-m argument**), all images under the image folder will be used for analysis. 
+When tackling multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see the below example). In this pipeline, three arguments will be provided by users, including an experimental design table containing metadata, the type of experiments (**options: "MULTI_PLANT", "SIDE_VIEW"**), and mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with the program, a tabular design table is required with restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT and SIDE_VIEW types of experiments. In addition, without providing the mode option (**-m argument**), all images under the image folder will be used for analysis. 
 
 **Type in the following command to check the help page**
 ```
@@ -144,7 +144,7 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 
   -d [Table] < /path/to/experimental design table stored, refer manual for details of each type of experiments>
 
-  -t [String] < type in one of the three experiment types: "MULTI_PLANT","SIDE_VIEW","ROOT_PHENOTYPE" >
+  -t [String] < type in one of the three experiment types: "MULTI_PLANT" or "SIDE_VIEW" >
 
   -m [String] < type in one of the two modes: "SAMPLE","ALL" DEFAULT: ALL>
 
