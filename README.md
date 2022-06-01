@@ -2,14 +2,14 @@
 Computational pipeline for phenotyping data analysis
 
 ## Introduction
-Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in responses to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as three sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pair with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
+Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in responses to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pair with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
 
 ## General overview of pipeline
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis will be performed. Detailed steps were described as follow:
 
 ### 1. Experimental setup and photo collections
 All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA) developed for MULTI_PLANT IMAGES phenotyping, plant SIDE_VIEW IMAGES phenotyping, and ROOT_PHENOTYPE IMAGES phenotyping.
-To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute, and other experiments related information** from the name of each photo in subsequent data processing. The data collection will be initiated by **three individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follow:
+To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute, and other experiments related information** from the name of each photo in subsequent data processing. The data collection will be initiated by **two individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follow:
 
 **MULTI_PLANT IMAGES:**
 ```
@@ -20,12 +20,6 @@ example: raspiU_cameraA.2021.09.07-09.00.01.jpg
 ```
 format: RASPI_side.NO_YYYY.MM.DD-HH.MM.SS.jpg
 example: RaspiZ_side1_2022.04.17-11.07.01.jpg
-```
-
-**ROOT_PHENOTYPE IMAGES:**
-```
-format: RASPI_root.NO_YYYY.MM.DD-HH.MM.SS.jpg
-example: RaspiZ_root1_2022.04.17-11.07.01.jpg
 ```
 
 ### 2. Image-processing parameter selection
