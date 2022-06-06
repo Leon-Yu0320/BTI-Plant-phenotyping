@@ -5,7 +5,14 @@ Computational pipeline for phenotyping data analysis
 Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in responses to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pair with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
 
 ## General overview of pipeline
-To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis will be performed. Detailed steps were described as follow:
+To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis will be performed. Two schematic charts were displayed and detailed steps were described as follow:
+
+### Workflow for SINGLE experiment mode:
+![image](https://user-images.githubusercontent.com/69836931/172203550-c249e501-6dd9-491b-86ba-fbb74b6f6918.png)
+
+
+### Workflow for BULK analysis mode 
+![image](https://user-images.githubusercontent.com/69836931/172203757-bbb0485f-bf98-48eb-9f02-62b2a65c6aa4.png)
 
 ### 1. Experimental setup and photo collections
 All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA) developed for MULTI_PLANT IMAGES phenotyping and SIDE_VIEW IMAGES phenotyping.
