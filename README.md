@@ -30,7 +30,7 @@ example: RaspiZ_side1_2022.04.17-11.07.01.jpg
 ```
 
 ### 2. Image-processing parameter selection
-Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. Basically, one sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among the rest images derived from the same batch of experiment. Examples of parameter settings can be referred from house-hold [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA). 
+Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. Basically, one sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among the rest images derived from the same batch of experiment. Examples of parameter settings can be referred from house-hold [**protocols**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-jupyter-notebo-car5sd86). 
 
 ### 3.Image batch processes
 After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
