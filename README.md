@@ -8,6 +8,10 @@ Image-based phenotyping provides a powerful avenue to characterize plant growth 
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis will be performed. Two schematic charts were displayed and detailed steps were described as follow:
 
 ![image](https://user-images.githubusercontent.com/69836931/172638259-1b878be5-eee5-47fa-915a-402225164c9d.png)
+
+
+
+
 ![image](https://user-images.githubusercontent.com/69836931/172638321-95c3a393-0968-4613-a5c3-c6b1451a33e9.png)
 
 
