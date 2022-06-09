@@ -2,9 +2,9 @@
 Computational pipeline for phenotyping data analysis
 
 ## Introduction
-Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in responses to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pair with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
+Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in response to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pairs with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
 
-## General overview of pipeline
+## General overview of the pipeline
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis will be performed. Two schematic charts were displayed and detailed steps were described as follow:
 
 ![image](https://user-images.githubusercontent.com/69836931/172638259-1b878be5-eee5-47fa-915a-402225164c9d.png)
@@ -17,7 +17,7 @@ To realize the high-throughput manner of data processing, advantages of [**paral
 
 ### 1. Experimental setup and photo collections
 All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46) developed for MULTI_PLANT IMAGES phenotyping and SIDE_VIEW IMAGES phenotyping.
-To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute, and other experiments related information** from the name of each photo in subsequent data processing. The data collection will be initiated by **two individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follow:
+To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute, and other experiments related information** from the name of each photo in the subsequent data processing. The data collection will be initiated by **two individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follows:
 
 **MULTI_PLANT IMAGES:**
 ```
@@ -31,12 +31,12 @@ example: RaspiZ_side1_2022.04.17-11.07.01.jpg
 ```
 
 ### 2. Image-processing parameter selection
-Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. Basically, one sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among the rest images derived from the same batch of experiment. Examples of parameter settings can be referred from house-hold [**protocols**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-jupyter-notebo-car5sd86). 
+Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. One sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among the rest images derived from the same batch of experiments. Examples of parameter settings can be referred from household [**protocols**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-jupyter-notebo-car5sd86). 
 
 ### 3.Image batch processes
-After initial selection of parameters, users will save these data into databases corresponded to different experimental sets. The format of databases for each type of experiments were shown as follow:
+After the initial selection of parameters, users will save these data into databases corresponding to different experimental sets. The format of databases for each type of experiments was shown as follows:
 
-**NOTE: The column names of database is required and certain characters used for name is customizable**
+**NOTE: The column names of the database is required and certain characters used for name is customizable**
 
 #### Database format of MULTI_PLANT pipeline (20 columns)
 | Column Numbers | Description |
@@ -81,10 +81,10 @@ An example is attached:
 |WH| The height of white balance box used for color corrections|
 |CUTOFF1| Cutoff used for image masking from RGB into LAB channel (L channel)|
 |CUTOFF2| Cutoff used for image masking from RGB into HAV channel (V channel)|
-|RX| The horizontal coordinate of cropping regions of interests (ROIs) used for mapping|
-|RY| The vertical coordinate of cropping regions of interests (ROIs) used for mapping|
-|RW| The width of cropping regions of interests (ROIs) used for mapping|
-|RH| The height of cropping regions of interests (ROIs) used for mapping|
+|RX| The horizontal coordinate of cropping regions of interest (ROI) used for mapping|
+|RY| The vertical coordinate of cropping regions of interest (ROI) used for mapping|
+|RW| The width of cropping regions of interest (ROI) used for mapping|
+|RH| The height of cropping regions of interest (ROI) used for mapping|
 |BATCH| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 An example is attached:
@@ -98,7 +98,7 @@ An example is attached:
 After the copy of parameters to databases with one of the three experimental types, users will be able to launch the analysis of images based on parameters applied to a single test image. Please place all files under the **code** directory into the **same folder** when during configuration. There are two options provided to process images as details from the following descriptions:
 
 #### OPTION 1: single experiment analysis
-In this option, pipelines for MULTI_PLANT and SIDE_VIEW pipelines will be executed by users respectively to launch analysis. Here, a few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of the experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following commeand line and see outputs screenshot as below.
+In this option, pipelines for MULTI_PLANT and SIDE_VIEW pipelines will be executed by users respectively to launch analysis. Here, a few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of the experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following command line and see output screenshot as below.
 
 ```
 bash 2_MULTI_PLANT.sh
@@ -118,30 +118,30 @@ bash 3_SIDE_VIEW.sh
 **Parameters used for analysis will be displayed here**
 ![image](https://user-images.githubusercontent.com/69836931/170578823-b774752e-8328-49e7-a3a5-0e5ce3976e04.png)
 
-Based on these selected time periods of experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in a log file), warning message will be sent if images were missed from desired time period under certain folders. After parsing parameters from the database, these sample images will be processed by [**batch processing function from PlantCV**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) 
+Based on these selected periods of the experiment, one image per day will be randomly selected to validate parameters from image pre-processing steps (parameters selected will be printed in a log file), warning message will be sent if images were missed from desired time period under certain folders. After parsing parameters from the database, these sample images will be processed by [**batch processing function from PlantCV**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) 
 
 ![image](https://user-images.githubusercontent.com/69836931/170578867-2eb55c69-735e-4895-88af-78566aa6c167.png)
 
-Users are able to check quality of images either using pop-up window (Intallation of [**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local laptop image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
+Users are able to check the quality of images either using a pop-up window (Intallation of [**Xming**](http://www.straightrunning.com/XmingNotes/) or similar software is required) or local laptop image viewers. Please check more details regarding quality judgement of images [**protocols**](https://www.protocols.io/file-manager/092FD0D9DB1A426CA4106CB9D482C7FA).
 
 ![image](https://user-images.githubusercontent.com/69836931/170578910-e0f0c643-5a45-4475-a46c-48845053e898.png)
 
 ![image](https://user-images.githubusercontent.com/69836931/170578942-9b76ec96-e4b6-46c6-b9e7-58cf320cf13c.png)
 
-After quality control of sample images been processed, users will be asked if they decide to process rest images or if parameters should be modified for quality improvement. After adjustment of parameter, users should update database and re-launch the analysis
+After quality control of sample images has been processed, users will be asked if they decide to process rest images or if parameters should be modified for quality improvement. After adjustment of parameter, users should update database and re-launch the analysis
 ![image](https://user-images.githubusercontent.com/69836931/170578992-be8ded75-37bb-4974-977f-1e80bed060e8.png)
 
 ![image](https://user-images.githubusercontent.com/69836931/170579002-1fe36861-fd46-4db6-8273-816c31316700.png)
 
 
 #### OPTION 2: bulk analysis for multiple experiments	
-When tackling multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see the below example). In this pipeline, three arguments will be provided by users, including an experimental design table containing metadata, the type of experiments (**options: "MULTI_PLANT", "SIDE_VIEW"**), and mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with the program, a tabular design table is required with restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT and SIDE_VIEW types of experiments. In addition, without providing the mode option (**-m argument**), all images under the image folder will be used for analysis. 
+When tackling multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see the below example). In this pipeline, three arguments will be provided by users, including an experimental design table containing metadata, the type of experiments (**options: "MULTI_PLANT", "SIDE_VIEW"**), and the mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with the program, a tabular design table is required with a restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT and SIDE_VIEW types of experiments. In addition, without providing the mode option (**-m argument**), all images under the image folder will be used for analysis. 
 
 **Type in the following command to check the help page**
 ```
 bash 1_BULK_IMAGES.sh -help 
 ```
-**Help page will be displayed as folow:**
+**Help page will be displayed as follows:**
 ```
 *************************************** WELCOME TO USE BULK ANALYSIS FOR IMAGES ***************************************
 
@@ -158,7 +158,7 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 
   -h Show this usage information
 ```
-**Refer the following information to prepare experimental design table for differnet types of analysis**
+**Refer to the following information to prepare an experimental design table for different types of analysis**
 
 #### Format of design table when using "MULTI_PLANT" type for bulk analysis (14 columns)
 | Column Numbers | Description |
@@ -195,7 +195,7 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 |START_YEAR| Start **year (YYYY)** of the experiment |
 |END_YEAR| End **year (YYYY)** of the experiment |
 |START_MONTH| Start **month (MM)** of the experiment|
-|CEND_MONTH| End **month (MM)** of the experiment |
+|END_MONTH| End **month (MM)** of the experiment |
 |START_DATE| Start **date (DD)** of the experiment |
 |END_DATE| End **date (DD)** of the experiment |
 |OUTPUT_DIR| The directory where results to be saved |
