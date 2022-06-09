@@ -7,13 +7,8 @@ Image-based phenotyping provides a powerful avenue to characterize plant growth 
 ## General overview of the pipeline
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis will be performed. Two schematic charts were displayed and detailed steps were described as follow:
 
-![image](https://user-images.githubusercontent.com/69836931/172638259-1b878be5-eee5-47fa-915a-402225164c9d.png)
-
-
-
-
-![image](https://user-images.githubusercontent.com/69836931/172638321-95c3a393-0968-4613-a5c3-c6b1451a33e9.png)
-
+![image](https://user-images.githubusercontent.com/69836931/172938295-14267699-b17d-44de-a308-a15a8a793880.png)
+![image](https://user-images.githubusercontent.com/69836931/172938369-a8550d59-0a83-4d3e-bc43-b40ab42ef318.png)
 
 ### 1. Experimental setup and photo collections
 All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46) developed for MULTI_PLANT IMAGES phenotyping and SIDE_VIEW IMAGES phenotyping.
