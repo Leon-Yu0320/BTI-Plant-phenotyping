@@ -1,7 +1,32 @@
+
+
+
+
+# Table of Contents
+
 # BTI mobile plant phenotyping system
 Computational pipeline for phenotyping data analysis
 
+- [Table of Contents](#table-of-contents)
+- [BTI mobile plant phenotyping system](#bti-mobile-plant-phenotyping-system)
 - [Table of Content](#table-of-content)
+  - [Introduction](#introduction)
+  - [General overview of the pipeline](#general-overview-of-the-pipeline)
+  - [schematic charts of the pipeline for single experiemnt](#schematic-charts-of-the-pipeline-for-single-experiemnt)
+  - [schematic charts of the pipeline for multiple experiemnt](#schematic-charts-of-the-pipeline-for-multiple-experiemnt)
+    - [1. Experimental setup and photo collections](#1-experimental-setup-and-photo-collections)
+    - [2. Image-processing parameter selection](#2-image-processing-parameter-selection)
+    - [3.Image batch processes](#3image-batch-processes)
+      - [Database format of MULTI_PLANT pipeline (20 columns)](#database-format-of-multi_plant-pipeline-20-columns)
+      - [Example database of MULTI_PLANT pipeline](#example-database-of-multi_plant-pipeline)
+      - [Database format of MULTI_PLANT pipeline (13 columns)](#database-format-of-multi_plant-pipeline-13-columns)
+      - [Example database of SIDE_VIEW pipeline](#example-database-of-side_view-pipeline)
+      - [OPTION 1: single experiment analysis](#option-1-single-experiment-analysis)
+      - [OPTION 2: bulk analysis for multiple experiments](#option-2-bulk-analysis-for-multiple-experiments)
+      - [Format of design table when using "MULTI_PLANT" type for bulk analysis (14 columns)](#format-of-design-table-when-using-multi_plant-type-for-bulk-analysis-14-columns)
+      - [Example design table when using "MULTI_PLANT" type for bulk analysis](#example-design-table-when-using-multi_plant-type-for-bulk-analysis)
+      - [Format of design table when using "SIDE_VIEW" type for bulk analysis (11 columns)](#format-of-design-table-when-using-side_view-type-for-bulk-analysis-11-columns)
+      - [Example design table when using "SIDE_VIEW" type for bulk analysis](#example-design-table-when-using-side_view-type-for-bulk-analysis)
   -[Introduction](#introduction)
   
   
