@@ -1,12 +1,3 @@
-
-
-
-
-# Table of Contents
-
-# BTI mobile plant phenotyping system
-Computational pipeline for phenotyping data analysis
-
 - [Table of Contents](#table-of-contents)
 - [BTI mobile plant phenotyping system](#bti-mobile-plant-phenotyping-system)
 - [Table of Content](#table-of-content)
@@ -18,8 +9,11 @@ Computational pipeline for phenotyping data analysis
     - [2. Image-processing parameter selection](#2-image-processing-parameter-selection)
     - [3.Image batch processes](#3image-batch-processes)
   -[Introduction](#introduction)
-  
-  
+ 
+ # Table of Contents
+
+# BTI mobile plant phenotyping system
+Computational pipeline for phenotyping data analysis
   
 # Table of Content
 
