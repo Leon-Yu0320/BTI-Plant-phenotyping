@@ -1,3 +1,9 @@
+# Table of Contents
+
+# BTI mobile plant phenotyping system
+Computational pipeline for phenotyping data analysis
+
+
 - [Table of Contents](#table-of-contents)
 - [BTI mobile plant phenotyping system](#bti-mobile-plant-phenotyping-system)
 - [Table of Content](#table-of-content)
@@ -10,13 +16,6 @@
     - [3. Image batch processes](#3image-batch-processes)
   -[Introduction](#introduction)
  
- # Table of Contents
-
-# BTI mobile plant phenotyping system
-Computational pipeline for phenotyping data analysis
-  
-# Table of Content
-
 ## Introduction
 Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in response to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pairs with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
 
