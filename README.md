@@ -7,7 +7,7 @@
   - [schematic charts of the pipeline for multiple experiemnt](#schematic-charts-of-the-pipeline-for-multiple-experiemnt)
     - [1. Experimental setup and photo collections](#1-experimental-setup-and-photo-collections)
     - [2. Image-processing parameter selection](#2-image-processing-parameter-selection)
-    - [3.Image batch processes](#3image-batch-processes)
+    - [3. Image batch processes](#3image-batch-processes)
   -[Introduction](#introduction)
  
  # Table of Contents
@@ -46,7 +46,7 @@ example: RaspiZ_side1_2022.04.17-11.07.01.jpg
 ### 2. Image-processing parameter selection
 Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. One sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among the rest images derived from the same batch of experiments. Examples of parameter settings can be referred from household [**protocols**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-jupyter-notebo-car5sd86). 
 
-### 3.Image batch processes
+### 3. Image batch processes
 After the initial selection of parameters, users will save these data into databases corresponding to different experimental sets. The format of databases for each type of experiments was shown as follows:
 
 **NOTE: The column names of the database is required and certain characters used for name is customizable**
