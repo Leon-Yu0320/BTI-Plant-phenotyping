@@ -17,16 +17,6 @@ Computational pipeline for phenotyping data analysis
     - [1. Experimental setup and photo collections](#1-experimental-setup-and-photo-collections)
     - [2. Image-processing parameter selection](#2-image-processing-parameter-selection)
     - [3.Image batch processes](#3image-batch-processes)
-      - [Database format of MULTI_PLANT pipeline (20 columns)](#database-format-of-multi_plant-pipeline-20-columns)
-      - [Example database of MULTI_PLANT pipeline](#example-database-of-multi_plant-pipeline)
-      - [Database format of MULTI_PLANT pipeline (13 columns)](#database-format-of-multi_plant-pipeline-13-columns)
-      - [Example database of SIDE_VIEW pipeline](#example-database-of-side_view-pipeline)
-      - [OPTION 1: single experiment analysis](#option-1-single-experiment-analysis)
-      - [OPTION 2: bulk analysis for multiple experiments](#option-2-bulk-analysis-for-multiple-experiments)
-      - [Format of design table when using "MULTI_PLANT" type for bulk analysis (14 columns)](#format-of-design-table-when-using-multi_plant-type-for-bulk-analysis-14-columns)
-      - [Example design table when using "MULTI_PLANT" type for bulk analysis](#example-design-table-when-using-multi_plant-type-for-bulk-analysis)
-      - [Format of design table when using "SIDE_VIEW" type for bulk analysis (11 columns)](#format-of-design-table-when-using-side_view-type-for-bulk-analysis-11-columns)
-      - [Example design table when using "SIDE_VIEW" type for bulk analysis](#example-design-table-when-using-side_view-type-for-bulk-analysis)
   -[Introduction](#introduction)
   
   
@@ -67,7 +57,7 @@ After the initial selection of parameters, users will save these data into datab
 
 **NOTE: The column names of the database is required and certain characters used for name is customizable**
 
-#### Database format of MULTI_PLANT pipeline (20 columns)
+**Database format of MULTI_PLANT pipeline (20 columns)**
 | Column Numbers | Description |
 | --------------------- | ----------- |
 |RASPIID| The identifier of planting trays for plants|
@@ -92,14 +82,14 @@ After the initial selection of parameters, users will save these data into datab
 |BATCH| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 An example is attached:
-#### Example database of MULTI_PLANT pipeline
+**Example database of MULTI_PLANT pipeline**
 | RASPIID | CAMERAID | WX | WY | WW | WH | DEGREE | S1_SIZE | S1_DIR | S2_SIZE | S2_DIR | CUTOFF | RX | RY | RW | RH | PX | PY | RADIUS | BATCH |
 | ------- | -------- | -- | -- | -- | -- | ------ | ------- | ------ | ------- |------- | ------ | -- | -- | -- | -- | -- | -- | ------ | ----- |
 | raspiN | cameraA | 950 | 950 | 100 | 100 | 0 | 1 | Right | 1 |Bottom| 108 | 150 | 150 | 1870 | 1930 | 350 | 350 | 100 | NA |
 | raspiK | cameraB | 950 | 850 | 100 | 90 | 5 | 20 | Left | 1 |Bottom| 108 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Mike |
 | raspiU | cameraB | 100 | 500 | 100 | 90 | 0 | 1 | Left | 1 |Bottom| 134 | 150 | 150 | 1870 | 1220| 350 | 450 | 100 | Nick |
 
-#### Database format of MULTI_PLANT pipeline (13 columns)
+**Database format of MULTI_PLANT pipeline (13 columns)**
 | Column Numbers | Description |
 | -------------- | ----------- |
 |FRAME | The identifier of facility for image capturing|
@@ -117,7 +107,7 @@ An example is attached:
 |BATCH| The batch name used for experiments, used as an identifier to distinguish different experiments under the same camera and planting trays|
 
 An example is attached:
-#### Example database of SIDE_VIEW pipeline
+**Example database of SIDE_VIEW pipeline**
 | FRAME |DEGREE | WX | WY | WW | WH | CUTOFF1 | CUTOFF2 | RX | RY | RW | RH | BATCH |
 | ----- | ----- | -- | -- | -- | -- | ------- | ------- | -- | -- | -- | -- | ----- | 
 | raspiX | 0 | 450 | 1250 | 100 | 100 | 95 | 113 | 350 | 200 | 1300 | 1300 | DEMO |
@@ -126,7 +116,7 @@ An example is attached:
 
 After the copy of parameters to databases with one of the three experimental types, users will be able to launch the analysis of images based on parameters applied to a single test image. Please place all files under the **code** directory into the **same folder** when during configuration. There are two options provided to process images as details from the following descriptions:
 
-#### OPTION 1: single experiment analysis
+**OPTION 1: single experiment analysis**
 In this option, pipelines for MULTI_PLANT and SIDE_VIEW pipelines will be executed by users respectively to launch analysis. Here, a few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of the experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following command line and see output screenshot as below.
 
 ```
@@ -163,7 +153,7 @@ After quality control of sample images has been processed, users will be asked i
 ![image](https://user-images.githubusercontent.com/69836931/170579002-1fe36861-fd46-4db6-8273-816c31316700.png)
 
 
-#### OPTION 2: bulk analysis for multiple experiments	
+**OPTION 2: bulk analysis for multiple experiments**
 When tackling multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see the below example). In this pipeline, three arguments will be provided by users, including an experimental design table containing metadata, the type of experiments (**options: "MULTI_PLANT", "SIDE_VIEW"**), and the mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with the program, a tabular design table is required with a restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT and SIDE_VIEW types of experiments. In addition, without providing the mode option (**-m argument**), all images under the image folder will be used for analysis. 
 
 **Type in the following command to check the help page**
@@ -189,7 +179,7 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 ```
 **Refer to the following information to prepare an experimental design table for different types of analysis**
 
-#### Format of design table when using "MULTI_PLANT" type for bulk analysis (14 columns)
+**Format of design table when using "MULTI_PLANT" type for bulk analysis (14 columns)**
 | Column Numbers | Description |
 | -------------- | ----------- |
 |CODE|  The directory where code been saved |
@@ -207,14 +197,14 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 |LIGHTS_OFF| Hour **and minute (HH.MM)** of lights-off for experiments |
 |OUTPUT_DIR| The directory where results to be saved |
 
-#### Example design table when using "MULTI_PLANT" type for bulk analysis
+**Example design table when using "MULTI_PLANT" type for bulk analysis**
 | CODE |IMAGE | RIG | CAMERA |BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | LIGHTS_ON | LIGHTS_OFF | OUTPUT_DIR |
 | ---- | ---- | ----| ------ | ---- | ---------- | -------- | ----------- | --------- | ---------- | -------- | --------- | ---------- | ---------- |
 | /home/User/code | home/image | raspiU | cameraA | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | 09.00 | 21.00 | /data/results |
 | /home/User/code | home/image | raspiK | cameraA | Nick | 2021 | 2022 | 12 | 01 | 18 | 07 | 12.00 | 18.00 | /data/results |
 | /home/User/code | home/image | raspiN | cameraB | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | 09.00 | 21.00 | /data/results |
 
-#### Format of design table when using "SIDE_VIEW" type for bulk analysis (11 columns)
+**Format of design table when using "SIDE_VIEW" type for bulk analysis (11 columns)**
 | Column Numbers | Description |
 | -------------- | ----------- |
 |CODE| The directory where code been saved |
@@ -230,7 +220,7 @@ Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 |OUTPUT_DIR| The directory where results to be saved |
 
 
-#### Example design table when using "SIDE_VIEW" type for bulk analysis
+**Example design table when using "SIDE_VIEW" type for bulk analysis**
 | CODE |IMAGE | FRAME | BATCH | START_YEAR | END_YEAR | START_MONTH | END_MONTH | START_DATE | END_DATE | OUTPUT_DIR |
 | ---- | ---- | ----- | ----- | ---------- | -------- | ----------- | --------- | ---------- | -------- | ---------- | 
 | /home/User/code | home/image | raspiZ | Mike | 2022 | 2022 | 04 | 04 | 02 | 15 | /data/results |
