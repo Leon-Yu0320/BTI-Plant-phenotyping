@@ -1,5 +1,5 @@
 # BTI mobile plant phenotyping system
-Computational pipeline for phenotyping data analysis
+Computational pipeline for phenotyping data analysis using images
 
 - [BTI mobile plant phenotyping system](#bti-mobile-plant-phenotyping-system)
   - [Introduction](#introduction)
