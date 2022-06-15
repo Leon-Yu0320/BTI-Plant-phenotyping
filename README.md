@@ -4,8 +4,9 @@ Computational pipeline for phenotyping data analysis using images
 - [BTI mobile plant phenotyping system](#bti-mobile-plant-phenotyping-system)
   - [Introduction](#introduction)
   - [General overview of the pipeline](#general-overview-of-the-pipeline)
-  - [schematic charts of the pipeline for single experiemnt](#schematic-charts-of-the-pipeline-for-single-experiemnt)
-  - [schematic charts of the pipeline for multiple experiemnt](#schematic-charts-of-the-pipeline-for-multiple-experiemnt)
+    - [schematic charts of the pipeline for single experiemnt](#schematic-charts-of-the-pipeline-for-single-experiemnt)
+    - [schematic charts of the pipeline for multiple experiemnt](#schematic-charts-of-the-pipeline-for-multiple-experiemnt)
+  - [Detailed steps for the pipeline](#detailed-steps-for-the-pipeline)
     - [1. Experimental setup and photo collections](#1-experimental-setup-and-photo-collections)
     - [2. Image-processing parameter selection](#2-image-processing-parameter-selection)
     - [3. Image batch processes](#3-image-batch-processes)
@@ -16,11 +17,13 @@ Image-based phenotyping provides a powerful avenue to characterize plant growth 
 ## General overview of the pipeline
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis of [**MVAPP**](https://mvapp.kaust.edu.sa/) will be performed. Two schematic charts were displayed and detailed steps were described as follow:
 
-## schematic charts of the pipeline for single experiemnt
+### schematic charts of the pipeline for single experiemnt
 ![image](https://user-images.githubusercontent.com/69836931/172938295-14267699-b17d-44de-a308-a15a8a793880.png)
-## schematic charts of the pipeline for multiple experiemnt
+### schematic charts of the pipeline for multiple experiemnt
 ![image](https://user-images.githubusercontent.com/69836931/172938369-a8550d59-0a83-4d3e-bc43-b40ab42ef318.png)
 
+## Detailed steps for the pipeline
+Descriptions for each step were shown as follow, with link to our in-house protocol and refrences linked
 ### 1. Experimental setup and photo collections
 All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46) developed for MULTI_PLANT IMAGES phenotyping and SIDE_VIEW IMAGES phenotyping.
 To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute, and other experiments related information** from the name of each photo in the subsequent data processing. The data collection will be initiated by **two individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follows:
