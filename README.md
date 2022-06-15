@@ -47,18 +47,24 @@ The Current Time is: 2022.06.15-14.31.30
 
 Usage : sh s0_TOPVIEW_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
-  -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image" >
-  -f [String] < type in the name of facility used for photo collection eg: raspiZ DEFAULT: "raspi" >
-  -t [integer] < type in the minutes interval while taking pictures eg: 30 DEFAULT: "30" >
-  -d [String] < /path/to/images to be saved after collection DEFAULT: "." (The current directory) >
-  -ss [Integer] < Set shutterspeed DEFAULT: 500 (1/500s second) >
+  Image capture parameters
+  -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image"> 
+  -f [String] < type in the name of facility used for photo collection eg: raspiZ DEFAULT: "raspi"> 
+  -t [integer] < the minutes interval while taking pictures eg: 30 DEFAULT: "30"> 
+  -d [String] < /path/to/images to be saved after collection DEFAULT: "." (The current directory)>
+
+  Image quality parameters
+  -ss [Integer] < Set shutter speed DEFAULT: 500 (1/500s second) >
   -sh [Integer] < Set image sharpness (-100 to 100) DEFAULT: 50 >
   -sa [Integer] < Set image saturation (-100 to 100) DEFAULT: 50 >
-  -br [Integer] < Set image brightness (0 to 100) DEFAULT: 60 >
+  -br [Integer] < Set image brightness (0 to 100) DEFAULT: 60 > 
   -co [Integer] < Set image contrast (-100 to 100) DEFAULT: 50 >
   -ISO [Integer] < Set image ISO DEFAULT: 300 >
+
+  Image size parameters
   -W [Integer] < Set the width of image DEFAULT: 2000 >
   -H [Integer] < Set the height of image DEFAULT: 2000 >
+
   -h Show this usage information
 
 ```
@@ -78,22 +84,29 @@ bash 0_SIDEVIEW_setup.sh -help
 *********************************** WELCOME TO USE SIDE-VIEW IMAGES SETUP PIPELINE ***********************************
 
 use -help argument to show usage information
-The Current Time is: 2022.06.15-14.51.49
 
+The Current Time is: 2022.06.15-16.36.35
 Usage : sh s0_SIDEVIEW_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
+  Image capture parameters
   -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image">
   -f [String] < type in the name of facility used for photo collection eg: raspiZ DEFAULT: "raspi">
   -d [String] < /path/to/images to be saved after collection DEFAULT: "." (The current directory)>
+
+  Image quality parameters
   -ss [Integer] < Set shutterspeed DEFAULT: 500 (1/500s second) >
   -sh [Integer] < Set image sharpness (-100 to 100) DEFAULT: 50 >
   -sa [Integer] < Set image saturation (-100 to 100) DEFAULT: 50 >
   -br [Integer] < Set image brightness (0 to 100) DEFAULT: 60 >
   -co [Integer] < Set image contrast (-100 to 100) DEFAULT: 50 >
   -ISO [Integer] < Set image ISO DEFAULT: 300 >
+
+  Image size parameters
   -W [Integer] < Set the width of image DEFAULT: 2000 >
   -H [Integer] < Set the height of image DEFAULT: 2000 >
+
   -h Show this usage information
+
 ```
 Please note that most parameters are not required with alternative default parameters to set inputs. The default settings will be displayed while launching pipelines.
 
