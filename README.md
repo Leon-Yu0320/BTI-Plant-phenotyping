@@ -69,6 +69,10 @@ Please note that most parameters are not required with alternative default param
 format: RASPI_side.NO_YYYY.MM.DD-HH.MM.SS.jpg
 example: RaspiZ_side1_2022.04.17-11.07.01.jpg
 ```
+**Type in the following command to check the help page**
+```
+bash 0_SIDEVIEW_setup.sh -help 
+```
 **Help page for side-view image setup pipeline will be displayed as follows:**
 ```
 *********************************** WELCOME TO USE SIDE-VIEW IMAGES SETUP PIPELINE ***********************************
