@@ -23,7 +23,7 @@ To realize the high-throughput manner of data processing, advantages of [**paral
 ![image](https://user-images.githubusercontent.com/69836931/172938369-a8550d59-0a83-4d3e-bc43-b40ab42ef318.png)
 
 ## Detailed steps for the pipeline
-Descriptions for each step were shown as follow, with link to our in-house protocols and refrences. 
+Descriptions for each step were shown as follow, with link to our in-house protocols and references. 
 ### 1. Experimental setup and photo collections
 All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46) developed for MULTI_PLANT IMAGES phenotyping and SIDE_VIEW IMAGES phenotyping.
 To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute, and other experiments related information** from the name of each photo in the subsequent data processing. The data collection will be initiated by **two individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follows:
