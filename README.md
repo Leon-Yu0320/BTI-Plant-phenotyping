@@ -216,13 +216,9 @@ use -help argument to show usage information
 
 Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 
-
   -d [Table] < /path/to/experimental design table stored, refer manual for details of each type of experiments>
-
   -t [String] < type in one of the three experiment types: "MULTI_PLANT" or "SIDE_VIEW" >
-
-  -m [String] < type in one of the two modes: "SAMPLE","ALL" DEFAULT: ALL>
-
+  -m [String] < type in one of the two modes: "SAMPLE","ALL" DEFAULT: "ALL">
   -h Show this usage information
 ```
 **Refer to the following information to prepare an experimental design table for different types of analysis**
