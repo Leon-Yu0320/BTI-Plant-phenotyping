@@ -122,42 +122,22 @@ then
             echo ""
             echo -e "${GREEN}*** STEP 2 Images for experiments will be loaded ***${NC}" 
 
-            ### Define the start and end data of experiments based on input and output
-            START_DATE=$(expr $START_DATE - 1)
-            if (( $START_DATE >= 10 ))
-            then
-                START_DATE="$START_DATE"
-            else
-                START_DATE="0$START_DATE"
-            fi
+            ### Create a temp datestamp based on unique date from the image directory
+            ls $IMAGE_DIR/*.jpg | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
 
-            startdate=$START_YEAR$START_MONTH$START_DATE
-            enddate=$END_YEAR$END_MONTH$END_DATE
-            dates=()
-            for (( date="$startdate"; date != enddate; )); do
-                dates+=( "$date" )
-                date="$(date --date="$date + 1 days" +'%Y%m%d')"
+            ### filter selected date based on duration of expriments
+            awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+                awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
+                awk -v a=$START_DATE -v b=$END_DATE -F "." '$3>=a && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
 
-                ### extract the specific timestamp based on start-end date interval
-                date_update=$(date -d $date +'%Y.%m.%d')
-                # redefine the INFO for extracting images 
+            ### copy images assocaited with the selected stamp to the Clean image dirctory
+            INFO=$(echo ${RIG_ID}_${CAMERA})
 
-                INFO=$(echo ${RIG_ID}_${CAMERA})
-
-                ### copy images with specific date from intervals
-                PATTERN=${IMAGE_DIR}/${INFO}.$date_update-??.??.??.jpg
-
-                if ls $PATTERN 1> /dev/null 2>&1
-                then
-                    cp ${IMAGE_DIR}/${INFO}.$date_update-??.??.??.jpg ${OUTPUT_DIR}/$PROJECT/Clean_image
-                else
-                    echo ""
-                    echo -e "${BLUE}WARRING: Images taken from $date_update under the ${INFO} do not existed${NC}"
-                    echo ""
-                fi
+            for SELECT_STAMP in $(cat ${OUTPUT_DIR}/$PROJECT/select_date.stamp);
+            do
+                cp ${IMAGE_DIR}/${INFO}.$SELECT_STAMP-??.??.??.jpg ${OUTPUT_DIR}/$PROJECT/Clean_image
             done
 
-            ### Define the start and end time stamp of experiments
             ### remove images taken during night (dark images)
             echo ""
             echo ""
@@ -166,6 +146,8 @@ then
             do
               rm ${OUTPUT_DIR}/${PROJECT}/Clean_image/${INFO}.????.??.??-$i.??.jpg
             done
+
+            ### Pick up one random image per day 
             echo "One random image per day from $START_YEAR.$START_MONTH.$START_DATE to $END_YEAR.$END_MONTH.$END_DATE will be saved under ${OUTPUT_DIR}/${PROJECT}/Test_image......"
             for i in $(ls ${OUTPUT_DIR}/$PROJECT/Clean_image | cut -d "." -f3,4 | cut -d "-" -f1 | sort | uniq);
             do
