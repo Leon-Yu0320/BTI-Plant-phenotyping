@@ -1,0 +1,4 @@
+indir	outdir	white_X	white_Y	white_w	white_h	degree	shift1_size	shift1_dir	shift2_size	shift2_dir	threshold	ROIx	ROIy	ROIw	ROIh	plantx	planty	Radius	Batch
+raspiN	cameraA	950	950	100	100	0	1	Right	1	Bottom	108	150	150	1870	1930	350	350	100	NA
+raspiK	cameraA	970	470	60	60	0	20	left	20	Top	102	75	95	1875	1870	270	315	180	CRE
+raspiU	cameraA	995	400	55	55	0	20	left	20	Top	104	75	95	1875	1870	330	250	180	CER
