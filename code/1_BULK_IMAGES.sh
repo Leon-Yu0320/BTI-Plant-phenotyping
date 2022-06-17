@@ -126,9 +126,24 @@ then
             ls $IMAGE_DIR/*.jpg | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
 
             ### filter selected date based on duration of expriments
-            awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
-                awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
-                awk -v a=$START_DATE -v b=$END_DATE -F "." '$3>=a && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+            if [[ $START_YEAR == $END_YEAR ]];
+            then
+                if [[ $START_DATE -ge $END_DATE ]];
+                then
+                    awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+                        awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
+                            awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a || $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+                else
+                    awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+                        awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
+                            awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a && $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+                fi
+            else
+                awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+                    awk -v a=$START_MONTH -v b=$END_MONTH -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $2>=a || $1==d && $2<=b {print $0}' |\
+                        awk -v a=$START_DATE -v b=$END_DATE -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $3>=a || $1==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+            fi
+
 
             ### copy images assocaited with the selected stamp to the Clean image dirctory
             INFO=$(echo ${RIG_ID}_${CAMERA})
