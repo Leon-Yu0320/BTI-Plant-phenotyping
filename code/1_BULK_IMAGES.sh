@@ -20,9 +20,9 @@ cat <<'EOF'
 
   -d [Table] < /path/to/experimental design table stored, refer manual for details of each type of experiments> 
 
-  -t [String] < type in one of the three experiment types: "MULTI_PLANT","SIDE_VIEW","ROOT_PHENOTYPE" >
+  -t [String] < type in one of the two experiment types: "TOP_VIEW","SIDE_VIEW">
 
-  -m [String] < type in one of the two modes: "SAMPLE","ALL" DEFAULT: ALL>
+  -m [String] < type in one of the two modes: "SAMPLE","ALL" DEFAULT: "ALL">
 
   -h Show this usage information
 
@@ -58,7 +58,7 @@ done
 
 
 ### Load Design table which contains all inforamtion 
-if [[ $EXPERIMENT_TYPE == "MULTI_PLANT" ]]
+if [[ $EXPERIMENT_TYPE == "TOP_VIEW" ]]
 then 
     echo ""
     echo -e "${GREEN}*** STEP 1 The Experimental design table for $EXPERIMENT_TYPE will be loaded ***${NC}" 
@@ -132,18 +132,17 @@ then
                 then
                     awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
                         awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
-                            awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a || $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+                        awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a || $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
                 else
                     awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
                         awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
-                            awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a && $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+                        awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a && $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
                 fi
             else
                 awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
                     awk -v a=$START_MONTH -v b=$END_MONTH -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $2>=a || $1==d && $2<=b {print $0}' |\
-                        awk -v a=$START_DATE -v b=$END_DATE -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $3>=a || $1==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+                    awk -v a=$START_DATE -v b=$END_DATE -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $3>=a || $1==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
             fi
-
 
             ### copy images assocaited with the selected stamp to the Clean image dirctory
             INFO=$(echo ${RIG_ID}_${CAMERA})
@@ -156,7 +155,7 @@ then
             ### remove images taken during night (dark images)
             echo ""
             echo ""
-            echo "Images during night from $END_TIME to $START_TIME will be removed "
+            echo "Images during night from $END_TIME to $START_TIME will be removed "TOPVIE
             for i in $(ls ${OUTPUT_DIR}/$PROJECT/Clean_image | cut -d "." -f4,5 | cut -d "-" -f2 | sort | uniq | awk -v a=$START_TIME -v b=$END_TIME '$1< a || $1> b {print $0}');
             do
               rm ${OUTPUT_DIR}/${PROJECT}/Clean_image/${INFO}.????.??.??-$i.??.jpg
@@ -169,7 +168,6 @@ then
                 SELECT=$(ls ${OUTPUT_DIR}/${PROJECT}/Clean_image/${INFO}.????.$i-??.??.??.jpg | shuf -n 1)
                 cp $SELECT ${OUTPUT_DIR}/${PROJECT}/Test_image
             done
-
             ### Loading parameters for image processing
             echo ""
             echo ""
@@ -178,7 +176,7 @@ then
             ### Extract parameter in database for analyis
             if [[ $BATCH_NAME == "NA" ]]
             then 
-                grep $CAMERA $CODE_DIR/MULTI_database | grep $RIG_ID > ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter 
+                grep $CAMERA $CODE_DIR/TOPVIEW_database | grep $RIG_ID > ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter 
                 echo ""
                 echo ""
                 echo "The paramters for $RIG_ID under the $CAMERA were loaded" 
@@ -186,48 +184,48 @@ then
                 echo ""
                 echo ""
                 echo "The paramters of $BATCH_NAME for $RIG_ID under the $CAMERA were loaded" 
-                grep $CAMERA $CODE_DIR/MULTI_database | grep $RIG_ID | grep $BATCH_NAME > ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter
+                grep $CAMERA $CODE_DIR/TOPVIEW_database | grep $RIG_ID | grep $BATCH_NAME > ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter
             fi
 
-            COLUMN_NUMBER=$(awk '{print NF}' ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | sort -nu | tail -n 1)
+            COLUMN_NUMBER=$(awk '{print NF}' ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | sort -nu | tail -n 1)
             if [[ $COLUMN_NUMBER -ne 20 ]]
             then
                 echo ""
                 echo -e "${RED}ERROR: Incorrect column(s) numbers from $CODE_DIR/SIDEVIEW_parameter! Please check the format and re-launch analysis......${NC}"
             else
                 ### check the numbers of parameters 
-                PARAMETER_COUNT=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | wc -l)
+                PARAMETER_COUNT=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | wc -l)
                 if (( $PARAMETER_COUNT > 1 ))
                 then 
-                    echo -e "${RED}ERROR:There are $PARAMETER_COUNT sets parameter under the $CODE_DIR/MULTI_database for $PROJECT, please add the BATCH information to distinguish these parameters${NC}"
+                    echo -e "${RED}ERROR:There are $PARAMETER_COUNT sets parameter under the $CODE_DIR/TOPVIEW_database for $PROJECT, please add the BATCH information to distinguish these parameters${NC}"
                 elif (( $PARAMETER_COUNT == 0 ))
                 then
-                    echo -e "${RED}ERROR:There is $PARAMETER_COUNT parameter found under the $CODE_DIR/MULTI_database, please provide the parameter information for $PROJECT${NC}"
+                    echo -e "${RED}ERROR:There is $PARAMETER_COUNT parameter found under the $CODE_DIR/TOPVIEW_database, please provide the parameter information for $PROJECT${NC}"
                 else
                     ### Loading parameters for image processing
                     echo ""
                     #read parameter for white balance
-                    white_X=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $3 }')
-                    white_Y=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $4 }')
-                    white_W=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $5 }')
-                    white_H=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $6 }')
+                    white_X=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $3 }')
+                    white_Y=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $4 }')
+                    white_W=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $5 }')
+                    white_H=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $6 }')
                     #read parameter for moving image
-                    deg=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $7 }')
-                    shift1_size=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $8 }')
-                    shift1_dir=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $9 }')
-                    shift2_size=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $10 }')
-                    shift2_dir=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $11 }')
+                    deg=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $7 }')
+                    shift1_size=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $8 }')
+                    shift1_dir=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $9 }')
+                    shift2_size=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $10 }')
+                    shift2_dir=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $11 }')
                     #read parameter for cutoff
-                    threshold=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $12 }')
+                    threshold=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $12 }')
                     #read parameter for ROI
-                    ROIx=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $13 }')
-                    ROIy=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $14 }')
-                    ROIw=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $15 }')
-                    ROIh=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $16 }')
+                    ROIx=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $13 }')
+                    ROIy=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $14 }')
+                    ROIw=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $15 }')
+                    ROIh=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $16 }')
                     #read paramter for reference plant
-                    plantx=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $17 }')
-                    planty=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $18 }')
-                    radius=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/MULTI_parameter | awk '{ print $19 }')
+                    plantx=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $17 }')
+                    planty=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $18 }')
+                    radius=$(cat ${OUTPUT_DIR}/$PROJECT/Configure/TOPVIEW_parameter | awk '{ print $19 }')
 
                     #ASSIGN PARAMETERS
                     white_balance="$white_X, $white_Y, $white_W, $white_H"
@@ -254,7 +252,7 @@ then
 
                     echo -e "${GREEN}*** STEP 4 Generating python scripts and json configuration file for selected rig based on parameter ***${NC}"
                     #replace python scripts
-                    sed "s/white_Xwhite_Ywhite_Wwhite_H/$white_balance/g" $CODE_DIR/multi_plant.py | \
+                    sed "s/white_Xwhite_Ywhite_Wwhite_H/$white_balance/g" $CODE_DIR/top_view.py | \
                         sed "s/rotation_deg=/$rotations/g" | \
                         sed "s/cut_off/$threshold/g" | \
                         sed "s/img=img1, number=shift1, side=dir1/$shift1/g" | \
@@ -262,7 +260,7 @@ then
                         sed "s/ROIxROIyROIwROIh/$ROI/g" | \
                         sed "s/plantx/$plantx/g" | \
                         sed "s/planty/$planty/g" | \
-                        sed "s/VALUE/$radius/g" > ${OUTPUT_DIR}/$PROJECT/Configure/$PROJECT.multi.py
+                        sed "s/VALUE/$radius/g" > ${OUTPUT_DIR}/$PROJECT/Configure/$PROJECT.TOPVIEW.py
 
                     ### Determine if all images or part images included
                     if [[ $MODE == "SAMPLE" ]]
@@ -281,10 +279,10 @@ then
                     fi
 
                     ### repalce json scripts
-                    sed "s@INPUT@${OUTPUT_DIR}/${PROJECT}/$FINAL_FOLDER@g" $CODE_DIR/multi_plant.json | \
+                    sed "s@INPUT@${OUTPUT_DIR}/${PROJECT}/$FINAL_FOLDER@g" $CODE_DIR/top_view.json | \
                         sed "s@JSON@${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.json@g" | \
-                        sed "s@WORKFLOW@${OUTPUT_DIR}/$PROJECT/Configure/$PROJECT.multi.py@g" | \
-                        sed "s@OUTDIR@${OUTPUT_DIR}/$PROJECT/Results_images@g" > ${OUTPUT_DIR}/$PROJECT/Configure/$PROJECT.multi.json
+                        sed "s@WORKFLOW@${OUTPUT_DIR}/$PROJECT/Configure/$PROJECT.TOPVIEW.py@g" | \
+                        sed "s@OUTDIR@${OUTPUT_DIR}/$PROJECT/Results_images@g" > ${OUTPUT_DIR}/$PROJECT/Configure/$PROJECT.TOPVIEW.json
                 
                     echo ""
                     echo ""
@@ -298,7 +296,7 @@ then
                     else
                         ### Perform analysis for all images
                         python $CODE_DIR/plantcv-workflow.py \
-                            --config ${OUTPUT_DIR}/${PROJECT}/Configure/$PROJECT.multi.json
+                            --config ${OUTPUT_DIR}/${PROJECT}/Configure/$PROJECT.TOPVIEW.json
 
                         python $CODE_DIR/plantcv-utils.py json2csv \
                             --json ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.json \
@@ -306,7 +304,7 @@ then
                         echo ""
                         echo -e "${GREEN}*** Image analysis finished ! Please check results under the ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result...... ***${NC}"
                         echo ""
-                        echo -e "${GREEN}*************************************** Thanks for using BULK ANALYSIS FOR MULTI_PLANTS ***************************************${NC}"
+                        echo -e "${GREEN}*************************************** Thanks for using BULK ANALYSIS FOR TOPVIEW_PLANTS ***************************************${NC}"
                         echo ""
                     fi
                 fi
@@ -374,40 +372,34 @@ then
             echo ""
             echo -e "${GREEN}*** STEP 2 Images for experiments will be loaded ***${NC}" 
 
-            ### Define the start and end data of experiments based on input and output
-            START_DATE=$(expr $START_DATE - 1)
-            if (( $START_DATE >= 10 ))
+            ### Create a temp datestamp based on unique date from the image directory
+            ls $IMAGE_DIR/*.jpg | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
+
+            ### filter selected date based on duration of expriments
+            if [[ $START_YEAR == $END_YEAR ]];
             then
-                START_DATE="$START_DATE"
+                if [[ $START_DATE -ge $END_DATE ]];
+                then
+                    awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+                        awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
+                        awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a || $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+                else
+                    awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+                        awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
+                        awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a && $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+                fi
             else
-                START_DATE="0$START_DATE"
+                awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+                    awk -v a=$START_MONTH -v b=$END_MONTH -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $2>=a || $1==d && $2<=b {print $0}' |\
+                    awk -v a=$START_DATE -v b=$END_DATE -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $3>=a || $1==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
             fi
 
-            ### Define the start and end data of experiments based on input and output
-            startdate=$START_YEAR$START_MONTH$START_DATE
-            enddate=$END_YEAR$END_MONTH$END_DATE
-            dates=()
-            for (( date="$startdate"; date != enddate; )); do
-                dates+=( "$date" )
-                date="$(date --date="$date + 1 days" +'%Y%m%d')"
+            ### copy images assocaited with the selected stamp to the Clean image dirctory
+            INFO=$(echo ${RIG_ID}_${CAMERA})
 
-                ### extract the specific timestamp based on start-end date interval
-                date_update=$(date -d $date +'%Y.%m.%d')
-                # redefine the INFO for extracting images 
-
-                INFO=$(echo ${FRAME_ID})
-
-                ### copy images with specific date from intervals
-                PATTERN=${IMAGE_DIR}/${INFO}_side?_$date_update-??.??.??.jpg
-
-                if ls $PATTERN 1> /dev/null 2>&1
-                then
-                    cp ${IMAGE_DIR}/${INFO}_side?_$date_update-??.??.??.jpg ${OUTPUT_DIR}/$PROJECT/Clean_image
-                else
-                    echo ""
-                    echo -e "${BLUE}WARNING: Images taken from $date_update under the ${INFO} do not existed${NC}"
-                    echo ""
-                fi
+            for SELECT_STAMP in $(cat ${OUTPUT_DIR}/$PROJECT/select_date.stamp);
+            do
+                cp ${IMAGE_DIR}/${INFO}.$SELECT_STAMP-??.??.??.jpg ${OUTPUT_DIR}/$PROJECT/Clean_image
             done
 
             echo ""

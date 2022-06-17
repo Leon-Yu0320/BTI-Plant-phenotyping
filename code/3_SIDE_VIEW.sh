@@ -7,7 +7,7 @@ NC='\033[0m'
 
 echo ""
 echo ""
-echo -e "${GREEN}**************************************************WELCOME TO USE SIDE-VIEW IMAGE PHENOTYPING SYSTEM ***************************************************${NC}"
+echo -e "${GREEN}**************************************************WELCOME TO USE SIDE_VIEW IMAGE PHENOTYPING SYSTEM ***************************************************${NC}"
 echo -e "${GREEN}********************************************Please answer the following questions to launch analysis**************************************************${NC}"
 echo ""
 echo ""
@@ -61,40 +61,34 @@ mkdir ${OUTPUT_DIR}/$PROJECT/Results_images
 
 echo -e "${GREEN}*** STEP 1 Images for experiments will be loaded ***${NC}" 
 
-### Define the start and end data of experiments based on input and output
-START_DATE=$(expr $START_DATE - 1)
-if (( $START_DATE >= 10 ))
+### Create a temp datestamp based on unique date from the image directory
+ls $IMAGE_DIR/*.jpg | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
+
+### filter selected date based on duration of expriments
+if [[ $START_YEAR == $END_YEAR ]];
 then
-    START_DATE="$START_DATE"
+    if [[ $START_DATE -ge $END_DATE ]];
+    then
+        awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+            awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
+            awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a || $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+    else
+        awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+            awk -v a=$START_MONTH -v b=$END_MONTH -F "." '$2>=a && $2<=b {print $0}' |\
+            awk -v a=$START_DATE -v b=$END_DATE -v c=$START_MONTH -v d=$END_MONTH -F "." '$2==c && $3>=a && $2==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
+    fi
 else
-    START_DATE="0$START_DATE"
+    awk -v a=$START_YEAR -v b=$END_YEAR -F "." '$1>=a && $1<=b {print $0}' ${OUTPUT_DIR}/$PROJECT/date.stamp |\
+        awk -v a=$START_MONTH -v b=$END_MONTH -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $2>=a || $1==d && $2<=b {print $0}' |\
+        awk -v a=$START_DATE -v b=$END_DATE -v c=$START_YEAR -v d=$END_YEAR -F "." '$1==c && $3>=a || $1==d && $3<=b {print $0}' > ${OUTPUT_DIR}/$PROJECT/select_date.stamp
 fi
 
-### Define the start and end data of experiments based on input and output
-startdate=$START_YEAR$START_MONTH$START_DATE
-enddate=$END_YEAR$END_MONTH$END_DATE
-dates=()
-for (( date="$startdate"; date != enddate; )); do
-    dates+=( "$date" )
-    date="$(date --date="$date + 1 days" +'%Y%m%d')"
+### copy images assocaited with the selected stamp to the Clean image dirctory
+INFO=$(echo ${RIG_ID}_${CAMERA})
 
-    ### extract the specific timestamp based on start-end date interval
-    date_update=$(date -d $date +'%Y.%m.%d')
-    # redefine the INFO for extracting images 
-
-    INFO=$(echo ${FRAME_ID})
-
-    ### copy images with specific date from intervals
-    PATTERN=${IMAGE_DIR}/${INFO}_side?_$date_update-??.??.??.jpg
-
-    if ls $PATTERN 1> /dev/null 2>&1
-    then
-        cp ${IMAGE_DIR}/${INFO}_side?_$date_update-??.??.??.jpg ${OUTPUT_DIR}/$PROJECT/Clean_image
-    else
-         echo ""
-         echo -e "${BLUE}WARNING: Images taken from $date_update under the ${INFO} do not existed${NC}"
-         echo ""
-    fi
+for SELECT_STAMP in $(cat ${OUTPUT_DIR}/$PROJECT/select_date.stamp);
+do
+    cp ${IMAGE_DIR}/${INFO}.$SELECT_STAMP-??.??.??.jpg ${OUTPUT_DIR}/$PROJECT/Clean_image
 done
 
 echo ""
@@ -248,7 +242,7 @@ else
             echo ""
             echo "${GREEN}*** Image analysis finished ! Please check results under the ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.csv..... ***${NC}"
             echo ""
-            echo -e "${GREEN}*************************************** Thanks for using SIDE_VIEW PIPELINES ***************************************${NC}"
+            echo -e "${GREEN}*************************************** Thanks for using SIDE-VIEW PIPELINES ***************************************${NC}"
             echo ""
         else 
             echo ""
