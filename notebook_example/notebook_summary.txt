@@ -1,1 +1,2 @@
-
+The TOP_VIEW_notebook.ipynb is the example for top-view images analysis 
+The SIDE_VIEW_notebook.ipynb is the example for side-view images analysis 
