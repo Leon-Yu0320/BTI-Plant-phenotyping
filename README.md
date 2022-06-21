@@ -3,6 +3,7 @@ Computational pipeline for phenotyping data analysis using images
 
 - [BTI mobile plant phenotyping system](#bti-mobile-plant-phenotyping-system)
   - [Introduction](#introduction)
+  - [Required packages](#required-packages)
   - [General overview of the pipeline](#general-overview-of-the-pipeline)
     - [schematic charts of the pipeline for single experiemnt](#schematic-charts-of-the-pipeline-for-single-experiemnt)
     - [schematic charts of the pipeline for multiple experiemnt](#schematic-charts-of-the-pipeline-for-multiple-experiemnt)
@@ -15,9 +16,9 @@ Computational pipeline for phenotyping data analysis using images
 Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in response to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pairs with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
 
 ## Required packages
-[Jupyter notebook](https://jupyter.org/)
-[Conda](https://docs.conda.io/en/latest/)
-[PlantCV](https://plantcv.readthedocs.io/en/stable/)
+[**Jupyter notebook**](https://jupyter.org/)\
+[**Conda**](https://docs.conda.io/en/latest/)\
+[**PlantCV**](https://plantcv.readthedocs.io/en/stable/)
 
 ## General overview of the pipeline
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis of [**MVAPP**](https://mvapp.kaust.edu.sa/) will be performed. Two schematic charts were displayed and detailed steps were described as follow:
