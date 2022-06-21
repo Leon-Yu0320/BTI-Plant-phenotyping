@@ -67,7 +67,7 @@ mkdir ${OUTPUT_DIR}/$PROJECT/Results_images
 echo -e "${GREEN}*** STEP 1 Images for experiments will be loaded ***${NC}" 
 
 ### Create a temp datestamp based on unique date from the image directory
-ls $IMAGE_DIR/*.jpg | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
+ls $IMAGE_DIR/*.jpg | sed "s@$IMAGE_DIR/@@g" | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
 
 ### filter selected date based on duration of expriments
 if [[ $START_YEAR == $END_YEAR ]];

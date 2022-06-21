@@ -123,7 +123,7 @@ then
             echo -e "${GREEN}*** STEP 2 Images for experiments will be loaded ***${NC}" 
 
             ### Create a temp datestamp based on unique date from the image directory
-            ls $IMAGE_DIR/*.jpg | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
+            ls $IMAGE_DIR/*.jpg | sed "s@$IMAGE_DIR/@@g" | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
 
             ### filter selected date based on duration of expriments
             if [[ $START_YEAR == $END_YEAR ]];
@@ -373,7 +373,7 @@ then
             echo -e "${GREEN}*** STEP 2 Images for experiments will be loaded ***${NC}" 
 
             ### Create a temp datestamp based on unique date from the image directory
-            ls $IMAGE_DIR/*.jpg | cut -d "." -f2,3,4 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
+            ls $IMAGE_DIR/*.jpg | sed "s@$IMAGE_DIR/@@g" | cut -d "_" -f3 | cut -d "-" -f1 | sort | uniq > ${OUTPUT_DIR}/$PROJECT/date.stamp
 
             ### filter selected date based on duration of expriments
             if [[ $START_YEAR == $END_YEAR ]];
@@ -395,11 +395,10 @@ then
             fi
 
             ### copy images assocaited with the selected stamp to the Clean image dirctory
-            INFO=$(echo ${RIG_ID}_${CAMERA})
 
             for SELECT_STAMP in $(cat ${OUTPUT_DIR}/$PROJECT/select_date.stamp);
             do
-                cp ${IMAGE_DIR}/${INFO}.$SELECT_STAMP-??.??.??.jpg ${OUTPUT_DIR}/$PROJECT/Clean_image
+                cp ${IMAGE_DIR}/${FRAME_ID}_side?_$SELECT_STAMP-??.??.??.jpg ${OUTPUT_DIR}/$PROJECT/Clean_image
             done
 
             echo ""
@@ -407,7 +406,7 @@ then
             echo "One random image per day from $START_YEAR.$START_MONTH.$START_DATE to $END_YEAR.$END_MONTH.$END_DATE will be saved under ${OUTPUT_DIR}/$PROJECT/Test_image...... "
             for i in $(ls ${OUTPUT_DIR}/$PROJECT/Clean_image | cut -d "." -f2,3 | cut -d "-" -f1 | sort | uniq);
             do
-                SELECT=$(ls ${OUTPUT_DIR}/${PROJECT}/Clean_image/${INFO}_side?_????.$i-??.??.??.jpg | shuf -n 1)
+                SELECT=$(ls ${OUTPUT_DIR}/${PROJECT}/Clean_image/${FRAME_ID}_side?_????.$i-??.??.??.jpg | shuf -n 1)
                 cp $SELECT ${OUTPUT_DIR}/${PROJECT}/Test_image
             done
 
