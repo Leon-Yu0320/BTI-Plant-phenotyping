@@ -2,6 +2,7 @@
 This folder contains STL files that can be used for 3D printing projects - if you wish to make your phenotyping facility look a little bit more professional. 
 
 ![image](https://user-images.githubusercontent.com/69836931/175128662-7136bfa2-9403-4a7d-a3d5-21786445d981.png)
+Overview of 3-D printed accesories used for phenotyping system
 **A:** Templacte 1 case for LCD screen protection and installation on phenoCage hardware 
 **B:** Templacte 2 case for LCD screen protection and installation on phenoCage hardware 
 **C:** Templacte case for raspiberry Pi camera installation on phenoCage hardware 
