@@ -15,7 +15,7 @@ Computational pipeline for phenotyping data analysis using images
     - [3. Image batch processes](#3-image-batch-processes)
  
 ## Introduction
-Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in response to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities (**phenoRig** and **PhenoCage**) for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pairs with the two lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
+Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in response to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pairs with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
 
 ## Required packages
 [**Jupyter notebook**](https://jupyter.org/)\
@@ -26,9 +26,9 @@ Image-based phenotyping provides a powerful avenue to characterize plant growth 
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis of [**MVAPP**](https://mvapp.kaust.edu.sa/) will be performed. Two schematic charts were displayed and detailed steps were described as follow:
 
 ### schematic charts of the pipeline for single experiemnt
-![image](https://user-images.githubusercontent.com/69836931/175119244-c9bac0e5-4bae-4022-84d4-a2c4fab21620.png)
+![image](https://user-images.githubusercontent.com/69836931/172938295-14267699-b17d-44de-a308-a15a8a793880.png)
 ### schematic charts of the pipeline for multiple experiemnt
-![image](https://user-images.githubusercontent.com/69836931/175119303-16ef0882-7ee0-468c-894c-343069af0f89.png)
+![image](https://user-images.githubusercontent.com/69836931/172938369-a8550d59-0a83-4d3e-bc43-b40ab42ef318.png)
 
 ## Detailed steps for the pipeline
 Descriptions for each step were shown as follow, with link to our in-house protocols and references. 
@@ -44,7 +44,7 @@ example: raspiU_cameraA.2021.09.07-09.00.01.jpg
 
 **Type in the following command to check the help page**
 ```
-bash phenoRig_setup.sh -help 
+bash 0_TOPVIEW_setup.sh -help 
 ```
 **Help page for top-view image setup pipeline will be displayed as follows:**
 ```
@@ -53,13 +53,12 @@ bash phenoRig_setup.sh -help
 use -help argument to show usage information
 The Current Time is: 2022.06.15-14.31.30
 
-Usage : sh phenoRig_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
+Usage : sh s0_TOPVIEW_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
   Image capture parameters
-  -m [String] < type in one of the two modes:"collection","calibration" DEFAULT: "collection"> 
+  -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image"> 
   -f [String] < type in the name of facility used for photo collection eg: raspiZ DEFAULT: "raspi"> 
-  -i [Integer] < the minutes interval while taking pictures eg: 30 DEFAULT: "30"> 
-  -t [Integer] < Number of days (duration) for images collections DEFAULT: "15" >
+  -t [integer] < the minutes interval while taking pictures eg: 30 DEFAULT: "30"> 
   -d [String] < /path/to/images to be saved after collection DEFAULT: "." (The current directory)>
 
   Image quality parameters
@@ -86,7 +85,7 @@ example: RaspiZ_side1_2022.04.17-11.07.01.jpg
 ```
 **Type in the following command to check the help page**
 ```
-bash phenoCage_setup.sh -help 
+bash 0_SIDEVIEW_setup.sh -help 
 ```
 **Help page for side-view image setup pipeline will be displayed as follows:**
 ```
@@ -95,7 +94,7 @@ bash phenoCage_setup.sh -help
 use -help argument to show usage information
 
 The Current Time is: 2022.06.15-16.36.35
-Usage : sh phenoCage_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
+Usage : sh s0_SIDEVIEW_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
   Image capture parameters
   -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image">
@@ -118,6 +117,9 @@ Usage : sh phenoCage_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEED 
 
 ```
 Please note that most parameters are not required with alternative default parameters to set inputs. The default settings will be displayed while launching pipelines.
+
+After collection of images, images from different experiments will be transferd to local server or PC for data processing due to limited computational power of raspiberry computers. Users can use hardware transfer (flash drive, hard disk, and etc). However, the remote transfer by SSH will be recommended. The manual and configureation of IP address of host and raspiberry computers can be found in out [**data transfer tutorial**](https://www.protocols.io/edit/bti-plant-phenotyping-system-image-data-transfer-t-cbudsns6)
+
 
 ### 2. Image-processing parameter selection
 Phenotypic data extraction from images will be processed by PlantCV software with minor modifications and optimizations. One sample image will be selected to define parameters used for data extraction and the optimized parameter will be used to extract data among the rest images derived from the same batch of experiments. Examples of parameter settings can be referred from household [**protocols**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-jupyter-notebo-car5sd86). 
@@ -190,7 +192,7 @@ After the copy of parameters to databases with one of the three experimental typ
 In this option, pipelines for MULTI_PLANT and SIDE_VIEW pipelines will be executed by users respectively to launch analysis. Here, a few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of the experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following command line and see output screenshot as below.
 
 ```
-bash phenoRig_process.sh
+bash 2_MULTI_PLANT.sh
 ```
 **Type in the answers for each questions to launch analysis**
 ![image](https://user-images.githubusercontent.com/69836931/170578689-aa2de6ae-22bd-4b67-bf39-4895de0fab0d.png)
@@ -199,7 +201,7 @@ bash phenoRig_process.sh
 ![image](https://user-images.githubusercontent.com/69836931/170578770-a78b1328-097a-4075-a144-d4b00b9007e3.png)
 
 ```
-bash phenoCage_process.sh
+bash 3_SIDE_VIEW.sh
 ```
 **Type in the answers for each questions to launch analysis**
 ![image](https://user-images.githubusercontent.com/69836931/170578807-0224e5fa-5aa9-4b81-a8c8-26d70e3bdf12.png)
@@ -224,11 +226,11 @@ After quality control of sample images has been processed, users will be asked i
 
 
 **OPTION 2: bulk analysis for multiple experiments**
-When tackling multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see the below example). In this pipeline, three arguments will be provided by users, including an experimental design table containing metadata, the type of experiments (**options: "TOP_VIEW", "SIDE_VIEW"**), and the mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with the program, a tabular design table is required with a restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT and SIDE_VIEW types of experiments. In addition, without providing the mode option (**-m argument**), all images under the image folder will be used for analysis. 
+When tackling multiple experiments or large datasets, bulk analysis is recommended by incorporating experimental design metadata into a table (see the below example). In this pipeline, three arguments will be provided by users, including an experimental design table containing metadata, the type of experiments (**options: "MULTI_PLANT", "SIDE_VIEW"**), and the mode of analysis regarding inclusion of one random image per day (**sample images**) or all images (**option: "SAMPLE","ALL" DEFAULT: ALL**) as shown from the attached picture. To start with the program, a tabular design table is required with a restricted format regarding column information. Please note that there are different column numbers from design table for MULTI_PLANT and SIDE_VIEW types of experiments. In addition, without providing the mode option (**-m argument**), all images under the image folder will be used for analysis. 
 
 **Type in the following command to check the help page**
 ```
-bash BULK_IMAGES.sh -help 
+bash 1_BULK_IMAGES.sh -help 
 ```
 **Help page will be displayed as follows:**
 ```
