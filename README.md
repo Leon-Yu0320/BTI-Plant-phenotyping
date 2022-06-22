@@ -118,6 +118,7 @@ Usage : sh s0_SIDEVIEW_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEE
 ```
 Please note that most parameters are not required with alternative default parameters to set inputs. The default settings will be displayed while launching pipelines.
 
+**Image data transfer**
 After collection of images, images from different experiments will be transferd to local server or PC for data processing due to limited computational power of raspiberry computers. Users can use hardware transfer (flash drive, hard disk, and etc). However, the remote transfer by SSH will be recommended. The manual and configureation of IP address of host and raspiberry computers can be found in out [**data transfer tutorial**](https://www.protocols.io/edit/bti-plant-phenotyping-system-image-data-transfer-t-cbudsns6)
 
 
