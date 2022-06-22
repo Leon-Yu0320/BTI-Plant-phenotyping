@@ -7,7 +7,7 @@ NC='\033[0m'
 
 echo ""
 echo ""
-echo -e "${GREEN}*********************************** WELCOME TO USE TOP_VIEW IMAGE PHENOTYPING SYSTEM ***********************************${NC}"
+echo -e "${GREEN}*********************************** WELCOME TO USE phenoRig IMAGE PROCESSING SYSTEM ***********************************${NC}"
 echo -e "${GREEN}*******************************Please answer the following questions to launch analysis********************************${NC}"
 echo ""
 echo ""
@@ -261,7 +261,7 @@ else
             echo ""
             echo -e "${GREEN}*** Image analysis finished ! Please check results under the ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.csv..... ***${NC}"
             echo ""
-            echo -e "${GREEN}*************************************** Thanks for using TOP_VIEW PIPELINES ***************************************${NC}"
+            echo -e "${GREEN}*************************************** Thanks for using phenoRig IMAGE PROCESSING SYSTEM ***************************************${NC}"
             echo ""
         else 
             echo ""
