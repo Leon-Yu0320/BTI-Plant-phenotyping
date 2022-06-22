@@ -56,9 +56,10 @@ The Current Time is: 2022.06.15-14.31.30
 Usage : sh s0_TOPVIEW_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
   Image capture parameters
-  -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image"> 
+  -m [String] < type in one of the two modes:"collection","calibration" DEFAULT: "collection"> 
   -f [String] < type in the name of facility used for photo collection eg: raspiZ DEFAULT: "raspi"> 
-  -t [integer] < the minutes interval while taking pictures eg: 30 DEFAULT: "30"> 
+  -i [Integer] < the minutes interval while taking pictures eg: 30 DEFAULT: "30"> 
+  -t [Integer] < Number of days (duration) for images collections DEFAULT: "15" >
   -d [String] < /path/to/images to be saved after collection DEFAULT: "." (The current directory)>
 
   Image quality parameters
