@@ -15,7 +15,7 @@ Computational pipeline for phenotyping data analysis using images
     - [3. Image batch processes](#3-image-batch-processes)
  
 ## Introduction
-Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in response to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities (phenoRig and PhenoCage) for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pairs with the two lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
+Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in response to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities (**phenoRig** and **PhenoCage**) for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pairs with the two lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
 
 ## Required packages
 [**Jupyter notebook**](https://jupyter.org/)\
@@ -44,7 +44,7 @@ example: raspiU_cameraA.2021.09.07-09.00.01.jpg
 
 **Type in the following command to check the help page**
 ```
-bash 0_TOPVIEW_setup.sh -help 
+bash phenoRig_setup.sh -help 
 ```
 **Help page for top-view image setup pipeline will be displayed as follows:**
 ```
@@ -53,7 +53,7 @@ bash 0_TOPVIEW_setup.sh -help
 use -help argument to show usage information
 The Current Time is: 2022.06.15-14.31.30
 
-Usage : sh s0_TOPVIEW_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
+Usage : sh phenoRig_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
   Image capture parameters
   -m [String] < type in one of the two modes:"collection","calibration" DEFAULT: "collection"> 
@@ -86,7 +86,7 @@ example: RaspiZ_side1_2022.04.17-11.07.01.jpg
 ```
 **Type in the following command to check the help page**
 ```
-bash 0_SIDEVIEW_setup.sh -help 
+bash phenoCage_setup.sh -help 
 ```
 **Help page for side-view image setup pipeline will be displayed as follows:**
 ```
@@ -95,7 +95,7 @@ bash 0_SIDEVIEW_setup.sh -help
 use -help argument to show usage information
 
 The Current Time is: 2022.06.15-16.36.35
-Usage : sh s0_SIDEVIEW_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
+Usage : sh phenoCage_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
   Image capture parameters
   -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image">
@@ -190,7 +190,7 @@ After the copy of parameters to databases with one of the three experimental typ
 In this option, pipelines for MULTI_PLANT and SIDE_VIEW pipelines will be executed by users respectively to launch analysis. Here, a few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of the experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following command line and see output screenshot as below.
 
 ```
-bash 2_MULTI_PLANT.sh
+bash phenoRig_process.sh
 ```
 **Type in the answers for each questions to launch analysis**
 ![image](https://user-images.githubusercontent.com/69836931/170578689-aa2de6ae-22bd-4b67-bf39-4895de0fab0d.png)
@@ -199,7 +199,7 @@ bash 2_MULTI_PLANT.sh
 ![image](https://user-images.githubusercontent.com/69836931/170578770-a78b1328-097a-4075-a144-d4b00b9007e3.png)
 
 ```
-bash 3_SIDE_VIEW.sh
+bash phenoCage_process.sh
 ```
 **Type in the answers for each questions to launch analysis**
 ![image](https://user-images.githubusercontent.com/69836931/170578807-0224e5fa-5aa9-4b81-a8c8-26d70e3bdf12.png)
@@ -228,7 +228,7 @@ When tackling multiple experiments or large datasets, bulk analysis is recommend
 
 **Type in the following command to check the help page**
 ```
-bash 1_BULK_IMAGES.sh -help 
+bash BULK_IMAGES.sh -help 
 ```
 **Help page will be displayed as follows:**
 ```
