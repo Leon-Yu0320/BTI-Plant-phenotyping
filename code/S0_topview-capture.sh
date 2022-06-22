@@ -7,7 +7,7 @@ NC='\033[0m'
 
 echo ""
 echo ""
-echo -e "${GREEN}*********************************** WELCOME TO USE TOP-VIEW IMAGES SETUP PIPELINE ***********************************${NC}"
+echo -e "${GREEN}*********************************** WELCOME TO USE phenoRig IMAGES SETUP PIPELINE ***********************************${NC}"
 echo ""
 echo -e "${GREEN}use -help argument to show usage information${NC}"
 echo ""
@@ -19,14 +19,15 @@ echo "The Current Time is: $current_time"
 
 usage() {
       echo ""
-      echo -e "${BLUE}Usage : sh $0 -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT${NC}"
+      echo -e "${BLUE}Usage : sh $0 -m MODE -f FACILITY -i INTERVAL -t DURATION -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT${NC}"
       echo ""
 
 cat <<'EOF'
   Image capture parameters
-  -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image"> 
+  -m [String] < type in one of the two modes:"collection","calibration" DEFAULT: "collection"> 
   -f [String] < type in the name of facility used for photo collection eg: raspiZ DEFAULT: "raspi"> 
-  -t [integer] < the minutes interval while taking pictures eg: 30 DEFAULT: "30"> 
+  -i [Integer] < the minutes interval while taking pictures eg: 30 DEFAULT: "30"> 
+  -t [Integer] < Number of days (duration) for images collections DEFAULT: "15" >
   -d [String] < /path/to/images to be saved after collection DEFAULT: "." (The current directory)>
 
   Image quality parameters
@@ -47,7 +48,7 @@ EOF
     exit 0
 }
 
-while getopts ":m:f:t:d:ss:sh:sa:br:co:ISO:W:H:h:" opt; do
+while getopts ":m:f:i:t:d:ss:sh:sa:br:co:ISO:W:H:h:" opt; do
   case $opt in
     m)
      MODE=$OPTARG
@@ -55,8 +56,11 @@ while getopts ":m:f:t:d:ss:sh:sa:br:co:ISO:W:H:h:" opt; do
     f)
      FACILITY=$OPTARG
       ;;
-    t)
+    i)
      INTERVAL=$OPTARG
+      ;;
+    t)
+     DURATION=$OPTARG
       ;;
     d)
      DIRECTORY=$OPTARG
@@ -125,7 +129,18 @@ then
     echo -e "${BLUE}No interval provided, use default interavl instead ${NC} <DEAFULT:30 (unit: minutes)> "
     INTERVAL=30
 else
-    echo -e "${BLUE}The interval name for experiment is${NC} $INTERVAL "
+    echo -e "${BLUE}The interval for experiment is${NC} $INTERVAL minutes"
+fi
+echo ""
+echo -e "${Green}Load image parameters${NC}"
+
+### forexperiment duration
+if [[ $DURATION -eq 0 ]]
+then
+    echo -e "${BLUE}No duration of experiments provided, use default interavl instead ${NC} <DEAFULT:15 (unit: days)> "
+    DURATION=15
+else
+    echo -e "${BLUE}The duration time for experiment is${NC} $INTERVAL days"
 fi
 echo ""
 echo -e "${Green}Load image parameters${NC}"
@@ -210,42 +225,65 @@ if [ -d "${DIRECTORY}/$FACILITY" ]
     then
     echo ""
     echo ""
-    echo -e "${BLUE}WARNING: Directory ${DIRECTORY}/$FACILITY exists. Results will be overwritten${NC}"
-    rm -r ${DIRECTORY}/$FACILITY
+    echo -e "${BLUE}Directory ${DIRECTORY}/$FACILITY exists. ${NC}"
+else
+    mkdir ${DIRECTORY}/$FACILITY
 fi
-
-mkdir ${DIRECTORY}/$FACILITY
 
 if [[ $MODE == "calibration" ]]
 then 
-    raspistill -ss $SHUTTERSPEED -sh $SHARPNESS -sa $SATURATION -br $BRIGHTNESS -co $CONTRAST --ISO $ISO -w $WIDTH -h $HEIGHT -dt -o ${DIRECTORY}/${FACILITY}_CALIBRATOIN_$current_time.jpg
+    raspistill -ss $SHUTTERSPEED -sh $SHARPNESS -sa $SATURATION -br $BRIGHTNESS -co $CONTRAST --ISO $ISO -w $WIDTH -h $HEIGHT -dt -o ${DIRECTORY}/${FACILITY}_CALIBRATOIN.jpg
     echo -e "${BLUE}Please check calibration images taken under : $HEIGHT ${NC}"
 else
-    ### set the crown
-    SHELL=/bin/bash
-    PATH=/sbin:/bin:/usr/sbin:/usr/bin
+    ### check the remaning disk space
+    LEFT_SPACE=$(df -a /home | cut -f1)
+    TIMES=$((60/$INTERVAL))
+    ESTIMATED_SIZE=$((5000*2*12*$TIMES*$DURATION))
 
-    i2cset -y 1 0x70 0x00 0x01
-    gpio -g mode 17 out
-    gpio -g mode 4  out
-    gpio -g write 17 0 #set the gpio17 low
-    gpio -g write 4 0 #set the gpio4   low
-    echo -e "${BLUE}Taking a picture with Camera A${NC}"
+    if [ "$ESTIMATED_SIZE" > "$LEFT_SPACE" ];
+    then 
+        echo -e "${RED}WARNING: The space on this device is not enough for a $DURATION days experiment with $INTERVAL minutes interval settings"
+        echo -e "${RED}Please clean the space on this device and re-launch the setup process"
+    else
+        echo "Setting up crontab for $FACILITY with $DURATION days and  $INTERVAL minutes interval"
+	### Define the current directory to save the crontab
+        CURRENT_DIR=$(pwd)
 
-    */$INTERVAL * * * * raspistill -ss $SHUTTERSPEED -sh $SHARPNESS -sa $SATURATION -br $BRIGHTNESS -co $CONTRAST --ISO $ISO \
-         -w $WIDTH -h $HEIGHT \
-         -dt -o ${DIRECTORY}/${FACILITY}_cameraA.$current_time.jpg
+        echo '#!/bin/sh
+        current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+        ###Initiate cameras###
+        i2cset -y 1 0x70 0x00 0x01
+        gpio -g mode 17 out
+        gpio -g mode 4  out
+        gpio -g write 17 0 #set the gpio17 low
+        gpio -g write 4 0 #set the gpio4   low
 
-    i2cset -y 1 0x70 0x00 0x02
-    gpio -g write 4 1 #set the gpio4 high
+        ###Taking a picture with Camera A
+        raspistill -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST --ISO ISO_SETTING -w WIDTH -h HEIGHT -dt -o DIRECTORY/FACILITY_cameraA.${current_time}.jpg
 
-    echo -e "${BLUE}Taking a picture with Camera B${NC}"
+        i2cset -y 1 0x70 0x00 0x02
+        gpio -g write 4 1 #set the gpio4 high
 
-    */$INTERVAL * * * * raspistill -ss $SHUTTERSPEED -sh $SHARPNESS -sa $SATURATION -br $BRIGHTNESS -co $CONTRAST --ISO $ISO \
-        -w $WIDTH -h $HEIGHT \
-        -dt -o ${DIRECTORY}/${FACILITY}_cameraB.$current_time.jpg
+        ###Taking a picture with Camera B
+        raspistill -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST --ISO ISO_SETTING -w WIDTH -h HEIGHT -dt -o DIRECTORY/FACILITY_cameraA.${current_time}.jpg' > $CURRENT_DIR/image_capture_${FACILITY}.sh
 
-    echo -e "${GREEN}Image capture from cameraA and cameraB with $INTERVAL minutes intervals were completed! Check images under ${DIRECTORY}/$FACILITY ${NC}"
+        ### Replace character with vairables
+        sed -i "s/SHUTTERSPEED/${SHUTTERSPEED}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh
+        sed -i "s/SHARPNESS/${SHARPNESS}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh 
+        sed -i "s/SATURATION/${SATURATION}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh 
+        sed -i "s/BRIGHTNESS/${SATURATION}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh 
+        sed -i "s/CONTRAST/${CONTRAST}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh 
+        sed -i "s/ISO_SETTING/${ISO_SETTING}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh
+        sed -i "s/WIDTH/${WIDTH}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh 
+        sed -i "s/HEIGHT/${HEIGHT}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh
+        sed -i "s@DIRECTORY@${DIRECTORY}@g" $CURRENT_DIR/image_capture_${FACILITY}.sh 
+        sed -i "s/FACILITY/${FACILITY}/g" $CURRENT_DIR/image_capture_${FACILITY}.sh
+
+        #echo -e "SHELL=/bin/bash\\nPATH=/sbin:/bin:/usr/sbin:/usr/bin\\n*/$INTERVAL * * * * bash $CURRENT_DIR/image_capture_${FACILITY}.sh" > ${CURRENT_DIR}/${FACILITY}_newcrontab
+        #echo -e " 0 0 */$DURATION * *   sed -i 's~\*~#\*~g' ${CURRENT_DIR}/${FACILITY}_newcrontab"
+
+        echo "Crontab setting finished!"
+    fi
 fi
-
-
+echo ""
+echo -e "${GREEN}*********************************** Thanks for using phenoRig IMAGES SETUP PIPELINE ***********************************${NC}"
