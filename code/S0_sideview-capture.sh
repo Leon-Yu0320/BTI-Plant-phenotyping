@@ -7,7 +7,7 @@ NC='\033[0m'
 
 echo ""
 echo ""
-echo -e "${GREEN}*********************************** WELCOME TO USE SIDE-VIEW IMAGES SETUP PIPELINE ***********************************${NC}"
+echo -e "${GREEN}*********************************** WELCOME TO USE phenoCage IMAGES SETUP PIPELINE ***********************************${NC}"
 echo ""
 echo -e "${GREEN}use -help argument to show usage information${NC}"
 echo ""
@@ -218,3 +218,6 @@ else
 
     echo -e "${GREEN}Image capture from seven views were completed! Check images under ${DIRECTORY}/$FACILITY ${NC}"
 fi
+
+echo ""
+echo -e "${GREEN}*********************************** Thanks for using phenoCage IMAGES SETUP PIPELINE ***********************************${NC}"
