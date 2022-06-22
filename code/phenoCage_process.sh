@@ -7,7 +7,7 @@ NC='\033[0m'
 
 echo ""
 echo ""
-echo -e "${GREEN}**************************************************WELCOME TO USE SIDE_VIEW IMAGE PHENOTYPING SYSTEM ***************************************************${NC}"
+echo -e "${GREEN}**************************************************WELCOME TO USE phenoCage IMAGE PHENOTYPING SYSTEM ***************************************************${NC}"
 echo -e "${GREEN}********************************************Please answer the following questions to launch analysis**************************************************${NC}"
 echo ""
 echo ""
@@ -241,7 +241,7 @@ else
             echo ""
             echo "${GREEN}*** Image analysis finished ! Please check results under the ${OUTPUT_DIR}/${PROJECT}/Results/$PROJECT.result.csv..... ***${NC}"
             echo ""
-            echo -e "${GREEN}*************************************** Thanks for using SIDE-VIEW PIPELINES ***************************************${NC}"
+            echo -e "${GREEN}*************************************** Thanks for using phenoCage IMAGE PHENOTYPING SYSTEM ***************************************${NC}"
             echo ""
         else 
             echo ""
