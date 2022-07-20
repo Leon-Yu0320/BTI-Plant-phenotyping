@@ -25,10 +25,10 @@ Image-based phenotyping provides a powerful avenue to characterize plant growth 
 ## General overview of the pipeline
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis of [**MVAPP**](https://mvapp.kaust.edu.sa/) will be performed. Two schematic charts were displayed and detailed steps were described as follow:
 
-### schematic charts of the pipeline for single experiemnt
-![image](https://user-images.githubusercontent.com/69836931/172938295-14267699-b17d-44de-a308-a15a8a793880.png)
-### schematic charts of the pipeline for multiple experiemnt
-![image](https://user-images.githubusercontent.com/69836931/172938369-a8550d59-0a83-4d3e-bc43-b40ab42ef318.png)
+### schematic charts of the pipeline for interactive surface experiments
+![image](https://user-images.githubusercontent.com/69836931/180051339-15279750-0225-47d5-a792-15512de06372.png)
+### schematic charts of the pipeline for BULK analysis
+![image](https://user-images.githubusercontent.com/69836931/180051103-e4d2b6a6-e736-4d90-bd6a-17eb0ceff22b.png)
 
 ## Detailed steps for the pipeline
 Descriptions for each step were shown as follow, with link to our in-house protocols and references. 
