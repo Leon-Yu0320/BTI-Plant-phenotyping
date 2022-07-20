@@ -231,7 +231,7 @@ When tackling multiple experiments or large datasets, bulk analysis is recommend
 
 **Type in the following command to check the help page**
 ```
-bash 1_BULK_IMAGES.sh -help 
+bash BULK_IMAGES.sh -help 
 ```
 **Help page will be displayed as follows:**
 ```
@@ -239,7 +239,7 @@ bash 1_BULK_IMAGES.sh -help
 
 use -help argument to show usage information
 
-Usage : sh code/1_BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
+Usage : sh code/BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 
   -d [Table] < /path/to/experimental design table stored, refer manual for details of each type of experiments>
   -t [String] < type in one of the three experiment types: "TOP_VIEW" or "SIDE_VIEW" >
