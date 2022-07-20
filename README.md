@@ -85,7 +85,7 @@ example: RaspiZ_side1_2022.04.17-11.07.01.jpg
 ```
 **Type in the following command to check the help page**
 ```
-bash 0_SIDEVIEW_setup.sh -help 
+bash phenoRig_setup.sh -help 
 ```
 **Help page for side-view image setup pipeline will be displayed as follows:**
 ```
@@ -193,7 +193,7 @@ After the copy of parameters to databases with one of the three experimental typ
 In this option, pipelines for MULTI_PLANT and SIDE_VIEW pipelines will be executed by users respectively to launch analysis. Here, a few settings can be specified by users while typing into questions from programs based on their experimental design, such as the start-end time period of the experiment, the lights-on and lights-off schedule of plant growth, the camera ID, and raspberry ID for experiments. To launch the analysis, type in the following command line and see output screenshot as below.
 
 ```
-bash 2_MULTI_PLANT.sh
+bash phenoRig_process.sh
 ```
 **Type in the answers for each questions to launch analysis**
 ![image](https://user-images.githubusercontent.com/69836931/170578689-aa2de6ae-22bd-4b67-bf39-4895de0fab0d.png)
@@ -202,7 +202,7 @@ bash 2_MULTI_PLANT.sh
 ![image](https://user-images.githubusercontent.com/69836931/170578770-a78b1328-097a-4075-a144-d4b00b9007e3.png)
 
 ```
-bash 3_SIDE_VIEW.sh
+bash phenoCage_process.sh
 ```
 **Type in the answers for each questions to launch analysis**
 ![image](https://user-images.githubusercontent.com/69836931/170578807-0224e5fa-5aa9-4b81-a8c8-26d70e3bdf12.png)
