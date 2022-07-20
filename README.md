@@ -44,7 +44,7 @@ example: raspiU_cameraA.2021.09.07-09.00.01.jpg
 
 **Type in the following command to check the help page**
 ```
-bash 0_TOPVIEW_setup.sh -help 
+bash phenoRig_setup.sh -help 
 ```
 **Help page for top-view image setup pipeline will be displayed as follows:**
 ```
@@ -53,7 +53,7 @@ bash 0_TOPVIEW_setup.sh -help
 use -help argument to show usage information
 The Current Time is: 2022.06.15-14.31.30
 
-Usage : sh s0_TOPVIEW_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
+Usage : sh phenoRig_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
   Image capture parameters
   -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image"> 
@@ -94,7 +94,7 @@ bash phenoRig_setup.sh -help
 use -help argument to show usage information
 
 The Current Time is: 2022.06.15-16.36.35
-Usage : sh s0_SIDEVIEW_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
+Usage : sh phenoCage_setup.sh -m MODE -f FACILITY -d DIRECTORY -ss SHUTTERSPEED -sh SHARPNESS -sa SATURATION -br BRIGHTNESS -co CONTRAST -ISO ISO -W WIDTH -H HEIGHT
 
   Image capture parameters
   -m [String] < type in one of the two modes:"image","calibration" DEFAULT: "image">
