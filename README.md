@@ -6,10 +6,10 @@ Computational pipeline for phenotyping data analysis using images
 - [BTI mobile plant phenotyping system](#bti-mobile-plant-phenotyping-system)
   - [Introduction](#introduction)
   - [Required packages](#required-packages)
-  - [General overview of the pipeline](#general-overview-of-the-pipeline)
-    - [schematic charts of the pipeline for single experiemnt](#schematic-charts-of-the-pipeline-for-single-experiemnt)
-    - [schematic charts of the pipeline for multiple experiemnt](#schematic-charts-of-the-pipeline-for-multiple-experiemnt)
-  - [Detailed steps for the pipeline](#detailed-steps-for-the-pipeline)
+  - [General overview of the workflow](#general-overview-of-the-workflow)
+    - [schematic charts of the RasPiPheno PIPE for single experiemnt](#schematic-charts-of-the-pipeline-for-single-experiemnt)
+    - [schematic charts of the RasPiPheno PIPE for multiple experiemnt](#schematic-charts-of-the-pipeline-for-multiple-experiemnt)
+  - [Detailed steps for the RasPiPheno PIPE](#detailed-steps-for-the-pipeline)
     - [1. Experimental setup and photo collections](#1-experimental-setup-and-photo-collections)
     - [2. Image-processing parameter selection](#2-image-processing-parameter-selection)
     - [3. Image batch processes](#3-image-batch-processes)
@@ -22,7 +22,7 @@ Image-based phenotyping provides a powerful avenue to characterize plant growth 
 [**Conda**](https://docs.conda.io/en/latest/)\
 [**PlantCV**](https://plantcv.readthedocs.io/en/stable/)
 
-## General overview of the pipeline
+## General overview of the workflow
 To realize the high-throughput manner of data processing, advantages of [**parallel data processing function**](https://plantcv.readthedocs.io/en/v3.7/pipeline_parallel/) from the PlantCV were adopted in the pipeline and four major steps from plant growth to final downstream analysis of [**MVAPP**](https://mvapp.kaust.edu.sa/) will be performed. Two schematic charts were displayed and detailed steps were described as follow:
 
 ### schematic charts of the pipeline for interactive surface experiments
