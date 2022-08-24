@@ -1,7 +1,7 @@
 # BTI mobile plant phenotyping system
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Leon-Yu0320/BTI-Plant-phenotyping/HEAD)
 
-Computational pipeline for phenotyping data analysis using images
+Integrated workflow for phenotyping data analysis using images
 
 - [BTI mobile plant phenotyping system](#bti-mobile-plant-phenotyping-system)
   - [Introduction](#introduction)
@@ -33,10 +33,10 @@ To realize the high-throughput manner of data processing, advantages of [**paral
 ## Detailed steps for the pipeline
 Descriptions for each step were shown as follow, with link to our in-house protocols and references. 
 ### 1. Experimental setup and photo collections
-All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46) developed for TOP_VIEW IMAGES phenotyping and SIDE_VIEW IMAGES phenotyping.
+All photos will be collected by Raspberry Pi camera along with light-weight [**facilities**](https://www.protocols.io/view/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46) (**PhenoRig and PhenoCage**) developed for phenotyping.
 To ensure the correct metadata fetching including **camera ID, plant ID, year, date, month, hour, minute, and other experiments related information** from the name of each photo in the subsequent data processing. The data collection will be initiated by **two individual shell scripts with respective fixed naming criteria**. Photo name examples from per experiment setup were listed as follows:
 
-**TOP_VIEW IMAGES:**
+**Top-view IMAGES for PhenoRig:**
 ```
 format: RASPI_cameraID.YYYY.MM.DD-HH.MM.SS.jpg
 example: raspiU_cameraA.2021.09.07-09.00.01.jpg
@@ -48,7 +48,7 @@ bash phenoRig_setup.sh -help
 ```
 **Help page for top-view image setup pipeline will be displayed as follows:**
 ```
-*********************************** WELCOME TO USE TOP-VIEW IMAGES SETUP PIPELINE ***********************************
+*********************************** WELCOME TO USE PhenoRig SETUP PIPELINE ***********************************
 
 use -help argument to show usage information
 The Current Time is: 2022.06.15-14.31.30
@@ -78,7 +78,7 @@ Usage : sh phenoRig_setup.sh -m MODE -f FACILITY -t INTERVAL -d DIRECTORY -ss SH
 ```
 Please note that most parameters are not required with alternative default parameters to set inputs. The default settings will be displayed while launching pipelines.
 
-**SIDE_VIEW IMAGES:**
+**Side-view IMAGES for PhenoCage:**
 ```
 format: RASPI_side.NO_YYYY.MM.DD-HH.MM.SS.jpg
 example: RaspiZ_side1_2022.04.17-11.07.01.jpg
@@ -89,7 +89,7 @@ bash phenoRig_setup.sh -help
 ```
 **Help page for side-view image setup pipeline will be displayed as follows:**
 ```
-*********************************** WELCOME TO USE SIDE-VIEW IMAGES SETUP PIPELINE ***********************************
+*********************************** WELCOME TO USE PhenoCage IMAGES SETUP PIPELINE ***********************************
 
 use -help argument to show usage information
 
