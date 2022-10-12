@@ -3,32 +3,40 @@ ui <- fluidPage(
   navbarPage( title = "RasPiPheno App", 
               
               tabPanel("Data Upload", icon=icon("upload"),
+                       sidebarPanel(
+                         
+                         selectizeInput("expType", label="What system did you use to collect data?",
+                                        choices = c("PhenoRig", "PhenoCage"), multiple = F),
+                         
+                         fileInput("csv.raspi",
+                                   label="Upload Raspberry Pi derived CSV files here",
+                                   multiple = TRUE),
+                         
+                         uiOutput("timeSTART"),
+                         
+                         fileInput("csv.meta",
+                                   label="Upload the decoding  Meta-data file here",
+                                   accept = c('text / csv', '.csv', 'text/comma-separated-values')),
+                         
+                         checkboxInput("FWCheck", label = "My Meta-data contains collumn with Fresh Weight informatio", value = F),
+                         uiOutput("FWColumn"),
+                         
+                         actionButton("MergeData",icon("file-import"), label = "Merge Data"),
+                         
+                         h3(strong("About the APP")),
+                         strong("RasPiPheno App"), "is developed by Stress Architecture & RNA Biology Lab at the Boyce Thompson Institute, Cornell University.",br(),br(),
+                        "The App is a part of high-throughput phenotypic data processing system and it aimed to streamline the downstream phenotypic data collected by
+                        customized phenotypic facilities which include", strong("PhenoRig"), "and",strong("PhenoCage")
+
+                         # end of sidebar panel
+                       ),
+                       
+                       
                        mainPanel(navbarPage(
                          ">> Data <<",
                          tabPanel("Raspberry Pi data", icon = icon("flask"),
-                                  sidebarPanel(
-                                    
-                                    selectizeInput("expType", label="What system did you use to collect data?",
-                                                   choices = c("PhenoRig", "PhenoCage"), multiple = F),
-                                    
-                                    fileInput("csv.raspi",
-                                              label="Upload Raspberry Pi derived CSV files here",
-                                              multiple = TRUE),
-                                    
-                                    uiOutput("timeSTART"),
-                                    
-                                    fileInput("csv.meta",
-                                              label="Upload the decoding  Meta-data file here",
-                                              accept = c('text / csv', '.csv', 'text/comma-separated-values')),
-                                    
-                                    checkboxInput("FWCheck", label = "My Meta-data contains collumn with Fresh Weight information", value = F),
-                                    uiOutput("FWColumn"),
-                                    
-                                    actionButton("MergeData", icon("file-import"),label = "Merge Data")
-                                    # end of sidebar panel
-                                  ),
                                   verbatimTextOutput("uploaded_RasPi_data_report"),
-                                  column(6,dataTableOutput("Data_tabl1"))),
+                                  dataTableOutput("Data_tabl1")),
                          
                          tabPanel("Meta data", icon = icon("ruler"),
                                   verbatimTextOutput("uploaded_metadata_report"),
@@ -39,38 +47,18 @@ ui <- fluidPage(
                                   dataTableOutput("Data_tabl3")),
                          
                          tabPanel("Vizual Curation", icon=icon("eye"),
-                                  sidebarPanel(
-                                    selectizeInput("expType", label="What system did you use to collect data?",
-                                                   choices = c("PhenoRig", "PhenoCage"), multiple = F),
-                                    sliderInput(inputId = "alpha",
-                                                label = "Transparency of data point to be displayed:",
-                                                min = 0.0,
-                                                max = 1,
-                                                step = 0.1,
-                                                value = 0.2),
-                                    sliderInput(inputId = "alpha_region",
-                                                label = "Transparency of statitics summary to be displayed:",
-                                                min = 0.0,
-                                                max = 1,
-                                                step = 0.1,
-                                                value = 0.5),
-                                    selectInput(inputId = "geom_method",
-                                                label = "Displaying standard error:",
-                                                choices = c("errorbar", "ribbon", "line", "point"),
-                                                selected = "ribbon"),
-                                    
-                                    uiOutput("minX_tickUI"),
-                                    uiOutput("minY_tickUI"),
-                                    uiOutput("dayX_tickUI"),
-                                    uiOutput("dayY_tickUI"),
-                                    uiOutput("color_original")),
-                                  mainPanel(plotlyOutput("graph_over_time", width = "100%", height = "500px")))
+                                  fluidRow(
+                                  column(6, uiOutput("Choose_alpha"), uiOutput("Select_geom_methods")),
+                                  column(6,uiOutput("Choose_alpha_region"), uiOutput("color_original")),
+                                  column(6,uiOutput("X_tickUI1")), 
+                                  column(6,uiOutput("Y_tickUI1"))), 
+                                  hr(),
+                                  mainPanel(plotlyOutput("graph_over_time")))
                                   ))
                        # end of Tab1
               ),
               
               # # # # # # # # # # # # # # # # TAB 2 # # # # # # # # # # # # # # # # # # # # # # # # 
-              
               tabPanel("Data Smoothing", icon=icon("blender"),
                        sidebarPanel(
                          selectizeInput("smoothType", label = "What kind of smoothing would you like to use?",
@@ -81,44 +69,72 @@ ui <- fluidPage(
                                      max = 3.0,
                                      step = 0.5,
                                      value = 1.5),
+                         
                          selectInput(inputId = "level",
                                      label = "Level of confidence interval to use: ",
                                      choices = c(0.9, 0.95, 0.975),
                                      selected = 0.95),
+                         
+                         selectizeInput(
+                           inputId = "outlier",
+                           label = "Select the outlier removal cutoff (n * SD): ",
+                           choices = c(1, 1.5, 2, 2.5, 3),
+                           selected = 1.5),
+                         
                          uiOutput("nknotsUI"),
                          uiOutput("spanUI"),
                          uiOutput("degreeUI"),
-                         
-                         uiOutput("min_X_tickUI"),
-                         uiOutput("min_Y_tickUI"),
-                         uiOutput("day_X_tickUI"),
-                         uiOutput("day_Y_tickUI"),
-                         
-                         uiOutput("Outlier_removal"),
-                         uiOutput("Outlier_range"),
-
-                         actionButton("SmoothGo", icon("file-import"),label = "Smooth all samples")
+              
+                         #uiOutput("Outlier_range"),
+                         uiOutput("SmoothGo"),
+                  
+                         h3(strong("Note")),
+                         "This App provides smoothing and cleaning option for data processing:",br(),br(),
+                         strong("Data smoothing:"),br(),
+                         "Using non-linear model to predict phenotypic data (both PhenoRig and PhenoCage).", br(),
+                         strong("Data cleaning:"),br(),
+                         "Data cleaning: Removing outliers based on fitted model (PhenoRig only)."
                        ),
+                       
                        mainPanel(navbarPage(
                          "Smooth",
-                         tabPanel("smooth design", icon = icon("snowplow"),
-                                  uiOutput("Choose_smooth_sample"),
-                                  uiOutput("Drop_smooth_sample"),
-                                  #uiOutput("Drop_action"),
+                         tabPanel("smoothing and cleaning", icon = icon("snowplow"),
+                                  fluidRow(
+                                    column(6,uiOutput("X_tickUI2"),uiOutput("Choose_smooth_sample")),
+                                    column(6,uiOutput("Y_tickUI2"),uiOutput("Drop_smooth_sample"))),
+                                  hr(),
                                   verbatimTextOutput("Drop_data_report"),
-                                  plotOutput("Smoothed_graph_one_sample")),
+                                  plotOutput("Smoothed_graph_one_sample")
+                         ),
                          tabPanel("smooth data", icon=icon("calculator"),
                                   uiOutput("Smooth_table_button"),
                                   verbatimTextOutput("smooth_table_data_report"),
-                                  dataTableOutput("Smooth_table")),
-                         tabPanel("smooth graph", icon=icon("cloud-sun"),
-                                  uiOutput("color_smooth"),
+                                  dataTableOutput("Smooth_table")
+                         ),
+                         tabPanel("smoothed data graph", icon=icon("cloud-sun"),
+                                  fluidRow(
+                                    column(6,uiOutput("color_smooth"),uiOutput("X_tickUI3")),
+                                    column(6,uiOutput("Select_geom_methods2"),uiOutput("Y_tickUI3"))),
+                                  hr(),
                                   plotlyOutput("all_smooth_graph"),
-                                  uiOutput("Smooth_graph_button")),
-                         mainPanel(plotOutput(outputId = "Smooth_plot_one",width = "100%", height = "500px")))
-                       )
+                                  uiOutput("Smooth_graph_button")
+                         ),
+                         tabPanel("clean data", icon=icon("brush"),
+                                  uiOutput("Clean_table_button"),
+                                  verbatimTextOutput("Clean_table_data_report"),
+                                  dataTableOutput("Clean_table")
+                         ),
+                         tabPanel("cleaned data graph", icon = icon("palette"),
+                                  fluidRow(
+                                    column(6,uiOutput("X_tickUI4"),uiOutput("color_clean")),
+                                    column(6,uiOutput("Y_tickUI4"),uiOutput("Select_geom_methods3"))),
+                                  hr(),
+                                  plotlyOutput("all_clean_graph"),
+                                  uiOutput("clean_graph_button"))
+                       ))
                        # end of Tab2
-              ),
+              ),              
+
               
               # # # # # # # # # # # # # # # # TAB 3 # # # # # # # # # # # # # # # # # # # # # # # # 
               
@@ -144,7 +160,7 @@ ui <- fluidPage(
                                                               uiOutput("Rhowlowui"))),
                                                      hr(),
                                                   
-                                                     mainPanel(plotOutput(outputId = "Growth_Graph",width = "100%", height = "500px")),
+                                                     mainPanel(plotOutput(outputId = "Growth_Graph")),
                                                      uiOutput("Growth_graph_button"))
                        ))
                        # end of Tab3
