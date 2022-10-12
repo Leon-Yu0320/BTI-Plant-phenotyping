@@ -172,7 +172,7 @@ server <- function(input, output) {
             return(meta_sentence)
             
         }
-        
+        a
     })
     
     output$Data_tabl3 <- renderDataTable({
@@ -210,6 +210,30 @@ server <- function(input, output) {
             
         })
     
+    output$Choose_alpha <- renderUI(
+      sliderInput(inputId = "alpha",
+                  label = "Transparency of data point to be displayed:",
+                  min = 0.0,
+                  max = 1,
+                  step = 0.1,
+                  value = 0.2)
+    )
+    
+    output$Choose_alpha_region <- renderUI(
+      sliderInput(inputId = "alpha_region",
+                  label = "Transparency of statitics summary to be displayed:",
+                  min = 0.0,
+                  max = 1,
+                  step = 0.1,
+                  value = 0.2)
+    )
+    
+    output$Select_geom_methods <- renderUI(
+    selectInput(inputId = "geom_method",
+                label = "Displaying standard error:",
+                choices = c("errorbar", "ribbon", "line", "point"),
+                selected = "ribbon"),
+    )
     
     output$color_original <- renderUI({
         if(is.null(Raspi_unique())){return()} else {
@@ -226,59 +250,99 @@ server <- function(input, output) {
     
     
     ### define the axis ticks
-    output$minX_tickUI <- renderUI({if(input$expType == "PhenoRig"){
-        sliderInput("minX_tickUI", label="Which ticks would you like to use for time (minutes)?", 
+    
+    output$X_tickUI1 <- renderUI({
+      if(input$expType == "PhenoRig"){
+        sliderInput("minX_tickUI1", label="Which ticks would you like to use for time (minutes)?", 
                     min = 1000, max=5000, step = 1000, value = 2000)
-    }else{return(NULL)}})
-    output$minY_tickUI <- renderUI({if(input$expType == "PhenoRig"){
-        sliderInput("minY_tickUI", label="Which ticks would you like to use for leaf area (pixels)?", 
-                    min = 1000, max=5000, step = 1000, value = 5000)
-    }else{return(NULL)}})
-    
-    
-    output$dayX_tickUI <- renderUI({if(input$expType == "PhenoCage"){
-        sliderInput("dayX_tickUI", label="Which ticks would you like to use for time (days)?", 
+      } else if (input$expType == "PhenoCage"){
+        sliderInput("dayX_tickUI1", label="Which ticks would you like to use for time (days)?", 
                     min = 1, max=5, step = 1, value = 2)
-    }else{return(NULL)}})
-    output$dayY_tickUI <- renderUI({if(input$expType == "PhenoCage"){
-        sliderInput("dayY_tickUI", label="Which ticks would you like to use for total leaf area (pixels)?", 
-                    min = 100, max=500, step = 100, value = 200)
-    }else{return(NULL)}})
+      }
+    })
+    
 
+    output$Y_tickUI1 <- renderUI({
+      if(input$expType == "PhenoRig"){
+        sliderInput("minY_tickUI1", label="Which ticks would you like to use for leaf area?", 
+                    min = 1000, max=10000, step = 1000, value = 5000)
+      } else if (input$expType == "PhenoCage"){
+        sliderInput("dayY_tickUI1", label="Which ticks would you like to use for total leaf area?", 
+                    min = 1000, max=5000, step = 1000, value = 2000)
+      }
+    })
+    
+    ### plot the area graph 
     TimeGraph <- reactive(if(is.null(Raspi_unique())){return(NULL)}else{  
-        my_data <- Raspi_unique()
-        my_data$col.sorting <- as.factor(my_data[,input$ColorAreaGG])
-        if(input$expType == "PhenoRig"){
-            my_data$time.min <- as.numeric(my_data$time.min)
-            my_data$area <- as.numeric(my_data$area)
-            Area_graph <- ggplot(data=my_data, aes(x= time.min, y=area, group = Plant.ID, color = col.sorting)) +
-                             geom_line(alpha = input$alpha) +
-                             stat_summary(fun.data = mean_se, geom=input$geom_method, linetype=0, 
-                                          aes(group=col.sorting), alpha=input$alpha_region) +
-                             theme_classic() +
-                             ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
-                             scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI)) +
-                             scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI))
-        }
-        if(input$expType == "PhenoCage"){
-            my_data$time.days <- as.numeric(my_data$time.days)
-            my_data$area.total <- as.numeric(my_data$area.total)
-            Area_graph <- ggplot(data=my_data, aes(x= time.days, y=area.total, group = POT, color = col.sorting)) +
-                            geom_line(alpha = input$alpha) +
-                            stat_summary(fun.data = mean_se, geom=input$geom_method, linetype=0, 
-                             aes(group=col.sorting), alpha=input$alpha_region) +
-                            theme_classic() +
-                            ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") 
-                            scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI)) +
-                            scale_y_continuous(breaks=seq(0,max(my_data$area.total),by=input$dayY_tickUI))
-        }
-        Area_graph
+      my_data <- Raspi_unique()
+      my_data$col.sorting <- as.factor(my_data[,input$ColorAreaGG])
+      if(input$expType == "PhenoRig"){
+        my_data$time.min <- as.numeric(my_data$time.min)
+        my_data$area <- as.numeric(my_data$area)
+        Area_graph <- ggplot(data=my_data, aes(x= time.min, y=area, group = Plant.ID, color = col.sorting)) +
+          geom_line(alpha = input$alpha) +
+          stat_summary(fun.data = mean_se, geom=input$geom_method, linetype=0, 
+                       aes(group=col.sorting), alpha=input$alpha_region) +
+          theme_classic() +
+          ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
+          scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI1)) +
+          scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI1))
+      }
+      if(input$expType == "PhenoCage"){
+        my_data$time.days <- as.numeric(my_data$time.days)
+        my_data$area.total <- as.numeric(my_data$area.total)
+        Area_graph <- ggplot(data=my_data, aes(x= time.days, y=area.total, group = POT, color = col.sorting)) +
+          geom_line(alpha = input$alpha) +
+          stat_summary(fun.data = mean_se, geom=input$geom_method, linetype=0, 
+                       aes(group=col.sorting), alpha=input$alpha_region) +
+          theme_classic() +
+          ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") +
+          scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI1)) +
+          scale_y_continuous(breaks=seq(0,max(my_data$area.total),by=input$dayY_tickUI1))
+      }
+      Area_graph
     })
     
     output$graph_over_time <- renderPlotly({
-        ggplotly(TimeGraph())
+      ggplotly(TimeGraph())
     })
     
+    
+    ### define the smooth and clean option
+    output$SmoothGo <- renderUI({
+      if(input$expType == "PhenoRig"){
+        actionButton("SmoothGo", icon("file-import"),label = "Smooth and clean all samples")
+        
+      }else if (input$expType == "PhenoCage") {
+        actionButton("SmoothGo", icon("file-import"),label = "Smooth and clean all samples")
+      }
+   })
+    
+    # Select samples to display smoothing
+    output$Choose_smooth_sample <- renderUI({
+      if(is.null(Raspi_unique())){return(NULL)
+      }else{tagList(
+        selectizeInput(
+          inputId = "sample_smooth",
+          label = "Select sample to display smoothing",
+          choices = smooth_sample(),
+          multiple=F))}
+    })
+    
+    # Select samples to be dropped
+    output$Drop_smooth_sample <- renderUI({
+      if (is.null(Raspi_unique())) {
+        return (NULL)
+      } else {
+        selectizeInput(
+          inputId = "SelectDrop",
+          label = "Manual selection of plants not included in clean data",
+          choices = smooth_sample(),
+          multiple = T,
+          selected = NULL
+        )}
+    })
+  
     
     # # # # # # # Smooth tab # # # # # 
     
@@ -295,63 +359,27 @@ server <- function(input, output) {
         return(sample.id)
         
     })
-    
-    # Select samples to display smoothing
-    output$Choose_smooth_sample <- renderUI({
-        if(is.null(Raspi_unique())){return(NULL)
-        }else{tagList(
-            selectizeInput(
-                inputId = "sample_smooth",
-                label = "Select sample to display smoothing",
-                choices = smooth_sample(),
-                multiple=F))}
-    })
-    
-    # Select samples to be dropped
-    output$Drop_smooth_sample <- renderUI({
-        if (is.null(Raspi_unique())) {
-            return (NULL)
-        } else {
-            
-                selectizeInput(
-                    inputId = "SelectDrop",
-                    label = "Manual selection of plants not included for further analysis",
-                    choices = smooth_sample(),
-                    multiple = T,
-                    selected = NULL
-                
-            )}
-    })
 
-    
-    # Drop sample actions
-    #output$Drop_action <- renderUI({
-      #  if (is.null(Raspi_unique())) {
-          #  return ()
-       # } else {
-                #actionButton("DropData", icon("file-import"),label = "Drop samples")
-        #}
-    #})
-    
 
-    # Remove samples from the decoded file
+    # Remove samples with unexpected growth pattern before smoothing
     Raspi_unique_drop <- reactive(if(is.null(Raspi_unique())) {
-        return(NULL)
+      return(NULL)
     } else {
         if(is.null(input$SelectDrop)){
-            temp <- Raspi_unique()
-            return(temp)
+           sub_Raspi <- Raspi_unique()
+            return(sub_Raspi)
         } else {
             if(input$expType == "PhenoRig"){
                 Raspi_unique <- Raspi_unique()
-                temp <- subset(Raspi_unique, Raspi_unique$Plant.ID != input$SelectDrop)
-                return(temp)
+                list_of_no <- input$SelectDrop
+                sub_Raspi <- Raspi_unique[Raspi_unique$Plant.ID != list_of_no,]
                 } 
             if(input$expType == "PhenoCage"){
                 Raspi_unique <- Raspi_unique()
-                temp <- subset(Raspi_unique, Raspi_unique$POT != input$SelectDrop)
-                return(temp)
-                }
+                list_of_no <- as.list(input$SelectDrop)
+                sub_Raspi <- Raspi_unique[Raspi_unique$POT != list_of_no,]
+            }
+          return(sub_Raspi)
             }
     })
     
@@ -359,8 +387,8 @@ server <- function(input, output) {
     output$Drop_data_report <- renderText({
         if(is.null(input$SelectDrop)) {
             return(NULL)} else {
-            meta_sentence <- paste("A total of", length(input$SelectDrop),"individuals were manually removed!")
-            return(meta_sentence)
+            test_sentence <- paste("A total of", length(input$SelectDrop),"individual(s) were manually removed!")
+            return(test_sentence)
             }
     })
 
@@ -376,26 +404,29 @@ server <- function(input, output) {
     output$degreeUI <- renderUI({if(input$smoothType != "Polynomial Regression Fit"){return(NULL)}else{
         sliderInput("degree", label="Which degree would you like to use?", min = 2, max=20, step = 1, value = 5)
     }})
-    
-    ### define the axis ticks
-    output$min_X_tickUI <- renderUI({if(input$expType == "PhenoRig"){
-        sliderInput("min_X_tickUI", label="Which ticks would you like to use for time (minutes)?", 
-                    min = 1000, max=10000, step = 1000, value = 5000)
-    }else{return(NULL)}})
-    output$min_Y_tickUI <- renderUI({if(input$expType == "PhenoRig"){
-        sliderInput("min_Y_tickUI", label="Which ticks would you like to use for leaf area (pixels)?", 
-                    min = 1000, max=10000, step = 1000, value = 5000)
-    }else{return(NULL)}})
-    
-    output$day_X_tickUI <- renderUI({if(input$expType == "PhenoCage"){
-        sliderInput("day_X_tickUI", label="Which ticks would you like to use for time (days)?", 
-                    min = 1, max=5, step = 1, value = 2)
-    }else{return(NULL)}})
-    output$day_Y_tickUI <- renderUI({if(input$expType == "PhenoCage"){
-        sliderInput("day_Y_tickUI", label="Which ticks would you like to use for total leaf area (pixels)?", 
-                    min = 1000, max=10000, step = 1000, value = 5000)
-    }else{return(NULL)}})
 
+    
+    ### define the ticks of plots
+    output$X_tickUI2 <- renderUI({
+      if(input$expType == "PhenoRig"){
+        sliderInput("minX_tickUI2", label="Which ticks would you like to use for time (minutes)?", 
+                    min = 1000, max=5000, step = 1000, value = 2000)
+      } else if (input$expType == "PhenoCage"){
+        sliderInput("dayX_tickUI2", label="Which ticks would you like to use for time (days)?", 
+                    min = 1, max=5, step = 1, value = 2)
+      }
+    })
+    
+    output$Y_tickUI2 <- renderUI({
+      if(input$expType == "PhenoRig"){
+        sliderInput("minY_tickUI2", label="Which ticks would you like to use for leaf area?", 
+                    min = 1000, max=10000, step = 1000, value = 5000)
+      } else if (input$expType == "PhenoCage"){
+        sliderInput("dayY_tickUI2", label="Which ticks would you like to use for total leaf area?", 
+                    min = 100, max=500, step = 100, value = 200)
+      }
+    })
+    
     
     # # # Plot the smooth plot # # # #
     Smooth_plot_one <- reactive(
@@ -414,8 +445,8 @@ server <- function(input, output) {
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Leaf area of Individual") +
-                        scale_x_continuous(breaks=seq(0,max(temp2$time.min),by=input$min_X_tickUI)) +
-                        scale_y_continuous(breaks=seq(0,max(temp2$area),by=input$min_Y_tickUI))
+                        scale_x_continuous(breaks=seq(0,max(temp2$time.min),by=input$minX_tickUI2)) +
+                        scale_y_continuous(breaks=seq(0,max(temp2$area),by=input$minY_tickUI2))
                     
                 }
                 if(input$expType == "PhenoCage"){
@@ -429,13 +460,13 @@ server <- function(input, output) {
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Leaf area of Individual") +
-                        scale_x_continuous(breaks=seq(0,max(temp2$time.days),by=input$day_X_tickUI)) +
-                        scale_y_continuous(breaks=seq(0,max(temp2$total.area),by=input$day_Y_tickUI))
+                        scale_x_continuous(breaks=seq(0,max(temp2$time.days),by=input$dayX_tickUI2)) +
+                        scale_y_continuous(breaks=seq(0,max(temp2$total.area),by=input$dayY_tickUI2))
                 }
                 Fit_graph
                 
             } else if (input$smoothType == "Loess Fit"){
-                temp <- Raspi_unique()
+                temp <- Raspi_unique_drop()
                 if(input$expType == "PhenoRig"){
                     temp2 <- subset(temp, temp$Plant.ID == input$sample_smooth)
                     temp2$time.min <- as.numeric(temp2$time.min)
@@ -447,8 +478,8 @@ server <- function(input, output) {
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Leaf area of Individual") +
-                        scale_x_continuous(breaks=seq(0,max(temp2$time.min),by=input$min_X_tickUI)) +
-                        scale_y_continuous(breaks=seq(0,max(temp2$area),by=input$min_Y_tickUI))
+                        scale_x_continuous(breaks=seq(0,max(temp2$time.min),by=input$minX_tickUI2)) +
+                        scale_y_continuous(breaks=seq(0,max(temp2$area),by=input$minY_tickUI2))
                 }
                 if(input$expType == "PhenoCage"){
                     temp2 <- subset(temp, temp$POT == input$sample_smooth)
@@ -462,14 +493,14 @@ server <- function(input, output) {
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Total Leaf area of Individual from multiple sides") +
-                        scale_x_continuous(breaks=seq(0,max(temp2$time.days),by=input$day_X_tickUI)) +
-                        scale_y_continuous(breaks=seq(0,max(temp2$area.total),by=input$day_Y_tickUI))
+                        scale_x_continuous(breaks=seq(0,max(temp2$time.days),by=input$dayX_tickUI2)) +
+                        scale_y_continuous(breaks=seq(0,max(temp2$area.total),by=input$dayY_tickUI2))
                 }
                 Fit_graph
                 
             } else if (input$smoothType == "Polynomial Regression Fit"){
 
-                temp <- Raspi_unique()
+                temp <- Raspi_unique_drop()
                 if(input$expType == "PhenoRig"){
                     temp2 <- subset(temp, temp$Plant.ID == input$sample_smooth)
                     temp2$time.min <- as.numeric(temp2$time.min)
@@ -481,8 +512,8 @@ server <- function(input, output) {
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Leaf area of Individual") +
-                        scale_x_continuous(breaks=seq(0,max(temp2$time.min),by=input$min_X_tickUI)) +
-                        scale_y_continuous(breaks=seq(0,max(temp2$area),by=input$min_Y_tickUI))
+                        scale_x_continuous(breaks=seq(0,max(temp2$time.min),by=input$minX_tickUI2)) +
+                        scale_y_continuous(breaks=seq(0,max(temp2$area),by=input$minY_tickUI2))
 
                 }
                 if(input$expType == "PhenoCage"){
@@ -496,40 +527,21 @@ server <- function(input, output) {
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Total Leaf area of Individual from multiple sides") +
-                        scale_x_continuous(breaks=seq(0,max(temp2$time.days),by=input$day_X_tickUI)) +
-                        scale_y_continuous(breaks=seq(0,max(temp2$area.total),by=input$day_Y_tickUI))
+                        scale_x_continuous(breaks=seq(0,max(temp2$time.days),by=input$dayX_tickUI2)) +
+                        scale_y_continuous(breaks=seq(0,max(temp2$area.total),by=input$dayY_tickUI2))
                 }
                 Fit_graph
             }
         })
     
-    # # # Smooth example2 # # # #
+    # # # smooth display per sample completed
     output$Smoothed_graph_one_sample <- renderPlot({
         Smooth_plot_one()}
     )
 
     
-    output$Outlier_removal <- renderUI({
-        if((input$expType == "PhenoCage")){
-            return ()
-        } else {
-            checkboxInput("Outlier_Check", label = "Remove oulier from the dataset", value = F)
-        }
-    })
-    
-    output$Outlier_range <- renderUI({
-        if((input$Outlier_Check == FALSE)){
-            return ()
-        } else {
-            selectizeInput(
-               inputId = "Outlier",
-                label = "Select the outlier removal cutoff (n * SD): ",
-                choices = c(1, 1.5, 2, 2.5, 3),
-                selected = 1.5)
-        }
-    })
-    
-    # # # Smooth calculations for all
+
+    ### TAB 2 Smooth calculations for all individual plants ###
 
     ### smooth spline function
     smooth_all <- reactive(if(input$SmoothGo == FALSE){return(NULL)}else{
@@ -547,7 +559,7 @@ server <- function(input, output) {
                 spl.model <- with(temp, ss(time.min, area, df = as.numeric(input$nknots)))
                 
                 spl.model.sum <- summary(spl.model)
-                temp$sigma <-  1.5 * spl.model.sum$sigma
+                temp$sigma <-  as.numeric(input$outlier) * spl.model.sum$sigma
                 temp$residuals <- abs(spl.model.sum$residuals)
                 
                 pred_temp <- predict(spl.model, day)
@@ -558,11 +570,11 @@ server <- function(input, output) {
                 spline_data[1:max_day,5] <- temp$sigma
                 spline_data_clean <- spline_data[spline_data$residuals < spline_data$sigma,]
                 
-                if((input$Outlier_Check == FALSE)){
+                #if((input$Outlier_Check == FALSE)){
                     final_spline <- spline_data
-                } else {
-                    final_spline <-  spline_data_clean
-                }
+               # } else {
+                   # final_spline <-  spline_data_clean
+               # }
             
                 for(i in 1:length(unique(my_data$Plant.ID))){
                     temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
@@ -572,7 +584,7 @@ server <- function(input, output) {
                     spl.model <- with(temp, ss(time.min, area, df = as.numeric(input$nknots)))
                     
                     spl.model.sum <- summary(spl.model)
-                    temp$sigma <-  1.5 * spl.model.sum$sigma
+                    temp$sigma <-  as.numeric(input$outlier) * spl.model.sum$sigma
                     temp$residuals <- abs(spl.model.sum$residuals)
                     
                     pred_temp <- predict(spl.model, day)
@@ -584,11 +596,11 @@ server <- function(input, output) {
                     
                     spline_data_clean <- spline_data[spline_data$residuals < spline_data$sigma,]
                     
-                    if((input$Outlier_Check == FALSE)){
+                   # if((input$Outlier_Check == FALSE)){
                         final_spline <- rbind(final_spline, spline_data)
-                    } else {
-                        final_spline <- rbind(final_spline, spline_data_clean)
-                    }
+                    #} else {
+                        #final_spline <- rbind(final_spline, spline_data_clean)
+                    #}
                 
                 }
                 meta <- decoding()
@@ -642,7 +654,7 @@ server <- function(input, output) {
                     loess.model <- with(temp, loess(area ~ time.min, span = as.numeric(input$span)))
                     loess.model.sum <- summary(loess.model)
                     
-                    temp$sigma <-  1.5 *loess.model.sum$s
+                    temp$sigma <-  as.numeric(input$outlier) *loess.model.sum$s
                     temp$residuals <- abs(loess.model.sum$residuals)
             
                     pred_temp <- predict(loess.model, day)
@@ -653,11 +665,11 @@ server <- function(input, output) {
                     loess_data[1:max_day,5] <- temp$sigma
                     loess_data_clean <- loess_data[loess_data$residuals < loess_data$sigma,]
 
-                    if((input$Outlier_Check == FALSE)){
+                #    if((input$Outlier_Check == FALSE)){
                         final_loess <- loess_data
-                    } else {
-                        final_loess <- loess_data_clean
-                    }
+                  #  } else {
+                      #  final_loess <- loess_data_clean
+                   # }
     
                     for(i in 1:length(unique(my_data$Plant.ID))){
                         temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
@@ -666,7 +678,7 @@ server <- function(input, output) {
                         max_day <- length(day)
                         loess.model <- with(temp, loess(area ~ time.min, span = as.numeric(input$span)))
                         loess.model.sum <- summary(loess.model)
-                        temp$sigma <-  1.5 *loess.model.sum$s
+                        temp$sigma <-  as.numeric(input$outlier) *loess.model.sum$s
                         temp$residuals <- abs(loess.model.sum$residuals)
                         
                         pred_temp <- predict(loess.model, day)
@@ -678,11 +690,11 @@ server <- function(input, output) {
                         
                         loess_data_clean <- loess_data[loess_data$residuals < loess_data$sigma,]
                         
-                        if((input$Outlier_Check == FALSE)){
+                       # if((input$Outlier_Check == FALSE)){
                             final_loess <- rbind(final_loess, loess_data)
-                        } else {
-                            final_loess <- rbind(final_loess, loess_data_clean)
-                        }
+                        #} else {
+                            #final_loess <- rbind(final_loess, loess_data_clean)
+                        #}
 
                     }
                     meta <- decoding()
@@ -738,7 +750,7 @@ server <- function(input, output) {
                 pred_temp <- predict(poly.model)
             
                 poly.model.sum <- summary(poly.model)
-                temp$sigma <-  1.5 *poly.model.sum$sigma
+                temp$sigma <-  as.numeric(input$outlier)*poly.model.sum$sigma
                 temp$residuals <- abs(poly.model.sum$residuals)
                 
                 polynomial_data[1:max_day,2] <- day
@@ -747,11 +759,11 @@ server <- function(input, output) {
                 polynomial_data[1:max_day,4] <- temp$residuals
                 polynomial_data[1:max_day,5] <- temp$sigma
                 
-                if((input$Outlier_Check == FALSE)){
+                #if((input$Outlier_Check == FALSE)){
                     final_polynomial <- polynomial_data
-                } else {
-                    final_polynomial <- polynomial_data_clean
-                }
+               # } else {
+                    #final_polynomial <- polynomial_data_clean
+                #}
                 
                 for(i in 1:length(unique(my_data$Plant.ID))){
                     temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
@@ -760,7 +772,7 @@ server <- function(input, output) {
                     max_day <- length(day)
                     poly.model <- lm(temp$area ~ poly(temp$time.min, as.numeric(input$degree), raw = TRUE))
                     poly.model.sum <- summary(poly.model)
-                    temp$sigma <-  1.5 *poly.model.sum$sigma
+                    temp$sigma <-  as.numeric(input$outlier)*poly.model.sum$sigma
                     temp$residuals <- abs(poly.model.sum$residuals)
                     
                     pred_temp <- predict(poly.model)
@@ -770,11 +782,11 @@ server <- function(input, output) {
                     polynomial_data[1:max_day,4] <- temp$residuals
                     polynomial_data[1:max_day,5] <- temp$sigma
                     
-                    if((input$Outlier_Check == FALSE)){
-                        final_polynomial <- rbind(final_polynomial, polynomial_data)
-                    } else {
-                        final_polynomial <- rbind(final_polynomial, polynomial_data_clean)
-                    }
+                    #if((input$Outlier_Check == FALSE)){
+                       final_polynomial <- rbind(final_polynomial, polynomial_data)
+                   # } else {
+                      #final_polynomial <- rbind(final_polynomial, polynomial_data_clean)
+                   # }
                 }
                 meta <- decoding()
                 meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
@@ -827,7 +839,7 @@ server <- function(input, output) {
             return()
         }
         else{
-            downloadButton("smooth_table_download_button", label = "Download table")
+            downloadButton("smooth_table_download_button", label = "Download the smooth table")
         }
     })
     
@@ -835,24 +847,19 @@ server <- function(input, output) {
         if(is.null(smooth_all())) {
             return(NULL)}
         else{
-            data <- Raspi_unique_drop()
+            data <- smooth_all()
             no_PIs <- length(unique(data$RasPi))
-            no_Month <- length(unique(data$Month))
-            no_Day <- length(unique(data$Day))
-            no_H <- length(unique(data$Hour))
             if(input$expType == "PhenoRig"){
                 no_Plants <- length(unique(data$Plant.ID))
             } else if (input$expType == "PhenoRig") {
                 no_Plants <- length(unique(data$POT))
                 }
-            sentence <- paste("Your Raspberry Pi smoothed data contains images collected over ",no_PIs, " Raspberry Pi devices, 
-                              collected over the period of ", no_Month, " months, ", no_Day, " days, and ", no_H, " hours among",
-                              no_Plants, "individuals")
-            return(sentence)
+            sentence_smooth <- paste("Your Raspberry Pi smoothed data contains images collected over ",no_PIs," Raspberry Pi devices collected among ",no_Plants, "individual(s)")
+            return(sentence_smooth)
         }
     })
 
-    ########### download smoothed file ####################################  
+    #### download smoothed file ##### 
     
     output$smooth_table_download_button <- downloadHandler(
         filename = paste("Smoothed_data.RasPiPhenoApp.csv"),
@@ -863,7 +870,8 @@ server <- function(input, output) {
         }
     )
     
-    # # # smooth graph # # # # # 
+    
+    ### TAB3  smooth graph for all plants### 
     
     output$color_smooth <- renderUI({
         if(is.null(smooth_all())){return()} else {
@@ -878,6 +886,34 @@ server <- function(input, output) {
         }
     })
     
+    output$Select_geom_methods2 <- renderUI(
+      selectInput(inputId = "geom_method2",
+                  label = "Displaying standard error:",
+                  choices = c("errorbar", "ribbon", "line", "point"),
+                  selected = "ribbon"),
+    )
+    
+    ### define the ticks of plots
+    output$X_tickUI3 <- renderUI({
+      if(input$expType == "PhenoRig"){
+        sliderInput("minX_tickUI3", label="Which ticks would you like to use for time (minutes)?", 
+                    min = 1000, max=5000, step = 1000, value = 2000)
+      } else if (input$expType == "PhenoCage"){
+        sliderInput("dayX_tickUI3", label="Which ticks would you like to use for time (days)?", 
+                    min = 1, max=5, step = 1, value = 2)
+      }
+    })
+    
+    output$Y_tickUI3 <- renderUI({
+      if(input$expType == "PhenoRig"){
+        sliderInput("minY_tickUI3", label="Which ticks would you like to use for leaf area?", 
+                    min = 1000, max=10000, step = 1000, value = 5000)
+      } else if (input$expType == "PhenoCage"){
+        sliderInput("dayY_tickUI3", label="Which ticks would you like to use for total leaf area?", 
+                    min = 100, max=500, step = 100, value = 200)
+      }
+    })
+    
     smooth_graph_all <- reactive(if(is.null(smooth_all())){return(NULL)}else{
         my_data <- smooth_all()
         my_data$col.sorting <- as.factor(my_data[,input$ColorSmoothGG])
@@ -889,11 +925,12 @@ server <- function(input, output) {
                 geom_line(alpha = 0.3) +
                 geom_point(alpha = 0.3, size = 0.5) +
                 theme_classic() +
-                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, 
+                stat_summary(fun.data = mean_se, geom=input$geom_method2, linetype=0, 
                              aes(group=col.sorting), alpha=0.5) +
+            
                 ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
-                scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$min_X_tickUI)) +
-                scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$min_Y_tickUI))
+                scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI3)) +
+                scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI3))
         }
         if(input$expType == "PhenoCage"){
             my_data$time.days <- as.numeric(my_data$time.days)
@@ -901,11 +938,11 @@ server <- function(input, output) {
             Area_graph <- ggplot(data=my_data, stat="summary",aes(x= time.days, y=area.total.smooth, group = POT, color = col.sorting)) +
                 geom_line(alpha = 0.3) +
                 theme_classic() +
-                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, 
+                stat_summary(fun.data = mean_se, geom=input$geom_method2, linetype=0, 
                                                     aes(group=col.sorting), alpha=0.5) +
                 ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") +
-                scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$day_X_tickUI)) +
-                scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$day_Y_tickUI))
+                scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$dayX_tickUI3)) +
+                scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$dayY_tickUI3))
         }
         Area_graph
     })
@@ -921,7 +958,7 @@ server <- function(input, output) {
             return()
         }
         else{
-            downloadButton("smoothgraph_download_button", label = "Download plot")
+            downloadButton("smoothgraph_download_button", label = "Download the smooth plot")
         }
     })
     
@@ -936,8 +973,419 @@ server <- function(input, output) {
         }
     )
     
-    # Calculating growth rate (GR) inputs
     
+    ### TAB 4 Clean data point which are outliers of model  ###
+    
+    ### smooth spline function
+    clean_all <- reactive(if(input$SmoothGo == FALSE){return(NULL)}else{
+      my_data <- Raspi_unique_drop()
+      if(input$smoothType== "Smooth Spline Fit"){
+        if(input$expType == "PhenoRig"){
+          names <- c(text="Plant.ID", "time.min", "area","residuals","sigma")
+          spline_data <- data.frame()
+          for (k in names) spline_data[[k]] <- as.character()
+          i=1
+          temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[1])
+          temp$time.min <- as.numeric(as.character(temp$time.min))
+          day <- unique(temp$time.min)
+          max_day <- length(day)
+          spl.model <- with(temp, ss(time.min, area, df = as.numeric(input$nknots)))
+          
+          spl.model.sum <- summary(spl.model)
+          temp$sigma <-  as.numeric(input$outlier) * spl.model.sum$sigma
+          temp$residuals <- abs(spl.model.sum$residuals)
+          
+          pred_temp <- predict(spl.model, day)
+          spline_data[1:max_day,2] <- pred_temp$x
+          spline_data[1:max_day,3] <- temp$area
+          spline_data[1:max_day,1] <- temp$Plant.ID[1]
+          spline_data[1:max_day,4] <- temp$residuals
+          spline_data[1:max_day,5] <- temp$sigma
+          spline_data_clean <- spline_data[spline_data$residuals < spline_data$sigma,]
+          
+          final_spline <-  spline_data_clean
+          
+          for(i in 1:length(unique(my_data$Plant.ID))){
+            temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
+            temp$time.min <- as.numeric(as.character(temp$time.min))
+            day <- unique(temp$time.min)
+            max_day <- length(day)
+            spl.model <- with(temp, ss(time.min, area, df = as.numeric(input$nknots)))
+            
+            spl.model.sum <- summary(spl.model)
+            temp$sigma <-  as.numeric(input$outlier) * spl.model.sum$sigma
+            temp$residuals <- abs(spl.model.sum$residuals)
+            
+            pred_temp <- predict(spl.model, day)
+            spline_data[1:max_day,2] <- pred_temp$x
+            spline_data[1:max_day,3] <- temp$area
+            spline_data[1:max_day,1] <- temp$Plant.ID[1]
+            spline_data[1:max_day,4] <- temp$residuals
+            spline_data[1:max_day,5] <- temp$sigma
+            
+            spline_data_clean <- spline_data[spline_data$residuals < spline_data$sigma,]
+            final_spline <- rbind(final_spline, spline_data_clean)
+          }
+          meta <- decoding()
+          meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
+          Raspi_decoded <- merge(final_spline, meta, by="Plant.ID", all = TRUE) 
+          Raspi_decoded2 <- na.omit(Raspi_decoded)
+        } 
+        if(input$expType == "PhenoCage"){
+          names <- c(text="POT", "time.days", "area.total")
+          spline_data <- data.frame()
+          for (k in names) spline_data[[k]] <- as.character()
+          i=1
+          temp <- subset(my_data, my_data$POT == unique(my_data$POT)[1])
+          temp$time.day <- as.numeric(as.character(temp$time.day))
+          day <- unique(temp$time.day)
+          max_day <- length(day)
+          plot.spl <- with(temp, smooth.spline(time.day, area.total, df = as.numeric(input$nknots)))
+          pred_temp <- predict(plot.spl, day)
+          spline_data[1:max_day,2] <- pred_temp$x
+          spline_data[1:max_day,3] <- temp$area.total
+          spline_data[1:max_day,1] <- temp$POT[1]
+          final_spline <- spline_data
+          
+          for(i in 1:length(unique(my_data$POT))){
+            temp <- subset(my_data, my_data$POT == unique(my_data$POT)[i])
+            temp$time.day <- as.numeric(as.character(temp$time.day))
+            day <- unique(temp$time.day)
+            max_day <- length(day)
+            plot.spl <- with(temp, smooth.spline(time.day, area.total, df = as.numeric(input$nknots)))
+            pred_temp <- predict(plot.spl, day)
+            spline_data[1:max_day,2] <- pred_temp$x
+            spline_data[1:max_day,3] <- ptemp$area.total
+            spline_data[1:max_day,1] <- temp$POT[1]
+            final_spline <- rbind(final_spline, spline_data)
+          }
+          meta <- decoding()
+          Raspi_decoded <- merge(final_spline, meta, by="POT", all = TRUE) 
+          Raspi_decoded2 <- na.omit(Raspi_decoded)
+          
+        }} else if(input$smoothType== "Loess Fit"){
+          
+          if(input$expType == "PhenoRig"){
+            names <- c(text="Plant.ID", "time.min", "area","residuals","sigma")
+            loess_data <- data.frame()
+            for (k in names) loess_data[[k]] <- as.character()
+            i=1
+            temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[1])
+            temp$time.min <- as.numeric(as.character(temp$time.min))
+            day <- unique(temp$time.min)
+            max_day <- length(day)
+            loess.model <- with(temp, loess(area ~ time.min, span = as.numeric(input$span)))
+            loess.model.sum <- summary(loess.model)
+            
+            temp$sigma <-  as.numeric(input$outlier) *loess.model.sum$s
+            temp$residuals <- abs(loess.model.sum$residuals)
+            
+            pred_temp <- predict(loess.model, day)
+            loess_data[1:max_day,2] <- day
+            loess_data[1:max_day,3] <- temp$area
+            loess_data[1:max_day,1] <- temp$Plant.ID[1]
+            loess_data[1:max_day,4] <- temp$residuals
+            loess_data[1:max_day,5] <- temp$sigma
+            loess_data_clean <- loess_data[loess_data$residuals < loess_data$sigma,]
+            
+            final_loess <- loess_data_clean
+            
+            for(i in 1:length(unique(my_data$Plant.ID))){
+              temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
+              temp$time.min <- as.numeric(as.character(temp$time.min))
+              day <- unique(temp$time.min)
+              max_day <- length(day)
+              loess.model <- with(temp, loess(area ~ time.min, span = as.numeric(input$span)))
+              loess.model.sum <- summary(loess.model)
+              temp$sigma <-  as.numeric(input$outlier) *loess.model.sum$s
+              temp$residuals <- abs(loess.model.sum$residuals)
+              
+              pred_temp <- predict(loess.model, day)
+              loess_data[1:max_day,2] <- day
+              loess_data[1:max_day,3] <- temp$area
+              loess_data[1:max_day,1] <- temp$Plant.ID[1]
+              loess_data[1:max_day,4] <- temp$residuals
+              loess_data[1:max_day,5] <- temp$sigma
+              
+              loess_data_clean <- loess_data[loess_data$residuals < loess_data$sigma,]
+              
+              final_loess <- rbind(final_loess, loess_data_clean)
+
+            }
+            meta <- decoding()
+            meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
+            Raspi_decoded <- merge(final_loess, meta, by="Plant.ID", all = TRUE) 
+            Raspi_decoded2 <- na.omit(Raspi_decoded)
+            
+          } 
+          if(input$expType == "PhenoCage"){
+            names <- c(text="POT", "time.days", "area.total")
+            loess_data <- data.frame()
+            for (k in names) loess_data[[k]] <- as.character()
+            i=1
+            temp <- subset(my_data, my_data$POT == unique(my_data$POT)[1])
+            temp$time.day <- as.numeric(as.character(temp$time.day))
+            day <- unique(temp$time.day)
+            max_day <- length(day)
+            loess.model <- with(temp, loess(area.total~ time.day, span = as.numeric(input$span)))
+            pred_temp <- predict(loess.model, day)
+            loess_data[1:max_day,2] <- day
+            loess_data[1:max_day,3] <- temp$area.total
+            loess_data[1:max_day,1] <- temp$POT[1]
+            final_loess <- loess_data
+            
+            for(i in 1:length(unique(my_data$POT))){
+              temp <- subset(my_data, my_data$POT == unique(my_data$POT)[i])
+              temp$time.day <- as.numeric(as.character(temp$time.day))
+              day <- unique(temp$time.day)
+              max_day <- length(day)
+              loess.model <- with(temp, loess(area ~ time.day, span = as.numeric(input$span)))
+              pred_temp <- predict(loess.model, day)
+              loess_data[1:max_day,2] <- day
+              loess_data[1:max_day,3] <- temp$area.total
+              loess_data[1:max_day,1] <- temp$POT[1]
+              final_loess <- rbind(final_loess, loess_data)
+            }
+            meta <- decoding()
+            Raspi_decoded <- merge(final_loess, meta, by="POT", all = TRUE) 
+            Raspi_decoded2 <- na.omit(Raspi_decoded)
+            
+          }} else if (input$smoothType== "Polynomial Regression Fit"){
+            
+            if(input$expType == "PhenoRig"){
+              names <- c(text="Plant.ID", "time.min", "area","residuals","sigma")
+              polynomial_data <- data.frame()
+              for (k in names) polynomial_data[[k]] <- as.character()
+              i=1
+              temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[1])
+              temp$time.min <- as.numeric(as.character(temp$time.min))
+              day <- unique(temp$time.min)
+              max_day <- length(day)
+              poly.model <- with(temp, lm(temp$area ~ poly(temp$time.min, as.numeric(input$degree), raw = TRUE)))
+              pred_temp <- predict(poly.model)
+              
+              poly.model.sum <- summary(poly.model)
+              temp$sigma <-  as.numeric(input$outlier)*poly.model.sum$sigma
+              temp$residuals <- abs(poly.model.sum$residuals)
+              
+              polynomial_data[1:max_day,2] <- day
+              polynomial_data[1:max_day,3] <- temp$area
+              polynomial_data[1:max_day,1] <- temp$Plant.ID[1]
+              polynomial_data[1:max_day,4] <- temp$residuals
+              polynomial_data[1:max_day,5] <- temp$sigma
+              
+              polynomial_data_clean <- polynomial_data[polynomial_data$residuals < polynomial_data$sigma,]
+              
+              final_polynomial <- polynomial_data_clean
+              
+              for(i in 1:length(unique(my_data$Plant.ID))){
+                temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
+                temp$time.min <- as.numeric(as.character(temp$time.min))
+                day <- unique(temp$time.min)
+                max_day <- length(day)
+                poly.model <- lm(temp$area ~ poly(temp$time.min, as.numeric(input$degree), raw = TRUE))
+                poly.model.sum <- summary(poly.model)
+                temp$sigma <-  as.numeric(input$outlier)*poly.model.sum$sigma
+                temp$residuals <- abs(poly.model.sum$residuals)
+                
+                pred_temp <- predict(poly.model)
+                polynomial_data[1:max_day,2] <- day
+                polynomial_data[1:max_day,3] <- as.numeric(temp$area)
+                polynomial_data[1:max_day,1] <- temp$Plant.ID[1]
+                polynomial_data[1:max_day,4] <- temp$residuals
+                polynomial_data[1:max_day,5] <- temp$sigma
+                
+                final_polynomial <- rbind(final_polynomial, polynomial_data_clean)
+              }
+              meta <- decoding()
+              meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
+              Raspi_decoded <- merge(final_polynomial, meta, by="Plant.ID", all = TRUE) 
+              Raspi_decoded2 <- na.omit(Raspi_decoded)
+            }
+            if(input$expType == "PhenoCage"){
+              names <- c(text="POT", "time.days", "area.total")
+              polynomial_data <- data.frame()
+              for (k in names) polynomial_data[[k]] <- as.character()
+              i=1
+              temp <- subset(my_data, my_data$POT == unique(my_data$POT)[1])
+              temp$time.day <- as.numeric(as.character(temp$time.day))
+              day <- unique(temp$time.day)
+              max_day <- length(day)
+              poly.model <- with(temp, polynomial(area.total ~ time.day,degree = as.numeric(input$degree)))
+              pred_temp <- predict(poly.model)
+              
+              polynomial_data[1:max_day,2] <- day
+              polynomial_data[1:max_day,3] <- temp$area.total
+              polynomial_data[1:max_day,1] <- temp$POT[1]
+              final_polynomial <- polynomial_data
+              
+              for(i in 1:length(unique(my_data$POT))){
+                temp <- subset(my_data, my_data$POT == unique(my_data$POT)[i])
+                temp$time.day <- as.numeric(as.character(temp$time.day))
+                day <- unique(temp$time.day)
+                max_day <- length(day)
+                poly.model <- with(temp, polynomial(area.total ~ time.day,degree = as.numeric(input$degree)))
+                pred_temp <- predict(poly.model)
+                polynomial_data[1:max_day,2] <- day
+                polynomial_data[1:max_day,3] <- temp$area.total
+                polynomial_data[1:max_day,1] <- temp$POT[1]
+                final_polynomial <- rbind(final_polynomial, polynomial_data)
+              }
+              meta <- decoding()
+              Raspi_decoded <- merge(final_polynomial, meta, by="POT", all = TRUE) 
+              Raspi_decoded2 <- na.omit(Raspi_decoded)
+            }}
+      
+      return(Raspi_decoded2)
+    })
+    
+    
+    output$Clean_table <- renderDataTable({
+      clean_all()
+    })    
+    
+    output$Clean_table_button <- renderUI({
+      if (is.null(clean_all())) {
+        return()
+      }
+      else{
+        downloadButton("Clean_table_download_button", label = "Download the clean table")
+      }
+    })
+    
+    
+    output$Clean_table_data_report <- renderText({
+      if(is.null(clean_all())) {
+        return(NULL)}
+      else{
+        clean_all <- clean_all()
+        no_PIs <- length(unique(clean_all$RasPi))
+        
+        if(input$expType == "PhenoRig"){
+          no_Plants <- length(unique(clean_all$Plant.ID))
+        } else if (input$expType == "PhenoRig") {
+          no_Plants <- length(unique(clean_all$POT))
+        }
+        sentence_clean <- paste("Your Raspberry Pi cleaned data contains images collected over ",no_PIs, " Raspberry Pi devices among",no_Plants, "individual(s)")
+        return(sentence_clean)
+      }
+    })
+    
+    #### download Cleaned file ##### 
+    
+    output$Clean_table_download_button <- downloadHandler(
+      filename = paste("Cleaned_data.RasPiPhenoApp.csv"),
+      content <- function(file) {
+        result <- clean_all()
+        write.csv(result, file, row.names = FALSE)
+        
+      }
+    )
+    
+    ### TAB 5 Plot the clean data for plants ###
+    output$color_clean <- renderUI({
+      if(is.null(clean_all())){return()} else {
+        tagList(
+          selectizeInput(
+            inputId = "ColorcleanGG",
+            label = "Color individual lines per:",
+            choices = metaList(),
+            multiple = F
+          )
+        )
+      }
+    })
+    
+    output$Select_geom_methods3 <- renderUI(
+      selectInput(inputId = "geom_method3",
+                  label = "Displaying standard error:",
+                  choices = c("errorbar", "ribbon", "line", "point"),
+                  selected = "ribbon"),
+    )
+    
+    ### define the ticks of plots
+    output$X_tickUI4 <- renderUI({
+      if(input$expType == "PhenoRig"){
+        sliderInput("minX_tickUI4", label="Which ticks would you like to use for time (minutes)?", 
+                    min = 1000, max=5000, step = 1000, value = 2000)
+      } else if (input$expType == "PhenoCage"){
+        sliderInput("dayX_tickUI4", label="Which ticks would you like to use for time (days)?", 
+                    min = 1, max=5, step = 1, value = 2)
+      }
+    })
+    
+    output$Y_tickUI4 <- renderUI({
+      if(input$expType == "PhenoRig"){
+        sliderInput("minY_tickUI4", label="Which ticks would you like to use for leaf area?", 
+                    min = 1000, max=10000, step = 1000, value = 5000)
+      } else if (input$expType == "PhenoCage"){
+        sliderInput("dayY_tickUI4", label="Which ticks would you like to use for total leaf area?", 
+                    min = 100, max=500, step = 100, value = 200)
+      }
+    })
+    
+    clean_graph_all <- reactive(if(is.null(clean_all())){return(NULL)}else{
+      my_data <- clean_all()
+      my_data$col.sorting <- as.factor(my_data[,input$ColorcleanGG])
+      if(input$expType == "PhenoRig"){
+        my_data$time.min <- as.numeric(my_data$time.min)
+        my_data$area <- as.numeric(my_data$area)
+        
+        Area_graph <- ggplot(data=my_data,aes(x= time.min, y=area, group = Plant.ID, color = col.sorting)) +
+          geom_line(alpha = 0.3) +
+          geom_point(alpha = 0.3, size = input$size) +
+          theme_classic() +
+          stat_summary(fun.data = mean_se, geom=input$geom_method3, linetype=0, 
+                       aes(group=col.sorting), alpha=0.5) +
+          
+          ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
+          scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI4)) +
+          scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI4))
+      }
+      if(input$expType == "PhenoCage"){
+        my_data$time.days <- as.numeric(my_data$time.days)
+        my_data$area.total <- as.numeric(my_data$area.total)
+        Area_graph <- ggplot(data=my_data, stat="summary",aes(x= time.days, y=area.total, group = POT, color = col.sorting)) +
+          geom_line(alpha = 0.3) +
+          geom_point(alpha = 0.3, size = input$size) +
+          theme_classic() +
+          stat_summary(fun.data = mean_se, geom=input$geom_method3, linetype=0, 
+                       aes(group=col.sorting), alpha=0.5) +
+          ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") +
+          scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$dayX_tickUI4)) +
+          scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$dayY_tickUI4))
+      }
+      Area_graph
+    })
+    
+    output$all_clean_graph <- renderPlotly(
+      ggplotly(clean_graph_all())
+    )
+    
+    ########### download clean graph ####################################  
+    
+    output$clean_graph_button <- renderUI({
+      if (is.null(clean_graph_all())) {
+        return()
+      }
+      else{
+        downloadButton("cleangraph_download_button", label = "Download the clean plot")
+      }
+    })
+    
+    
+    output$cleangraph_download_button <- downloadHandler(
+      filename = paste("cleaned_data_graph.RasPiPhenoApp.pdf"),
+      content <- function(file) {
+        pdf(file, width = 8, height =6)
+        plot(clean_graph_all())
+        dev.off()
+        
+      }
+    )
+    
+    
+    ## Calculating growth rate (GR) inputs
     interval_choices <- reactive(if(is.null(Raspi_unique())){return(NULL)}else{
         if(input$expType == "PhenoRig"){
             interval_list <- c("3 hours", "6 hours", "day", "2 days")
