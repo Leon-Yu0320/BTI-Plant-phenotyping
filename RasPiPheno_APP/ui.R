@@ -48,11 +48,13 @@ ui <- fluidPage(
                          
                          tabPanel("Vizual Curation", icon=icon("eye"),
                                   fluidRow(
-                                  column(6, uiOutput("Choose_alpha"), uiOutput("Select_geom_methods")),
-                                  column(6,uiOutput("Choose_alpha_region"), uiOutput("color_original")),
+                                  column(6,uiOutput("Choose_alpha")),
                                   column(6,uiOutput("X_tickUI1")), 
-                                  column(6,uiOutput("Y_tickUI1"))), 
+                                  column(6,uiOutput("color_original")),
+                                  column(6,uiOutput("Y_tickUI1"))),
                                   hr(),
+                                  checkboxInput("facet1_check", "facet variables of overall plot"),
+                                  uiOutput("facet_wrap1"),
                                   mainPanel(plotlyOutput("graph_over_time")))
                                   ))
                        # end of Tab1
@@ -69,11 +71,7 @@ ui <- fluidPage(
                                      max = 3.0,
                                      step = 0.5,
                                      value = 1.5),
-                         
-                         selectInput(inputId = "level",
-                                     label = "Level of confidence interval to use: ",
-                                     choices = c(0.9, 0.95, 0.975),
-                                     selected = 0.95),
+
                          
                          selectizeInput(
                            inputId = "outlier",
@@ -84,16 +82,15 @@ ui <- fluidPage(
                          uiOutput("nknotsUI"),
                          uiOutput("spanUI"),
                          uiOutput("degreeUI"),
-              
-                         #uiOutput("Outlier_range"),
                          uiOutput("SmoothGo"),
                   
                          h3(strong("Note")),
                          "This App provides smoothing and cleaning option for data processing:",br(),br(),
                          strong("Data smoothing:"),br(),
-                         "Using non-linear model to predict phenotypic data (both PhenoRig and PhenoCage).", br(),
+                         "Using non-linear model to predict phenotypic data (both PhenoRig and PhenoCage).", br(),br(),
                          strong("Data cleaning:"),br(),
                          "Data cleaning: Removing outliers based on fitted model (PhenoRig only)."
+                         # end of sidebar panel
                        ),
                        
                        mainPanel(navbarPage(
@@ -113,8 +110,11 @@ ui <- fluidPage(
                          ),
                          tabPanel("smoothed data graph", icon=icon("cloud-sun"),
                                   fluidRow(
-                                    column(6,uiOutput("color_smooth"),uiOutput("X_tickUI3")),
-                                    column(6,uiOutput("Select_geom_methods2"),uiOutput("Y_tickUI3"))),
+                                    column(6,uiOutput("color_smooth"),
+                                           checkboxInput("facet2_check", "facet variables of smooth graph")
+                                           ,uiOutput("facet_wrap2")),
+                                    column(6,uiOutput("X_tickUI3")),
+                                    column(6,uiOutput("Y_tickUI3"))),
                                   hr(),
                                   plotlyOutput("all_smooth_graph"),
                                   uiOutput("Smooth_graph_button")
@@ -125,9 +125,13 @@ ui <- fluidPage(
                                   dataTableOutput("Clean_table")
                          ),
                          tabPanel("cleaned data graph", icon = icon("palette"),
+                                  
                                   fluidRow(
-                                    column(6,uiOutput("X_tickUI4"),uiOutput("color_clean")),
-                                    column(6,uiOutput("Y_tickUI4"),uiOutput("Select_geom_methods3"))),
+                                    column(6,uiOutput("color_clean"),
+                                           checkboxInput("facet3_check", "facet variables of clean graph")
+                                           ,uiOutput("facet_wrap3")),
+                                    column(6,uiOutput("X_tickUI4")),
+                                    column(6,uiOutput("Y_tickUI4"))),
                                   hr(),
                                   plotlyOutput("all_clean_graph"),
                                   uiOutput("clean_graph_button"))
@@ -146,7 +150,9 @@ ui <- fluidPage(
                                         choices=c("Over whole experiment", "Step-wise")),
                          uiOutput("interval"),
                          uiOutput("step"),
-                         actionButton("GoGrowth", icon("file-import"),label = "Calculate Growth Rate")),
+                         actionButton("GoGrowth", icon("file-import"),label = "Calculate Growth Rate")
+                         # end of sidebar panel
+                         ),
                        
                        mainPanel(navbarPage("Plant Growth",
                                             tabPanel("Growth Table",
