@@ -1,5 +1,6 @@
 server <- function(input, output) {
     
+  ### TAB 1.1 Reshape the phenotypic data sheet ###
     Raspi <- reactive({
         rbindlist(lapply(input$csv.raspi$datapath, fread),
                   use.names = TRUE, fill = TRUE)})
@@ -23,8 +24,7 @@ server <- function(input, output) {
             return(Raspi_clean)
         })
     
-    
-    # Start calculating data table 
+  
     output$Data_tabl1 <- renderDataTable({
         Raspi_clean()
     })
@@ -110,11 +110,13 @@ server <- function(input, output) {
     })
     
     
-    # quick glance of the decoding file
+    ### TAB 1.2 quick glance of the decoding file ###
     output$Data_tabl2 <- renderDataTable({decoding()})
     
     
-    ### merge seven images each day 
+    ### TAB 1.3 Merge decoding and phenotypic data sheets ###
+    
+    ########################################################## merge decoding files and phenotype data ########################################################## 
     Raspi_unique <-  reactive(if(input$MergeData == F){
         return()} else{
             if(input$expType == "PhenoCage"){
@@ -187,11 +189,9 @@ server <- function(input, output) {
             downloadButton("mergedtable_download_button", label = "Download table")
         }
     })
-    
-    
-    ########### download merged file ####################################  
-    
-    
+
+    ########################################################## download merged file ########################################################## 
+
     output$mergedtable_download_button <- downloadHandler(
         filename = paste("Merged_data.RasPiPhenoApp.csv"),
         content <- function(file) {
@@ -201,8 +201,10 @@ server <- function(input, output) {
         }
     )
     
-    ########### Data Vis graph ####################################  
     
+    ### TAB 1.4 Overall of plant growth ###
+    
+    ########################################################## define UI variables ########################################################## 
     metaList = reactive(if(is.null(Raspi_unique())){
         return(NULL)} else {
             temp <- decoding()
@@ -210,30 +212,6 @@ server <- function(input, output) {
             
         })
     
-    output$Choose_alpha <- renderUI(
-      sliderInput(inputId = "alpha",
-                  label = "Transparency of data point to be displayed:",
-                  min = 0.0,
-                  max = 1,
-                  step = 0.1,
-                  value = 0.2)
-    )
-    
-    output$Choose_alpha_region <- renderUI(
-      sliderInput(inputId = "alpha_region",
-                  label = "Transparency of statitics summary to be displayed:",
-                  min = 0.0,
-                  max = 1,
-                  step = 0.1,
-                  value = 0.2)
-    )
-    
-    output$Select_geom_methods <- renderUI(
-    selectInput(inputId = "geom_method",
-                label = "Displaying standard error:",
-                choices = c("errorbar", "ribbon", "line", "point"),
-                selected = "ribbon"),
-    )
     
     output$color_original <- renderUI({
         if(is.null(Raspi_unique())){return()} else {
@@ -248,8 +226,27 @@ server <- function(input, output) {
         }
     })
     
+    output$Choose_alpha <- renderUI(
+      sliderInput(inputId = "alpha",
+                  label = "Transparency of data point to be displayed:",
+                  min = 0.0,
+                  max = 1,
+                  step = 0.1,
+                  value = 0.2)
+    )
     
-    ### define the axis ticks
+    
+    output$facet_wrap1 <- renderUI({
+      if(input$facet1_check == FALSE){return()} else {
+        if(is.null(Raspi_unique())){return()} else {
+          tagList(
+            selectizeInput("facet_item1", 
+                           label="Facet group per:", 
+                           choices = metaList(),
+                           multiple = F))}
+      }
+    })
+    
     
     output$X_tickUI1 <- renderUI({
       if(input$expType == "PhenoRig"){
@@ -268,37 +265,75 @@ server <- function(input, output) {
                     min = 1000, max=10000, step = 1000, value = 5000)
       } else if (input$expType == "PhenoCage"){
         sliderInput("dayY_tickUI1", label="Which ticks would you like to use for total leaf area?", 
-                    min = 1000, max=5000, step = 1000, value = 2000)
+                    min = 100000, max=500000, step = 100000, value = 200000)
       }
     })
     
-    ### plot the area graph 
+    
+    ########################################################## plot the area graph ########################################################## 
+    
     TimeGraph <- reactive(if(is.null(Raspi_unique())){return(NULL)}else{  
       my_data <- Raspi_unique()
       my_data$col.sorting <- as.factor(my_data[,input$ColorAreaGG])
+      
       if(input$expType == "PhenoRig"){
         my_data$time.min <- as.numeric(my_data$time.min)
         my_data$area <- as.numeric(my_data$area)
-        Area_graph <- ggplot(data=my_data, aes(x= time.min, y=area, group = Plant.ID, color = col.sorting)) +
-          geom_line(alpha = input$alpha) +
-          stat_summary(fun.data = mean_se, geom=input$geom_method, linetype=0, 
-                       aes(group=col.sorting), alpha=input$alpha_region) +
-          theme_classic() +
-          ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
-          scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI1)) +
-          scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI1))
+        
+        if(input$facet1_check == T){
+          my_data$facet.sorting <- as.factor(my_data[,input$facet_item1])
+          
+          Area_graph <- ggplot(data=my_data, aes(x= time.min, y=area, group = Plant.ID, color = col.sorting)) +
+            geom_line(alpha = input$alpha) +
+            theme_classic() +
+            stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+            stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+            facet_wrap(~ facet.sorting, ncol=(length(unique(my_data$facet.sorting)))) +
+            ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
+            scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI1)) +
+            scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI1))
+          
+        } else {
+          
+          Area_graph <- ggplot(data=my_data, aes(x= time.min, y=area, group = Plant.ID, color = col.sorting)) +
+            geom_line(alpha = input$alpha) +
+            stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+            stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+            theme_classic() +
+            ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
+            scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI1)) +
+            scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI1))
+        }
       }
+      
       if(input$expType == "PhenoCage"){
         my_data$time.days <- as.numeric(my_data$time.days)
         my_data$area.total <- as.numeric(my_data$area.total)
+        
+        if(input$facet1_check == T){
+          my_data$facet.sorting <- as.factor(my_data[,input$facet_item1])
+          
+          Area_graph <- ggplot(data=my_data, aes(x= time.days, y=area.total, group = POT, color = col.sorting)) +
+            geom_line(alpha = input$alpha) +
+            stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+            stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+            facet_wrap(~ facet.sorting, ncol=(length(unique(my_data$facet.sorting)))) +
+            theme_classic() +
+            ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") +
+            scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI1)) +
+            scale_y_continuous(breaks=seq(0,max(my_data$area.total),by=input$dayY_tickUI1))
+        } else {
+        
         Area_graph <- ggplot(data=my_data, aes(x= time.days, y=area.total, group = POT, color = col.sorting)) +
           geom_line(alpha = input$alpha) +
-          stat_summary(fun.data = mean_se, geom=input$geom_method, linetype=0, 
-                       aes(group=col.sorting), alpha=input$alpha_region) +
+          stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+          stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
           theme_classic() +
           ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") +
           scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI1)) +
           scale_y_continuous(breaks=seq(0,max(my_data$area.total),by=input$dayY_tickUI1))
+        
+        }
       }
       Area_graph
     })
@@ -308,7 +343,10 @@ server <- function(input, output) {
     })
     
     
-    ### define the smooth and clean option
+    
+    ### TAB 2.1  Design the smooth and cleaning process ###
+    
+    ########################################################## define UI variables ##########################################################
     output$SmoothGo <- renderUI({
       if(input$expType == "PhenoRig"){
         actionButton("SmoothGo", icon("file-import"),label = "Smooth and clean all samples")
@@ -342,9 +380,7 @@ server <- function(input, output) {
           selected = NULL
         )}
     })
-  
-    
-    # # # # # # # Smooth tab # # # # # 
+
     
     smooth_sample <- reactive(if(is.null(Raspi_unique())){return(NULL)
     }else{  
@@ -360,8 +396,6 @@ server <- function(input, output) {
         
     })
 
-
-    # Remove samples with unexpected growth pattern before smoothing
     Raspi_unique_drop <- reactive(if(is.null(Raspi_unique())) {
       return(NULL)
     } else {
@@ -372,12 +406,13 @@ server <- function(input, output) {
             if(input$expType == "PhenoRig"){
                 Raspi_unique <- Raspi_unique()
                 list_of_no <- input$SelectDrop
-                sub_Raspi <- Raspi_unique[Raspi_unique$Plant.ID != list_of_no,]
+                sub_Raspi <- subset(Raspi_unique, !(Raspi_unique$Plant.ID %in% list_of_no))
                 } 
             if(input$expType == "PhenoCage"){
                 Raspi_unique <- Raspi_unique()
                 list_of_no <- as.list(input$SelectDrop)
-                sub_Raspi <- Raspi_unique[Raspi_unique$POT != list_of_no,]
+                sub_Raspi <- subset(Raspi_unique, !(Raspi_unique$POT %in% list_of_no))
+
             }
           return(sub_Raspi)
             }
@@ -392,9 +427,8 @@ server <- function(input, output) {
             }
     })
 
-    ### define three types of curation methods
     output$nknotsUI <- renderUI({if(input$smoothType == "Smooth Spline Fit"){
-        sliderInput("nknots", label="Which nknots would you like to use?", min = 3, max=30, step = 1, value = 2)
+        sliderInput("nknots", label="Which nknots would you like to use?", min = 2, max=30, step = 1, value = 2)
     }else{return(NULL)}})
     
     output$spanUI <- renderUI({if(input$smoothType != "Loess Fit"){return(NULL)}else{
@@ -405,8 +439,7 @@ server <- function(input, output) {
         sliderInput("degree", label="Which degree would you like to use?", min = 2, max=20, step = 1, value = 5)
     }})
 
-    
-    ### define the ticks of plots
+
     output$X_tickUI2 <- renderUI({
       if(input$expType == "PhenoRig"){
         sliderInput("minX_tickUI2", label="Which ticks would you like to use for time (minutes)?", 
@@ -423,12 +456,11 @@ server <- function(input, output) {
                     min = 1000, max=10000, step = 1000, value = 5000)
       } else if (input$expType == "PhenoCage"){
         sliderInput("dayY_tickUI2", label="Which ticks would you like to use for total leaf area?", 
-                    min = 100, max=500, step = 100, value = 200)
+                    min = 100000, max=500000, step = 100000, value = 200000)
       }
     })
     
-    
-    # # # Plot the smooth plot # # # #
+    ########################################################## Plot the Individual plant ########################################################## 
     Smooth_plot_one <- reactive(
         if(is.null(smooth_sample())){return(NULL)}
         else{
@@ -437,16 +469,26 @@ server <- function(input, output) {
                 if(input$expType == "PhenoRig"){
                     temp2 <- subset(temp, temp$Plant.ID == input$sample_smooth)
                     temp2$time.min <- as.numeric(temp2$time.min)
+                    temp2$area <- as.numeric(temp2$area)
                     time.min <- unique(temp2$time.min)
                     
+                    mod.ss <- with(temp2, ss(time.min, area, df = as.numeric(input$nknots)))
+                    mod.ss.sum <- summary(mod.ss)
+                    temp2$sigma <-  as.numeric(input$outlier) * mod.ss.sum$sigma
+                    temp2$residuals <- abs(mod.ss.sum$residuals)
+                    pred_temp <- predict(mod.ss, temp2$time.min)
+
                     Fit_graph <- ggplot(temp2, aes(x=time.min, y=area) ) + 
                         geom_point(aes(y = area), size=input$size, shape = 21) +
-                        geom_smooth(method = "lm", level = as.numeric(input$level), formula = y ~ splines::bs(x, as.numeric(input$nknots)), se = T) +
+                        geom_spline(aes(x=time.min, y=area), nknots = as.numeric(input$nknots), size=1, color = "blue") +
+                        geom_ribbon(aes(ymin = pred_temp$y - unique(temp2$sigma), 
+                                       ymax = pred_temp$y + unique(temp2$sigma)), alpha = 0.2, fill = "grey40") +
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Leaf area of Individual") +
                         scale_x_continuous(breaks=seq(0,max(temp2$time.min),by=input$minX_tickUI2)) +
-                        scale_y_continuous(breaks=seq(0,max(temp2$area),by=input$minY_tickUI2))
+                       scale_y_continuous(breaks=seq(0,max(temp2$area),by=input$minY_tickUI2))
+   
                     
                 }
                 if(input$expType == "PhenoCage"){
@@ -454,14 +496,22 @@ server <- function(input, output) {
                     temp2$time.days <- as.numeric(temp2$time.days)
                     time.days <- unique(temp2$time.days)
                     
-                    Fit_graph <- ggplot(temp2, aes(x=time.days, y=total.area) ) + 
-                        geom_point(aes(y = total.area), size=input$size, shape = 21) +
-                        geom_smooth(method = "lm", level = as.numeric(input$level), formula = y ~ splines::bs(x, as.numeric(input$nknots)), se = T) +
+                    mod.ss <- with(temp2, ss(time.days, area.total, df = as.numeric(input$nknots)))
+                    mod.ss.sum <- summary(mod.ss)
+                    temp2$sigma <-  as.numeric(input$outlier) * mod.ss.sum$sigma
+                    temp2$residuals <- abs(mod.ss.sum$residuals)
+                    pred_temp <- predict(mod.ss, temp2$time.days)
+                    
+                    Fit_graph <- ggplot(temp2, aes(x=time.days, y=area.total) ) + 
+                        geom_point(aes(y = area.total), size=input$size, shape = 21) +
+                        geom_smooth(method = "lm", formula = y ~ splines::bs(x, as.numeric(input$nknots)), se = F)+
+                        geom_ribbon(aes(ymin = pred_temp$y - unique(temp2$sigma), 
+                                      ymax = pred_temp$y + unique(temp2$sigma)), alpha = 0.2, fill = "grey40") +
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Leaf area of Individual") +
                         scale_x_continuous(breaks=seq(0,max(temp2$time.days),by=input$dayX_tickUI2)) +
-                        scale_y_continuous(breaks=seq(0,max(temp2$total.area),by=input$dayY_tickUI2))
+                        scale_y_continuous(breaks=seq(0,max(temp2$area.total),by=input$dayY_tickUI2))
                 }
                 Fit_graph
                 
@@ -472,9 +522,17 @@ server <- function(input, output) {
                     temp2$time.min <- as.numeric(temp2$time.min)
                     time.min <- unique(temp2$time.min)
                     
+                    mod.loess <- loess(temp2$area ~ temp2$time.min, data = temp2, span = as.numeric(input$span))
+                    mod.sum <- summary(mod.loess)
+                    temp2$sigma <- as.numeric(input$outlier) * mod.sum$s
+                    temp2$residual <- abs(mod.sum$residuals)
+                    Predict_matrix1 <- predict(mod.loess, temp2$time.min)
+                    
                     Fit_graph <- ggplot(temp2, aes(x=time.min, y=area) ) + 
                         geom_point(aes(y = area), size=input$size, shape = 21) +
-                        geom_smooth(method = 'loess', level = as.numeric(input$level), span = as.numeric(input$span)) +
+                        geom_spline(aes(x = time.min, y = area), span = as.numeric(input$span), size=1, color = "blue") +
+                        geom_ribbon(aes(ymin = Predict_matrix1 - unique(temp2$sigma), 
+                                      ymax = Predict_matrix1 + unique(temp2$sigma)), alpha = 0.5, fill = "grey40") +
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Leaf area of Individual") +
@@ -486,10 +544,17 @@ server <- function(input, output) {
                     temp2$time.days <- as.numeric(temp2$time.days)
                     time.days <- unique(temp2$time.days)
                     
+                    mod.loess <- loess(temp2$area.total ~ temp2$time.days, data = temp2, span = as.numeric(input$span))
+                    mod.sum <- summary(mod.loess)
+                    temp2$sigma <- as.numeric(input$outlier) * mod.sum$s
+                    temp2$residual <- abs(mod.sum$residuals)
+                    Predict_matrix1 <- predict(mod.loess, temp2$time.days)
                     
                     Fit_graph <- ggplot(temp2, aes(x=time.days, y=area.total) ) + 
                         geom_point(aes(y = area.total), size=input$size, shape = 21) +
-                        geom_smooth(method = 'loess', level = as.numeric(input$level), span = as.numeric(input$span)) +
+                        geom_smooth(method = 'loess', span = as.numeric(input$span), se = F) +
+                        geom_ribbon(aes(ymin = Predict_matrix1 - unique(temp2$sigma), 
+                                      ymax = Predict_matrix1 + unique(temp2$sigma)), alpha = 0.5, fill = "grey40") +
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Total Leaf area of Individual from multiple sides") +
@@ -505,10 +570,20 @@ server <- function(input, output) {
                     temp2 <- subset(temp, temp$Plant.ID == input$sample_smooth)
                     temp2$time.min <- as.numeric(temp2$time.min)
                     time.min <- unique(temp2$time.min)
+  
+                    poly.model <- lm(area ~ poly(time.min, as.numeric(input$degree), raw = TRUE), data = temp2)
+                    pred_temp <- predict(poly.model)
+                    mod.sum <- summary(poly.model)
+                    temp2$sigma <- as.numeric(input$outlier) * mod.sum$sigma
+                    temp2$residual <- abs(mod.sum$residuals)
+                    
                     ### Plot graph
                     Fit_graph <- ggplot(temp2, aes(time.min, area) ) + 
                         geom_point(aes(y = area), size=input$size, shape = 21) +
-                        stat_smooth(method = 'lm', level = as.numeric(input$level), formula = y ~ poly(x, as.numeric(input$degree), raw = TRUE)) +
+                        #stat_smooth(method = 'lm', level = as.numeric(input$level), formula = y ~ poly(x, as.numeric(input$degree), raw = TRUE)) +
+                        geom_spline(aes(x = time.min, y = area), degree = as.numeric(input$degree), size=1, color = "blue") +
+                        geom_ribbon(aes(ymin = pred_temp - unique(temp2$sigma), 
+                                    ymax = pred_temp + unique(temp2$sigma)), alpha = 0.5, fill = "grey40") +
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Leaf area of Individual") +
@@ -520,10 +595,19 @@ server <- function(input, output) {
                     temp2 <- subset(temp, temp$POT == input$sample_smooth)
                     temp2$time.days <- as.numeric(temp2$time.days)
                     time.days <- unique(temp2$time.days)
+                    
+                    poly.model <- lm(area.total ~ poly(time.days, as.numeric(input$degree), raw = TRUE), data = temp2)
+                    pred_temp <- predict(poly.model)
+                    mod.sum <- summary(poly.model)
+                    temp2$sigma <- as.numeric(input$outlier) * mod.sum$sigma
+                    temp2$residual <- abs(mod.sum$residuals)
+                    
                     ### Plot graph
                     Fit_graph <- ggplot(temp2, aes(time.days, area.total) ) + 
                         geom_point(aes(y = area.total), size=input$size, shape = 21) +
-                        stat_smooth(method = 'lm', level = as.numeric(input$level), formula = y ~ poly(x, as.numeric(input$degree), raw = TRUE)) +
+                        stat_smooth(method = 'lm', formula = y ~ poly(x, as.numeric(input$degree), se = F)) +
+                        geom_ribbon(aes(ymin = pred_temp - unique(temp2$sigma), 
+                                      ymax = pred_temp + unique(temp2$sigma)), alpha = 0.5, fill = "grey40") +
                         theme_classic() +
                         xlab("Total Time (minutes)") +
                         ylab("Total Leaf area of Individual from multiple sides") +
@@ -541,11 +625,11 @@ server <- function(input, output) {
 
     
 
-    ### TAB 2 Smooth calculations for all individual plants ###
-
-    ### smooth spline function
+    ### TAB 2.2 Smooth calculations for all individual plants ###
+    
+    ########################################################## perform the data smoothing ########################################################## 
     smooth_all <- reactive(if(input$SmoothGo == FALSE){return(NULL)}else{
-        my_data <- Raspi_unique_drop()
+        my_data <- unique(Raspi_unique_drop())
         if(input$smoothType== "Smooth Spline Fit"){
             if(input$expType == "PhenoRig"){
                 names <- c(text="Plant.ID", "time.min", "area.smooth","residuals","sigma")
@@ -569,13 +653,9 @@ server <- function(input, output) {
                 spline_data[1:max_day,4] <- temp$residuals
                 spline_data[1:max_day,5] <- temp$sigma
                 spline_data_clean <- spline_data[spline_data$residuals < spline_data$sigma,]
+
+                final_spline <- spline_data
                 
-                #if((input$Outlier_Check == FALSE)){
-                    final_spline <- spline_data
-               # } else {
-                   # final_spline <-  spline_data_clean
-               # }
-            
                 for(i in 1:length(unique(my_data$Plant.ID))){
                     temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
                     temp$time.min <- as.numeric(as.character(temp$time.min))
@@ -595,18 +675,13 @@ server <- function(input, output) {
                     spline_data[1:max_day,5] <- temp$sigma
                     
                     spline_data_clean <- spline_data[spline_data$residuals < spline_data$sigma,]
-                    
-                   # if((input$Outlier_Check == FALSE)){
-                        final_spline <- rbind(final_spline, spline_data)
-                    #} else {
-                        #final_spline <- rbind(final_spline, spline_data_clean)
-                    #}
-                
+                    final_spline <- rbind(final_spline, spline_data)
+
                 }
                 meta <- decoding()
                 meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
                 Raspi_decoded <- merge(final_spline, meta, by="Plant.ID", all = TRUE) 
-                Raspi_decoded2 <- na.omit(Raspi_decoded)
+                Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
             } 
             if(input$expType == "PhenoCage"){
                 names <- c(text="POT", "time.days", "area.total.smooth")
@@ -638,7 +713,7 @@ server <- function(input, output) {
                 }
                 meta <- decoding()
                 Raspi_decoded <- merge(final_spline, meta, by="POT", all = TRUE) 
-                Raspi_decoded2 <- na.omit(Raspi_decoded)
+                Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
                 
             }} else if(input$smoothType== "Loess Fit"){
                 
@@ -665,12 +740,8 @@ server <- function(input, output) {
                     loess_data[1:max_day,5] <- temp$sigma
                     loess_data_clean <- loess_data[loess_data$residuals < loess_data$sigma,]
 
-                #    if((input$Outlier_Check == FALSE)){
-                        final_loess <- loess_data
-                  #  } else {
-                      #  final_loess <- loess_data_clean
-                   # }
-    
+                   final_loess <- loess_data
+
                     for(i in 1:length(unique(my_data$Plant.ID))){
                         temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
                         temp$time.min <- as.numeric(as.character(temp$time.min))
@@ -689,18 +760,13 @@ server <- function(input, output) {
                         loess_data[1:max_day,5] <- temp$sigma
                         
                         loess_data_clean <- loess_data[loess_data$residuals < loess_data$sigma,]
-                        
-                       # if((input$Outlier_Check == FALSE)){
-                            final_loess <- rbind(final_loess, loess_data)
-                        #} else {
-                            #final_loess <- rbind(final_loess, loess_data_clean)
-                        #}
+                        final_loess <- rbind(final_loess, loess_data)
 
                     }
                     meta <- decoding()
                     meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
                     Raspi_decoded <- merge(final_loess, meta, by="Plant.ID", all = TRUE) 
-                    Raspi_decoded2 <- na.omit(Raspi_decoded)
+                    Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
 
                 } 
                 if(input$expType == "PhenoCage"){
@@ -712,10 +778,10 @@ server <- function(input, output) {
                     temp$time.day <- as.numeric(as.character(temp$time.day))
                     day <- unique(temp$time.day)
                     max_day <- length(day)
-                    loess.model <- with(temp, loess(area ~ time.day, span = as.numeric(input$span)))
+                    loess.model <- with(temp, loess(area.total ~ time.day, span = as.numeric(input$span)))
                     pred_temp <- predict(loess.model, day)
                     loess_data[1:max_day,2] <- day
-                    loess_data[1:max_day,3] <- loess.model
+                    loess_data[1:max_day,3] <- pred_temp
                     loess_data[1:max_day,1] <- temp$POT[1]
                     final_loess <- loess_data
                     
@@ -724,16 +790,16 @@ server <- function(input, output) {
                         temp$time.day <- as.numeric(as.character(temp$time.day))
                         day <- unique(temp$time.day)
                         max_day <- length(day)
-                        loess.model <- with(temp, loess(area ~ time.day, span = as.numeric(input$span)))
+                        loess.model <- with(temp, loess(area.total ~ time.day, span = as.numeric(input$span)))
                         pred_temp <- predict(loess.model, day)
                         loess_data[1:max_day,2] <- day
-                        loess_data[1:max_day,3] <- loess.model
+                        loess_data[1:max_day,3] <- pred_temp
                         loess_data[1:max_day,1] <- temp$POT[1]
                         final_loess <- rbind(final_loess, loess_data)
                     }
                     meta <- decoding()
                     Raspi_decoded <- merge(final_loess, meta, by="POT", all = TRUE) 
-                    Raspi_decoded2 <- na.omit(Raspi_decoded)
+                    Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
                 
             }} else if (input$smoothType== "Polynomial Regression Fit"){
                 
@@ -746,7 +812,7 @@ server <- function(input, output) {
                 temp$time.min <- as.numeric(as.character(temp$time.min))
                 day <- unique(temp$time.min)
                 max_day <- length(day)
-                poly.model <- with(temp, lm(temp$area ~ poly(temp$time.min, as.numeric(input$degree), raw = TRUE)))
+                poly.model <- lm(temp$area ~ poly(temp$time.min, as.numeric(input$degree), raw = TRUE))
                 pred_temp <- predict(poly.model)
             
                 poly.model.sum <- summary(poly.model)
@@ -758,13 +824,9 @@ server <- function(input, output) {
                 polynomial_data[1:max_day,1] <- temp$Plant.ID[1]
                 polynomial_data[1:max_day,4] <- temp$residuals
                 polynomial_data[1:max_day,5] <- temp$sigma
-                
-                #if((input$Outlier_Check == FALSE)){
-                    final_polynomial <- polynomial_data
-               # } else {
-                    #final_polynomial <- polynomial_data_clean
-                #}
-                
+
+                final_polynomial <- polynomial_data
+
                 for(i in 1:length(unique(my_data$Plant.ID))){
                     temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[i])
                     temp$time.min <- as.numeric(as.character(temp$time.min))
@@ -772,7 +834,7 @@ server <- function(input, output) {
                     max_day <- length(day)
                     poly.model <- lm(temp$area ~ poly(temp$time.min, as.numeric(input$degree), raw = TRUE))
                     poly.model.sum <- summary(poly.model)
-                    temp$sigma <-  as.numeric(input$outlier)*poly.model.sum$sigma
+                    temp$sigma <-  as.numeric(input$outlier) * poly.model.sum$sigma
                     temp$residuals <- abs(poly.model.sum$residuals)
                     
                     pred_temp <- predict(poly.model)
@@ -782,16 +844,12 @@ server <- function(input, output) {
                     polynomial_data[1:max_day,4] <- temp$residuals
                     polynomial_data[1:max_day,5] <- temp$sigma
                     
-                    #if((input$Outlier_Check == FALSE)){
-                       final_polynomial <- rbind(final_polynomial, polynomial_data)
-                   # } else {
-                      #final_polynomial <- rbind(final_polynomial, polynomial_data_clean)
-                   # }
+                    final_polynomial <- rbind(final_polynomial, polynomial_data)
                 }
                 meta <- decoding()
                 meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
                 Raspi_decoded <- merge(final_polynomial, meta, by="Plant.ID", all = TRUE) 
-                Raspi_decoded2 <- na.omit(Raspi_decoded)
+                Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
             }
             if(input$expType == "PhenoCage"){
                 names <- c(text="POT", "time.days", "area.total.smooth")
@@ -802,7 +860,7 @@ server <- function(input, output) {
                 temp$time.day <- as.numeric(as.character(temp$time.day))
                 day <- unique(temp$time.day)
                 max_day <- length(day)
-                poly.model <- with(temp, polynomial(area ~ time.day,degree = as.numeric(input$degree)))
+                poly.model <- lm(temp$area.total ~ poly(temp$time.day, as.numeric(input$degree), raw = TRUE))
                 pred_temp <- predict(poly.model)
                 
                 polynomial_data[1:max_day,2] <- day
@@ -815,7 +873,7 @@ server <- function(input, output) {
                     temp$time.day <- as.numeric(as.character(temp$time.day))
                     day <- unique(temp$time.day)
                     max_day <- length(day)
-                    poly.model <- with(temp, polynomial(area ~ time.day,degree = as.numeric(input$degree)))
+                    poly.model <- lm(temp$area.total ~ poly(temp$time.day, as.numeric(input$degree), raw = TRUE))
                     pred_temp <- predict(poly.model)
                     polynomial_data[1:max_day,2] <- day
                     polynomial_data[1:max_day,3] <- pred_temp
@@ -824,7 +882,7 @@ server <- function(input, output) {
                 }
                 meta <- decoding()
                 Raspi_decoded <- merge(final_polynomial, meta, by="POT", all = TRUE) 
-                Raspi_decoded2 <- na.omit(Raspi_decoded)
+                Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
             }}
         
         return(Raspi_decoded2)
@@ -848,18 +906,18 @@ server <- function(input, output) {
             return(NULL)}
         else{
             data <- smooth_all()
-            no_PIs <- length(unique(data$RasPi))
+            
             if(input$expType == "PhenoRig"){
                 no_Plants <- length(unique(data$Plant.ID))
-            } else if (input$expType == "PhenoRig") {
+            } else if (input$expType == "PhenoCage") {
                 no_Plants <- length(unique(data$POT))
                 }
-            sentence_smooth <- paste("Your Raspberry Pi smoothed data contains images collected over ",no_PIs," Raspberry Pi devices collected among ",no_Plants, "individual(s)")
+            sentence_smooth <- paste("Your Raspberry Pi smoothed data contains images collected  among ",no_Plants, "individual(s)")
             return(sentence_smooth)
         }
     })
 
-    #### download smoothed file ##### 
+    ########################################################## download smoothed file ##########################################################  
     
     output$smooth_table_download_button <- downloadHandler(
         filename = paste("Smoothed_data.RasPiPhenoApp.csv"),
@@ -871,8 +929,9 @@ server <- function(input, output) {
     )
     
     
-    ### TAB3  smooth graph for all plants### 
+    ### TAB2.3  smooth graph for all plants### 
     
+    ########################################################## define UI variables ########################################################## 
     output$color_smooth <- renderUI({
         if(is.null(smooth_all())){return()} else {
             tagList(
@@ -885,15 +944,18 @@ server <- function(input, output) {
             )
         }
     })
+
+    output$facet_wrap2 <- renderUI({
+      if(input$facet2_check == FALSE){return()} else {
+        if(is.null(smooth_all())){return()} else {
+          tagList(
+          selectizeInput("facet_item2", 
+                       label="Facet group per:", 
+                       choices = metaList(),
+                       multiple = F))}
+      }
+    })
     
-    output$Select_geom_methods2 <- renderUI(
-      selectInput(inputId = "geom_method2",
-                  label = "Displaying standard error:",
-                  choices = c("errorbar", "ribbon", "line", "point"),
-                  selected = "ribbon"),
-    )
-    
-    ### define the ticks of plots
     output$X_tickUI3 <- renderUI({
       if(input$expType == "PhenoRig"){
         sliderInput("minX_tickUI3", label="Which ticks would you like to use for time (minutes)?", 
@@ -910,39 +972,84 @@ server <- function(input, output) {
                     min = 1000, max=10000, step = 1000, value = 5000)
       } else if (input$expType == "PhenoCage"){
         sliderInput("dayY_tickUI3", label="Which ticks would you like to use for total leaf area?", 
-                    min = 100, max=500, step = 100, value = 200)
+                    min = 100000, max=500000, step = 100000, value = 200000)
       }
     })
     
+    ########################################################## Plot the smooth graph ##########################################################
+    
     smooth_graph_all <- reactive(if(is.null(smooth_all())){return(NULL)}else{
-        my_data <- smooth_all()
+        my_data <- unique(smooth_all())
         my_data$col.sorting <- as.factor(my_data[,input$ColorSmoothGG])
+
         if(input$expType == "PhenoRig"){
-            my_data$time.min <- as.numeric(my_data$time.min)
-            my_data$area.smooth <- as.numeric(my_data$area.smooth)
+          my_data$time.min <- as.numeric(my_data$time.min)
+          my_data$area.smooth <- as.numeric(my_data$area.smooth)
+        
+          if(input$facet2_check == T){
+            my_data$facet.sorting <- as.factor(my_data[,input$facet_item2])
             
-            Area_graph <- ggplot(data=my_data,aes(x= time.min, y=area.smooth, group = Plant.ID, color = col.sorting)) +
-                geom_line(alpha = 0.3) +
-                geom_point(alpha = 0.3, size = 0.5) +
-                theme_classic() +
-                stat_summary(fun.data = mean_se, geom=input$geom_method2, linetype=0, 
-                             aes(group=col.sorting), alpha=0.5) +
+            Area_graph <- ggplot(data=my_data,aes(x= time.min, y=area.smooth, color = col.sorting)) +
+              geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
+              theme_classic() +
+              facet_wrap(~ facet.sorting, ncol=(length(unique(my_data$facet.sorting)))) +
+              geom_point(alpha = 0.3, size = 0.2) +
+              theme_classic() +
+              stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+              stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+              stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "anova", hide.ns = T) +
+              ylab("Rosette Area (Smooth data)") + 
+              xlab("Time (minutes)") +
+              scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI3)) +
+              scale_y_continuous(breaks=seq(0,max(my_data$area.smooth),by=input$minY_tickUI3))
             
-                ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
-                scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI3)) +
-                scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI3))
+          } else {
+
+            Area_graph <- ggplot(data=my_data,aes(x= time.min, y=area.smooth, color = col.sorting)) +
+              geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
+              theme_classic() +
+              geom_point(alpha = 0.3, size = 0.2) +
+              stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+              stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+              stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "anova", hide.ns = T) +
+              ylab("Rosette Area (Smooth data)") + 
+              xlab("Time (minutes)") +
+              scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI3)) +
+              scale_y_continuous(breaks=seq(0,max(my_data$area.smooth),by=input$minY_tickUI3))
+          }
         }
+        
         if(input$expType == "PhenoCage"){
             my_data$time.days <- as.numeric(my_data$time.days)
             my_data$area.total.smooth <- as.numeric(my_data$area.total.smooth)
-            Area_graph <- ggplot(data=my_data, stat="summary",aes(x= time.days, y=area.total.smooth, group = POT, color = col.sorting)) +
-                geom_line(alpha = 0.3) +
+            
+            if(input$facet2_check == T){
+            my_data$facet.sorting <- as.factor(my_data[,input$facet_item2])
+            
+            Area_graph <- ggplot(data = my_data, aes(x= time.days, y=area.total.smooth, color = col.sorting)) + 
+              geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
+              theme_classic() +
+              facet_wrap(~ facet.sorting, ncol=(length(unique(my_data$facet.sorting)))) +
+              ylab("Cummulative Shoot Area (Smooth data)") +
+              xlab("Time (days)") +
+              stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+              stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+              stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "anova", hide.ns = T) +
+              scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI3)) +
+              scale_y_continuous(breaks=seq(0,max(my_data$area.total.smooth),by=input$dayY_tickUI3))
+            
+            } else {
+              Area_graph <- ggplot(data = my_data, aes(x= time.days, y=area.total.smooth, color = col.sorting)) + 
+                geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
                 theme_classic() +
-                stat_summary(fun.data = mean_se, geom=input$geom_method2, linetype=0, 
-                                                    aes(group=col.sorting), alpha=0.5) +
-                ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") +
-                scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$dayX_tickUI3)) +
-                scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$dayY_tickUI3))
+                ylab("Cummulative Shoot Area (Smooth data)") +
+                xlab("Time (days)") +
+                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+                stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+                stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "anova", hide.ns = T) +
+                scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI3)) +
+                scale_y_continuous(breaks=seq(0,max(my_data$area.total.smooth),by=input$dayY_tickUI3))
+            }  
         }
         Area_graph
     })
@@ -951,7 +1058,7 @@ server <- function(input, output) {
         ggplotly(smooth_graph_all())
     )
     
-    ########### download smooth graph ####################################  
+    ########################################################## download smooth graph ##########################################################  
     
     output$Smooth_graph_button <- renderUI({
         if (is.null(smooth_graph_all())) {
@@ -974,11 +1081,11 @@ server <- function(input, output) {
     )
     
     
-    ### TAB 4 Clean data point which are outliers of model  ###
+    ### TAB 2.4 Clean data point which are outliers of model  ###
     
-    ### smooth spline function
+    ##########################################################  Generate the smooth table ##########################################################
     clean_all <- reactive(if(input$SmoothGo == FALSE){return(NULL)}else{
-      my_data <- Raspi_unique_drop()
+      my_data <- unique(Raspi_unique_drop())
       if(input$smoothType== "Smooth Spline Fit"){
         if(input$expType == "PhenoRig"){
           names <- c(text="Plant.ID", "time.min", "area","residuals","sigma")
@@ -1029,7 +1136,7 @@ server <- function(input, output) {
           meta <- decoding()
           meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
           Raspi_decoded <- merge(final_spline, meta, by="Plant.ID", all = TRUE) 
-          Raspi_decoded2 <- na.omit(Raspi_decoded)
+          Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
         } 
         if(input$expType == "PhenoCage"){
           names <- c(text="POT", "time.days", "area.total")
@@ -1055,13 +1162,13 @@ server <- function(input, output) {
             plot.spl <- with(temp, smooth.spline(time.day, area.total, df = as.numeric(input$nknots)))
             pred_temp <- predict(plot.spl, day)
             spline_data[1:max_day,2] <- pred_temp$x
-            spline_data[1:max_day,3] <- ptemp$area.total
+            spline_data[1:max_day,3] <- temp$area.total
             spline_data[1:max_day,1] <- temp$POT[1]
             final_spline <- rbind(final_spline, spline_data)
           }
           meta <- decoding()
           Raspi_decoded <- merge(final_spline, meta, by="POT", all = TRUE) 
-          Raspi_decoded2 <- na.omit(Raspi_decoded)
+          Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
           
         }} else if(input$smoothType== "Loess Fit"){
           
@@ -1097,7 +1204,7 @@ server <- function(input, output) {
               max_day <- length(day)
               loess.model <- with(temp, loess(area ~ time.min, span = as.numeric(input$span)))
               loess.model.sum <- summary(loess.model)
-              temp$sigma <-  as.numeric(input$outlier) *loess.model.sum$s
+              temp$sigma <-  as.numeric(input$outlier) * loess.model.sum$s
               temp$residuals <- abs(loess.model.sum$residuals)
               
               pred_temp <- predict(loess.model, day)
@@ -1115,7 +1222,7 @@ server <- function(input, output) {
             meta <- decoding()
             meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
             Raspi_decoded <- merge(final_loess, meta, by="Plant.ID", all = TRUE) 
-            Raspi_decoded2 <- na.omit(Raspi_decoded)
+            Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
             
           } 
           if(input$expType == "PhenoCage"){
@@ -1139,7 +1246,7 @@ server <- function(input, output) {
               temp$time.day <- as.numeric(as.character(temp$time.day))
               day <- unique(temp$time.day)
               max_day <- length(day)
-              loess.model <- with(temp, loess(area ~ time.day, span = as.numeric(input$span)))
+              loess.model <- with(temp, loess(area.total ~ time.day, span = as.numeric(input$span)))
               pred_temp <- predict(loess.model, day)
               loess_data[1:max_day,2] <- day
               loess_data[1:max_day,3] <- temp$area.total
@@ -1148,7 +1255,7 @@ server <- function(input, output) {
             }
             meta <- decoding()
             Raspi_decoded <- merge(final_loess, meta, by="POT", all = TRUE) 
-            Raspi_decoded2 <- na.omit(Raspi_decoded)
+            Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
             
           }} else if (input$smoothType== "Polynomial Regression Fit"){
             
@@ -1157,15 +1264,16 @@ server <- function(input, output) {
               polynomial_data <- data.frame()
               for (k in names) polynomial_data[[k]] <- as.character()
               i=1
+              
               temp <- subset(my_data, my_data$Plant.ID == unique(my_data$Plant.ID)[1])
               temp$time.min <- as.numeric(as.character(temp$time.min))
               day <- unique(temp$time.min)
               max_day <- length(day)
-              poly.model <- with(temp, lm(temp$area ~ poly(temp$time.min, as.numeric(input$degree), raw = TRUE)))
+              poly.model <- lm(temp$area ~ poly(temp$time.min, as.numeric(input$degree), raw = TRUE))
               pred_temp <- predict(poly.model)
               
               poly.model.sum <- summary(poly.model)
-              temp$sigma <-  as.numeric(input$outlier)*poly.model.sum$sigma
+              temp$sigma <-  as.numeric(input$outlier) * poly.model.sum$sigma
               temp$residuals <- abs(poly.model.sum$residuals)
               
               polynomial_data[1:max_day,2] <- day
@@ -1175,7 +1283,6 @@ server <- function(input, output) {
               polynomial_data[1:max_day,5] <- temp$sigma
               
               polynomial_data_clean <- polynomial_data[polynomial_data$residuals < polynomial_data$sigma,]
-              
               final_polynomial <- polynomial_data_clean
               
               for(i in 1:length(unique(my_data$Plant.ID))){
@@ -1190,17 +1297,19 @@ server <- function(input, output) {
                 
                 pred_temp <- predict(poly.model)
                 polynomial_data[1:max_day,2] <- day
-                polynomial_data[1:max_day,3] <- as.numeric(temp$area)
+                polynomial_data[1:max_day,3] <- temp$area
                 polynomial_data[1:max_day,1] <- temp$Plant.ID[1]
                 polynomial_data[1:max_day,4] <- temp$residuals
                 polynomial_data[1:max_day,5] <- temp$sigma
+                
+                polynomial_data_clean <- polynomial_data[polynomial_data$residuals < polynomial_data$sigma,]
                 
                 final_polynomial <- rbind(final_polynomial, polynomial_data_clean)
               }
               meta <- decoding()
               meta$Plant.ID <- paste(meta$RasPi, meta$Camera, meta$position, sep="_")
               Raspi_decoded <- merge(final_polynomial, meta, by="Plant.ID", all = TRUE) 
-              Raspi_decoded2 <- na.omit(Raspi_decoded)
+              Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
             }
             if(input$expType == "PhenoCage"){
               names <- c(text="POT", "time.days", "area.total")
@@ -1233,7 +1342,7 @@ server <- function(input, output) {
               }
               meta <- decoding()
               Raspi_decoded <- merge(final_polynomial, meta, by="POT", all = TRUE) 
-              Raspi_decoded2 <- na.omit(Raspi_decoded)
+              Raspi_decoded2 <- unique(na.omit(Raspi_decoded))
             }}
       
       return(Raspi_decoded2)
@@ -1259,19 +1368,18 @@ server <- function(input, output) {
         return(NULL)}
       else{
         clean_all <- clean_all()
-        no_PIs <- length(unique(clean_all$RasPi))
         
         if(input$expType == "PhenoRig"){
           no_Plants <- length(unique(clean_all$Plant.ID))
         } else if (input$expType == "PhenoRig") {
           no_Plants <- length(unique(clean_all$POT))
         }
-        sentence_clean <- paste("Your Raspberry Pi cleaned data contains images collected over ",no_PIs, " Raspberry Pi devices among",no_Plants, "individual(s)")
+        sentence_clean <- paste("Your Raspberry Pi cleaned data contains images collected among",no_Plants, "individual(s)")
         return(sentence_clean)
       }
     })
     
-    #### download Cleaned file ##### 
+    ########################################################## download Cleaned file ########################################################## 
     
     output$Clean_table_download_button <- downloadHandler(
       filename = paste("Cleaned_data.RasPiPhenoApp.csv"),
@@ -1282,7 +1390,9 @@ server <- function(input, output) {
       }
     )
     
-    ### TAB 5 Plot the clean data for plants ###
+    ### TAB 3.5 Plot the clean data for plants ###
+    
+    ########################################################## define UI of vatriables ##########################################################
     output$color_clean <- renderUI({
       if(is.null(clean_all())){return()} else {
         tagList(
@@ -1296,12 +1406,17 @@ server <- function(input, output) {
       }
     })
     
-    output$Select_geom_methods3 <- renderUI(
-      selectInput(inputId = "geom_method3",
-                  label = "Displaying standard error:",
-                  choices = c("errorbar", "ribbon", "line", "point"),
-                  selected = "ribbon"),
-    )
+    
+    output$facet_wrap3 <- renderUI({
+      if(input$facet3_check == FALSE){return()} else {
+        if(is.null(smooth_all())){return()} else {
+          tagList(
+            selectizeInput("facet_item3", 
+                           label="Facet group per:", 
+                           choices = metaList(),
+                           multiple = F))}
+      }
+    })
     
     ### define the ticks of plots
     output$X_tickUI4 <- renderUI({
@@ -1320,40 +1435,89 @@ server <- function(input, output) {
                     min = 1000, max=10000, step = 1000, value = 5000)
       } else if (input$expType == "PhenoCage"){
         sliderInput("dayY_tickUI4", label="Which ticks would you like to use for total leaf area?", 
-                    min = 100, max=500, step = 100, value = 200)
+                    min = 100000, max=500000, step = 100000, value = 200000)
       }
     })
     
+    ########################################################## Generate the clean graph ##########################################################
+    
     clean_graph_all <- reactive(if(is.null(clean_all())){return(NULL)}else{
-      my_data <- clean_all()
+      my_data <- unique(clean_all())
       my_data$col.sorting <- as.factor(my_data[,input$ColorcleanGG])
+      
       if(input$expType == "PhenoRig"){
         my_data$time.min <- as.numeric(my_data$time.min)
         my_data$area <- as.numeric(my_data$area)
         
-        Area_graph <- ggplot(data=my_data,aes(x= time.min, y=area, group = Plant.ID, color = col.sorting)) +
-          geom_line(alpha = 0.3) +
-          geom_point(alpha = 0.3, size = input$size) +
-          theme_classic() +
-          stat_summary(fun.data = mean_se, geom=input$geom_method3, linetype=0, 
-                       aes(group=col.sorting), alpha=0.5) +
+        if(input$facet3_check == T){
+          my_data$facet.sorting <- as.factor(my_data[,input$facet_item3])
           
-          ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
-          scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI4)) +
-          scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI4))
+          Area_graph <- ggplot(data = my_data, aes(x= time.min, y=area, color = col.sorting)) + 
+            geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
+            geom_point(alpha = 0.3, size = 0.2,aes(group= Plant.ID)) +
+            theme_classic() +
+            facet_wrap(~ facet.sorting, ncol=(length(unique(my_data$facet.sorting)))) +
+            ylab("Rosette Area (Cleaned data)") +
+            xlab("Time (minutes)") +
+            stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+            stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "anova", hide.ns = T) +
+            scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI4)) +
+            scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI4))
+          
+        } else {
+          Area_graph <- ggplot(data = my_data, aes(x= time.min, y=area, color = col.sorting)) + 
+            geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
+            geom_point(alpha = 0.3, size = 0.2,aes(group= Plant.ID)) +
+            theme_classic() +
+            ylab("Rosette Area (Cleaned data)") +
+            xlab("Time (minutes)") +
+            stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+            stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "anova", hide.ns = T) +
+            scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI4)) +
+            scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI4))
+        }
+        
       }
+      
       if(input$expType == "PhenoCage"){
+        
         my_data$time.days <- as.numeric(my_data$time.days)
         my_data$area.total <- as.numeric(my_data$area.total)
-        Area_graph <- ggplot(data=my_data, stat="summary",aes(x= time.days, y=area.total, group = POT, color = col.sorting)) +
-          geom_line(alpha = 0.3) +
-          geom_point(alpha = 0.3, size = input$size) +
+        
+        if(input$facet3_check == T){ 
+          
+        my_data$facet.sorting <- as.factor(my_data[,input$facet_item3])
+        Area_graph <- ggplot(data = my_data, aes(x= time.days, y=area.total, color = col.sorting)) + 
+          geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
+          geom_point(alpha = 0.3,size = 0.2, aes(group= POT)) +
           theme_classic() +
-          stat_summary(fun.data = mean_se, geom=input$geom_method3, linetype=0, 
-                       aes(group=col.sorting), alpha=0.5) +
-          ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") +
-          scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$dayX_tickUI4)) +
-          scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$dayY_tickUI4))
+          facet_wrap(~ facet.sorting, ncol=(length(unique(my_data$facet.sorting)))) +
+          ylab("Cummulative Shoot Area (cleaned data)") +
+          xlab("Time (days)") +
+          stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+          stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "anova", hide.ns = T) +
+          scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI4)) +
+          scale_y_continuous(breaks=seq(0,max(my_data$area.total),by=input$dayY_tickUI4))
+        
+        } else {
+          
+          Area_graph <- ggplot(data = my_data, aes(x= time.days, y=area.total, color = col.sorting)) + 
+            geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
+            geom_point(alpha = 0.3,size = 0.2, aes(group= POT)) +
+            theme_classic() +
+            ylab("Cummulative Shoot Area (cleaned data)") +
+            xlab("Time (days)") +
+            stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+            stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "anova", hide.ns = T) +
+
+            scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI4)) +
+            scale_y_continuous(breaks=seq(0,max(my_data$area.total),by=input$dayY_tickUI4))
+        }
+
       }
       Area_graph
     })
@@ -1362,7 +1526,7 @@ server <- function(input, output) {
       ggplotly(clean_graph_all())
     )
     
-    ########### download clean graph ####################################  
+    ########################################################## download clean graph ######################################################### 
     
     output$clean_graph_button <- renderUI({
       if (is.null(clean_graph_all())) {
@@ -1384,8 +1548,9 @@ server <- function(input, output) {
       }
     )
     
+    ### TAB 3.1 Calculating growth rate (GR) inputs ###
     
-    ## Calculating growth rate (GR) inputs
+    ########################################################## Define UI vatiables ########################################################## 
     interval_choices <- reactive(if(is.null(Raspi_unique())){return(NULL)}else{
         if(input$expType == "PhenoRig"){
             interval_list <- c("3 hours", "6 hours", "day", "2 days")
@@ -1430,8 +1595,7 @@ server <- function(input, output) {
         }
     })
     
-    
-    
+    ########################################################## generate the GR table ########################################################## 
     Growth_rate_table <- reactive(if(input$GoGrowth == FALSE){return(NULL)}else{
         if(input$GrowthType == "Step-wise"){
             if(input$dataGrowth == "Original data"){
@@ -2226,7 +2390,7 @@ server <- function(input, output) {
     })
     
     
-    ########### download growth rate file ####################################  
+    ##########################################################  download growth rate file ########################################################## 
     
     
     output$growthtable_download_button <- downloadHandler(
@@ -2237,8 +2401,10 @@ server <- function(input, output) {
             
         }
     )
+    ### TAB 3.1 ended
+    ### TAB 3.2 Generate the GR plot
     
-    # # # # # # # # Growth rate graph inputs # # # # # # # # # # # # # # 
+    ##########################################################  Define UI variables ########################################################## 
     
     output$Growth_Color_button <- renderUI({
         if(is.null(Growth_rate_table())){return()} else {
@@ -2288,7 +2454,7 @@ server <- function(input, output) {
     })
     
     
-    # # # # # # # # Growth rate graph  # # # # # # # # # # # # # # 
+    ########################################################## Growth rate graph  ##########################################################
     
     Growth_rate_graph <- reactive(if(input$GoGrowth==FALSE){return(NULL)}else{
         my_data <- Growth_rate_table()
@@ -2339,7 +2505,7 @@ server <- function(input, output) {
     })
     
     
-    ########### download growth rate graph ####################################  
+    ########################################################## download growth rate graph ##########################################################  
     
     output$Growth_graph_button <- renderUI({
         if (is.null(Growth_rate_graph())) {
