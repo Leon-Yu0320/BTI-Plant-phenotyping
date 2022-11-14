@@ -174,7 +174,7 @@ server <- function(input, output) {
             return(meta_sentence)
             
         }
-        a
+        
     })
     
     output$Data_tabl3 <- renderDataTable({
@@ -2526,6 +2526,221 @@ server <- function(input, output) {
             
         }
     )
+    
+    ### TAB 4.1 Perform the stats for raw data ###
+    ########################################################## Define UI variables ########################################################## 
+    
+    output$SelectPrimaryFactor <- renderUI({
+      if(is.null(smooth_all())){return()} else {
+        tagList(
+          selectizeInput(
+            inputId = "PrimaryFactor",
+            label = "Select the experimental independent variable(s)",
+            choices = metaList(),
+            multiple = F
+          )
+        )
+      }
+    })
+    
+    output$SelectOtherFactor <- renderUI({
+      if(input$FactorCheck == FALSE){return()} else {
+        tagList(
+          selectizeInput(
+            inputId = "OtherFactor",
+            label = "Select the additional experimental independent variable(s)",
+            choices = metaList(),
+            multiple = T
+          )
+        )
+      }
+    })
+
+    
+    FactorLength <-  reactive(if(is.null(smooth_all())){
+      return(NULL)} else {
+        temp <- smooth_all()
+        return(length(unique(temp[,input$PrimaryFactor])))
+        
+      })
+    
+    
+    output$SelectMethod <- renderUI({
+      if(input$FactorCheck == FALSE){
+          selectizeInput("StatsMethod", label = "What statistical methods used for comparison ?", 
+                         choices = c(
+                           "T-test", 
+                           "Wilcoxon test",
+                           "Kruskal-Wallis",
+                           "One-way ANOVA"
+                         ), multiple = F)
+
+      } else {
+        selectizeInput("StatsMethod", label = "What statistical methods used for comparison ?", 
+                       choices = c(
+                         "Kruskal-Wallis",
+                         "Multiple-way ANOVA"
+                       ), multiple = F)
+        
+      }
+    })
+    
+    ########################################################## Send the report information ########################################################## 
+
+    output$Smooth_data_stats_report <- renderText({
+      if(input$FactorCheck == FALSE){
+        if(is.null(smooth_all())){
+          return(NULL)}
+        else{
+          data <- smooth_all()
+          data_var <- input$PrimaryFactor
+          no_var <- length(unique(data[,input$PrimaryFactor]))
+
+          sentence_stats1 <- paste("Your selected independent variable is", data_var,
+                                   "and the level of the this variable is",no_var)
+          return(sentence_stats1)
+        }
+    } else {
+      if(is.null(smooth_all())){
+        return(NULL)}
+      else{
+        data <- smooth_all()
+        data_var1 <- input$PrimaryFactor
+        data_var2 <- input$OtherFactor
+        
+        sentence_stats2 <- paste("Your selected independent variable is", data_var1,
+                                "and ",data_var2)
+        return(sentence_stats2)
+      }
+      
+      }
+    })
+    
+    
+    GroupList <-  reactive(if(is.null(smooth_all())){
+      return(NULL)} else {
+        data <- smooth_all()
+        return(unique(data[,input$PrimaryFactor]))
+        
+      })
+    
+    
+    ########################################################## Define each of the stats comparison ########################################################## 
+
+    output$SelectCompSet1 <- renderUI({
+       if(input$StatsMethod == "T-test"){
+         if(FactorLength() > 2){
+          selectizeInput("Compset1", label = "Which group of data used as refenrece?", 
+                     choices = GroupList(), multiple = F)}
+         else {
+           return(NULL)
+           #list_of_comp <- GroupList()
+         }
+       } else if (input$StatsMethod == "Wilcoxon test"){
+           if(FactorLength() > 2){
+             selectizeInput("Compset1", label = "Which group of data used as refenrece?", 
+                            choices = GroupList(), multiple = F)}
+           else {
+             return(NULL)
+             #list_of_comp <- GroupList()
+           }
+       } else if (input$StatsMethod == "Kruskal-Wallis"){
+         return(NULL)
+       } else if (input$StatsMethod == "One-way ANOVA"){
+         return(NULL)
+      }
+    })
+          
+    output$SelectCompSet2 <- renderUI({
+      if(input$StatsMethod == "T-test"){
+        if(FactorLength() > 2){
+          selectizeInput("Compset2", label = "Which group of data used as comparison?", 
+                         choices = GroupList(), multiple = F)}
+        else {
+          return(NULL)
+          }
+        } else if (input$StatsMethod == "Wilcoxon test"){
+        if(FactorLength() > 2){
+          selectizeInput("Compset2", label = "Which group of data used as comparison?", 
+                         choices = GroupList(), multiple = F)}
+        else {
+          return(NULL)
+        }
+      } else if (input$StatsMethod == "Kruskal-Wallis"){
+        return(NULL)
+      } else if (input$StatsMethod == "One-way ANOVA"){
+        return(NULL)
+      }
+    })
+    
+    ### define selected variables
+    list_of_comp <-  reactive(if(is.null(smooth_all())){
+      return(NULL)} else {
+        if(input$StatsMethod == "T-test"){
+          return(c(input$Compset1,input$CompSet2))
+          
+        } else if (input$StatsMethod == "Wilcoxon test"){
+          return(c(input$Compset1,input$CompSet2))
+          
+        } else if (input$StatsMethod == "Kruskal-Wallis"){
+          return(GroupList())
+          
+        } else if (input$StatsMethod == "One-way ANOVA"){
+          return(GroupList())
+        }
+        
+      })
+
+    ########################################################## Plot the stats graph ########################################################## 
+    
+    smooth_comp_graph <- reactive(if(input$GoStats==FALSE){return(NULL)}else{
+        
+        my_data <- unique(smooth_all())
+        my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+        my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+        
+        smooth_stats_plot <- 
+          ggplot(data = my_data, aes(x= time.min, y=area.smooth)) + 
+                geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
+                geom_point(alpha = 0.3,size = 0.2, aes(group= Plant.ID)) + 
+                theme_classic() +
+                ylab("Cummulative Shoot Area (cleaned data)") +
+                xlab("Time (days)")
+        smooth_stats_plot
+         #stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=input$PrimaryFactor), alpha=0.3) +
+         #stat_summary(fun=mean, aes(group=input$PrimaryFactor),  size=0.7, geom="line", linetype = "dashed") +
+         #stat_compare_means(aes(group = input$PrimaryFactor), label = "p.signif", method = "t.test", hide.ns = F)
+      }
+
+    )
+    
+    output$Comp_graph1 <- renderPlotly({
+      ggplotly(smooth_comp_graph())
+    })
+    
+    
+    ########################################################## Generate the stats comparison table ########################################################## 
+    
+    output$Comp_table1 <- renderTable({
+      my_data <- unique(smooth_all())
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+      return(my_data)
+    })
+
+
+      ### Generate the statistical table of data 
+       
+
+    
+    ### TAB 4.2 Perform the stats for clean data ###
+    
+    ########################################################## Define UI variables ########################################################## 
+    
+    ### TAB 4.3 Perform the stats for GR data ###
+    
+    ########################################################## Define UI variables ########################################################## 
+    
     
     
     # Cant touch this! 
