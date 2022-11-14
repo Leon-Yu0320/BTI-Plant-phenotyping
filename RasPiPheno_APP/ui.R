@@ -2,6 +2,7 @@ ui <- fluidPage(
   theme = shinytheme("superhero"),
   navbarPage( title = "RasPiPheno App", 
               
+              # # # # # # # # # # # # # # # # # # # # # # # # TAB 1 # # # # # # # # # # # # # # # # # # # # # # # #
               tabPanel("Data Upload", icon=icon("upload"),
                        sidebarPanel(
                          
@@ -60,7 +61,7 @@ ui <- fluidPage(
                        # end of Tab1
               ),
               
-              # # # # # # # # # # # # # # # # TAB 2 # # # # # # # # # # # # # # # # # # # # # # # # 
+              ## # # # # # # # # # # # # # # # # # # # # # # # TAB 2 # # # # # # # # # # # # # # # # # # # # # # # # 
               tabPanel("Data Smoothing", icon=icon("blender"),
                        sidebarPanel(
                          selectizeInput("smoothType", label = "What kind of smoothing would you like to use?",
@@ -140,7 +141,7 @@ ui <- fluidPage(
               ),              
 
               
-              # # # # # # # # # # # # # # # # TAB 3 # # # # # # # # # # # # # # # # # # # # # # # # 
+              # # # # # # # # # # # # # # # # # # # # # # # # TAB 3 # # # # # # # # # # # # # # # # # # # # # # # # 
               
               tabPanel("Growth Rate", icon=icon("seedling"),
                        sidebarPanel(
@@ -170,7 +171,51 @@ ui <- fluidPage(
                                                      uiOutput("Growth_graph_button"))
                        ))
                        # end of Tab3
+              ),
+              
+              ## # # # # # # # # # # # # # # # # # # # # # #  TAB 4 # # # # # # # # # # # # # # # # # # # # # # # # 
+              tabPanel("Statistics", icon=icon("brain"),
+                       sidebarPanel(
+                         uiOutput("SelectPrimaryFactor"),
+                         checkboxInput("FactorCheck", "My experiment has more than one factor to be tested"),
+                         uiOutput("SelectOtherFactor"),
+                         
+                         uiOutput("SelectMethod"),
+                         actionButton("GoStats", icon("file-import"),label = "Launch the statistical analysis"),
+                         
+                         ### adding note information
+                         h3(strong("Note")),
+                         "This App provides a number of statistical tests based on experiment design:",br(),br(),
+                         strong("Primary independent variable (Required):"),br(),
+                         "This is the input to check influencens of one selected independet variable to dependent variable", br(),br(),
+                         strong("Additional independent variable(s) (Optional):"),br(),
+                         "This is the input to check influencens of multiple independet variables to dependent variable "
+                         # end of sidebar panel
+                       ),
+
+                      mainPanel(navbarPage("Growth comparison",
+                                   tabPanel("Smooth data statistics",
+                                            verbatimTextOutput("Smooth_data_stats_report"),
+                                            fluidRow(
+                                              column(6,uiOutput("SelectCompSet1")),
+                                              column(6,uiOutput("SelectCompSet2"))),
+                                            hr(),
+                                            
+                                            mainPanel(plotOutput(outputId = "Comp_graph1")),
+                                            uiOutput("Comp_graph_button1"),
+                                            dataTableOutput("Comp_table1")),
+                                   
+                                   tabPanel("Clean data statistics",
+                                            mainPanel(plotOutput(outputId = "Comp_graph2")),
+                                            uiOutput("Comp_graph_button2")),
+                                   tabPanel("Growth rate statistics",
+                                            mainPanel(plotOutput(outputId = "Comp_graph3")),
+                                            uiOutput("Comp_graph_button3"))
+                       ))
+                       # end of Tab4
               )
+              
+             
               
               # end of App - do not move!
   ))
