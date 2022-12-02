@@ -274,9 +274,9 @@ server <- function(input, output) {
     
     TimeGraph <- reactive(if(is.null(Raspi_unique())){return(NULL)}else{  
       my_data <- Raspi_unique()
-      my_data$col.sorting <- my_data[,input$ColorAreaGG]
       
       if(input$expType == "PhenoRig"){
+        my_data$col.sorting <- select(my_data, input$ColorAreaGG)
         my_data$time.min <- as.numeric(my_data$time.min)
         my_data$area <- as.numeric(my_data$area)
         
@@ -307,6 +307,7 @@ server <- function(input, output) {
       }
       
       if(input$expType == "PhenoCage"){
+        my_data$col.sorting <- as.factor(my_data[,input$ColorAreaGG])
         my_data$time.days <- as.numeric(my_data$time.days)
         my_data$area.total <- as.numeric(my_data$area.total)
         
@@ -335,7 +336,7 @@ server <- function(input, output) {
         
         }
       }
-      Area_graph
+      return(Area_graph)
     })
     
     output$graph_over_time <- renderPlotly({
