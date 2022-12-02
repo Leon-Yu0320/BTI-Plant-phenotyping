@@ -187,9 +187,9 @@ ui <- fluidPage(
                          h3(strong("Note")),
                          "This App provides a number of statistical tests based on experiment design:",br(),br(),
                          strong("Primary independent variable (Required):"),br(),
-                         "This is the input to check influencens of one selected independet variable to dependent variable", br(),br(),
+                         "This is the input to check influencens of one selected independent variable to dependent variable", br(),br(),
                          strong("Additional independent variable(s) (Optional):"),br(),
-                         "This is the input to check influencens of multiple independet variables to dependent variable "
+                         "This is the input to check influencens of multiple independent variables to dependent variable "
                          # end of sidebar panel
                        ),
 
@@ -200,9 +200,9 @@ ui <- fluidPage(
                                               column(6,uiOutput("SelectCompSet1")),
                                               column(6,uiOutput("SelectCompSet2"))),
                                             hr(),
-                                            
-                                            mainPanel(plotOutput(outputId = "Comp_graph1")),
+                                            plotlyOutput(outputId = "Comp_graph1"),
                                             uiOutput("Comp_graph_button1"),
+                                            
                                             dataTableOutput("Comp_table1")),
                                    
                                    tabPanel("Clean data statistics",

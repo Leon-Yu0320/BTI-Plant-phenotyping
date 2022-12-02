@@ -274,7 +274,7 @@ server <- function(input, output) {
     
     TimeGraph <- reactive(if(is.null(Raspi_unique())){return(NULL)}else{  
       my_data <- Raspi_unique()
-      my_data$col.sorting <- as.factor(my_data[,input$ColorAreaGG])
+      my_data$col.sorting <- my_data[,input$ColorAreaGG]
       
       if(input$expType == "PhenoRig"){
         my_data$time.min <- as.numeric(my_data$time.min)
@@ -2621,7 +2621,6 @@ server <- function(input, output) {
       return(NULL)} else {
         data <- smooth_all()
         return(unique(data[,input$PrimaryFactor]))
-        
       })
     
     
@@ -2650,19 +2649,27 @@ server <- function(input, output) {
          return(NULL)
       }
     })
+    
+    GroupList2 <-  reactive(if(is.null(smooth_all())){
+      return(NULL)} else {
+        data <- smooth_all()
+        list_of_things <- unique(data[,input$PrimaryFactor])
+        list_of_comparisons <- subset(list_of_things, !(list_of_things %in% input$Compset1))
+        return(list_of_comparisons)
+      })
           
     output$SelectCompSet2 <- renderUI({
       if(input$StatsMethod == "T-test"){
         if(FactorLength() > 2){
           selectizeInput("Compset2", label = "Which group of data used as comparison?", 
-                         choices = GroupList(), multiple = F)}
+                         choices = GroupList2(), multiple = F)}
         else {
           return(NULL)
           }
         } else if (input$StatsMethod == "Wilcoxon test"){
         if(FactorLength() > 2){
           selectizeInput("Compset2", label = "Which group of data used as comparison?", 
-                         choices = GroupList(), multiple = F)}
+                         choices = GroupList2(), multiple = F)}
         else {
           return(NULL)
         }
@@ -2673,46 +2680,44 @@ server <- function(input, output) {
       }
     })
     
-    ### define selected variables
+    ### define selected groups
     list_of_comp <-  reactive(if(is.null(smooth_all())){
       return(NULL)} else {
         if(input$StatsMethod == "T-test"){
-          return(c(input$Compset1,input$CompSet2))
-          
+          list_of_c <- c(input$Compset1,input$Compset2)
         } else if (input$StatsMethod == "Wilcoxon test"){
-          return(c(input$Compset1,input$CompSet2))
-          
+          list_of_c <- c(input$Compset1,input$Compset2)
         } else if (input$StatsMethod == "Kruskal-Wallis"){
-          return(GroupList())
-          
+          list_of_c <- GroupList()
         } else if (input$StatsMethod == "One-way ANOVA"){
-          return(GroupList())
+          list_of_c <- GroupList()
         }
-        
+        return(list_of_c)
       })
 
     ########################################################## Plot the stats graph ########################################################## 
     
     smooth_comp_graph <- reactive(if(input$GoStats==FALSE){return(NULL)}else{
-        
         my_data <- unique(smooth_all())
         my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
         my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+        my_data$area.smooth <- as.numeric(as.character(my_data$area.smooth))
+        my_data$time.min <- as.numeric(as.character(my_data$time.min))
         
         smooth_stats_plot <- 
-          ggplot(data = my_data, aes(x= time.min, y=area.smooth)) + 
+          ggplot(data = my_data, aes(x= time.min, y=area.smooth, color = col.sorting)) + 
                 geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
                 geom_point(alpha = 0.3,size = 0.2, aes(group= Plant.ID)) + 
                 theme_classic() +
-                ylab("Cummulative Shoot Area (cleaned data)") +
-                xlab("Time (days)")
-        smooth_stats_plot
-         #stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=input$PrimaryFactor), alpha=0.3) +
-         #stat_summary(fun=mean, aes(group=input$PrimaryFactor),  size=0.7, geom="line", linetype = "dashed") +
-         #stat_compare_means(aes(group = input$PrimaryFactor), label = "p.signif", method = "t.test", hide.ns = F)
-      }
-
-    )
+                ylab("Cummulative Shoot Area (pixels)") +
+                xlab("Time (minutes)") + 
+                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+                stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+                stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
+        
+        return(smooth_stats_plot)
+         #
+      })
     
     output$Comp_graph1 <- renderPlotly({
       ggplotly(smooth_comp_graph())
@@ -2721,7 +2726,7 @@ server <- function(input, output) {
     
     ########################################################## Generate the stats comparison table ########################################################## 
     
-    output$Comp_table1 <- renderTable({
+    output$Comp_table1 <- renderDataTable({
       my_data <- unique(smooth_all())
       my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
       my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
