@@ -2972,16 +2972,27 @@ server <- function(input, output) {
     }
   )
   
-  
   ### TAB 4.2 Perform the stats for clean data ###
   ########################################################## Define UI variables ########################################################## 
+  output$SelectPrimaryFactor <- renderUI({
+    if(is.null(clean_all())){return()} else {
+      tagList(
+        selectizeInput(
+          inputId = "PrimaryFactor",
+          label = "Select the experimental independent variable",
+          choices = metaList(),
+          multiple = F
+        )
+      )
+    }
+  })
   
   FactorLength2 <-  reactive(if(is.null(clean_all())){
     return(NULL)} else {
       temp <- clean_all()
       return(length(unique(temp[,input$PrimaryFactor])))
     })
- 
+  
   
   output$clean_stats_button <- renderUI({
     if (is.null(clean_all())) {
@@ -2991,6 +3002,7 @@ server <- function(input, output) {
       downloadButton("clean_stats_download_button", label = "Download the statistics of clean data")
     }
   })
+  
   
   ########################################################## Send the report information ########################################################## 
   
@@ -3023,14 +3035,14 @@ server <- function(input, output) {
     }
   })
   
-
+  
   ########################################################## Define each of the stats comparison ########################################################## 
   GroupList3 <-  reactive(if(is.null(clean_all())){
     return(NULL)} else {
       data <- clean_all()
       return(unique(data[,input$PrimaryFactor]))
     })
-
+  
   output$SelectCleanSet1 <- renderUI({
     if(input$StatsMethod == "T-test"){
       if(FactorLength2() >= 2){
@@ -3088,20 +3100,20 @@ server <- function(input, output) {
   })
   
   ### define selected groups
-  list_of_comp <-  reactive(if(is.null(clean_all())){
+  list_of_comp2 <-  reactive(if(is.null(clean_all())){
     return(NULL)} else {
       if(input$StatsMethod == "T-test"){
-        list_of_comp <- c(input$Compset1_clean,input$Compset2_clean)
+        list_of_comp2 <- c(input$Compset1_clean,input$Compset2_clean)
       } else if (input$StatsMethod == "Wilcox test"){
-        list_of_comp <- c(input$Compset1_clean,input$Compset2_clean)
+        list_of_comp2 <- c(input$Compset1_clean,input$Compset2_clean)
       } else if (input$StatsMethod == "Kruskal-Wallis"){
-        list_of_comp <- GroupList()
+        list_of_comp2 <- GroupList()
       } else if (input$StatsMethod == "One-way ANOVA"){
-        list_of_comp <- GroupList()
+        list_of_comp2 <- GroupList()
       } else if (input$StatsMethod == "Two-way ANOVA"){
-        list_of_comp <- GroupList()
+        list_of_comp2 <- GroupList()
       }
-      return(list_of_comp)
+      return(list_of_comp2)
     })
   
   ########################################################## Plot the clean stats graph ########################################################## 
@@ -3112,7 +3124,7 @@ server <- function(input, output) {
     if(input$expType == "PhenoRig"){
       
       my_data <- unique(clean_all())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp2()))
       my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
       my_data$area <- as.numeric(as.character(my_data$area))
       my_data$time.min <- as.numeric(as.character(my_data$time.min))
@@ -3141,7 +3153,7 @@ server <- function(input, output) {
     } else if (input$expType == "PhenoCage"){
       
       my_data <- unique(clean_all())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp2()))
       my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
       my_data$area.total <- as.numeric(as.character(my_data$area.total))
       my_data$time.days <- as.numeric(as.character(my_data$time.days))
@@ -3188,7 +3200,7 @@ server <- function(input, output) {
     if(input$expType == "PhenoRig"){
       
       my_data <- unique(clean_all())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp2()))
       my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
       my_data$area <- as.numeric(my_data$area)
       time.vector <- my_data$time.min %>% sort() %>% unique() 
@@ -3273,7 +3285,7 @@ server <- function(input, output) {
     } else if (input$expType == "PhenoCage"){
       
       my_data <- unique(clean_all())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp2()))
       my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
       my_data$area.total <- as.numeric(my_data$area.total)
       time.vector <- my_data$time.days %>% sort() %>% unique() 
@@ -3368,213 +3380,11 @@ server <- function(input, output) {
     }
   )
   
-  ### TAB 4.3 Perform the stats for GR data ###
-  ########################################################## Define UI variables ########################################################## 
+  
 
-  FactorLength3 <-  reactive(if(is.null(Growth_rate_table())){
-    return(NULL)} else {
-      temp <- Growth_rate_table()
-      return(length(unique(temp[,input$PrimaryFactor])))
-      
-    })
+
   
   
-  output$GR_stats_button <- renderUI({
-    if (is.null(Growth_rate_table())) {
-      return()
-    }
-    else{
-      downloadButton("GR_stats_download_button", label = "Download the statistics of GR data")
-    }
-  })
-  
-  ########################################################## Send the report information ########################################################## 
-  
-  output$GR_data_stats_report <- renderText({
-    if(input$FactorCheck == FALSE){
-      if(is.null(Growth_rate_table())){
-        return(NULL)}
-      else{
-        data <- Growth_rate_table()
-        data_var <- input$PrimaryFactor
-        no_var <- length(unique(data[,input$PrimaryFactor]))
-        
-        sentence_stats1 <- paste("Your selected independent variable is", data_var,
-                                 "and the level of the this variable is",no_var)
-        return(sentence_stats1)
-      }
-    } else {
-      if(is.null(Growth_rate_table())){
-        return(NULL)}
-      else{
-        data <- Growth_rate_table()
-        data_var1 <- input$PrimaryFactor
-        data_var2 <- input$OtherFactor
-        
-        sentence_stats2 <- paste("Your selected two independent variables are", data_var1,
-                                 "and ",data_var2)
-        return(sentence_stats2)
-      }
-      
-    }
-  })
-  
-  ########################################################## Define each of the stats comparison ########################################################## 
-  GroupList5 <-  reactive(if(is.null(Growth_rate_table())){
-    return(NULL)} else {
-      data <- Growth_rate_table()
-      return(unique(data[,input$PrimaryFactor]))
-    })
-  
-  
-  output$SelectGRSet1 <- renderUI({
-    if(input$StatsMethod == "T-test"){
-      if(FactorLength3() >= 2){
-        selectizeInput("Compset1_GR", label = "Which group of data used as refenrece?", 
-                       choices = GroupList5(), multiple = F)}
-      else if (FactorLength3() < 2) {
-        Warning_sentence <- paste("Please select the variable with at least 2 levels")
-        return(Warning_sentence)
-      }
-    } else if (input$StatsMethod == "Wilcox test"){
-      if(FactorLength3() >= 2){
-        selectizeInput("Compset1_GR", label = "Which group of data used as refenrece?", 
-                       choices = GroupList5(), multiple = F)}
-      else if (FactorLength3() < 2) {
-        Warning_sentence <- paste("Please select the variable with at least 2 levels")
-        return(Warning_sentence)
-      }
-    } else if (input$StatsMethod == "Kruskal-Wallis"){
-      return(NULL)
-    } else if (input$StatsMethod == "One-way ANOVA"){
-      return(NULL)
-    }
-  })
-  
-  GroupList6 <-  reactive(if(is.null(Growth_rate_table())){
-    return(NULL)} else {
-      data <- Growth_rate_table()
-      list_of_things <- unique(data[,input$PrimaryFactor])
-      list_of_comparisons <- subset(list_of_things, !(list_of_things %in% input$Compset1_GR))
-      return(list_of_comparisons)
-    })
-  
-  output$SelectGRSet2 <- renderUI({
-    if(input$StatsMethod == "T-test"){
-      if(FactorLength3() >= 2){
-        selectizeInput("Compset2_GR", label = "Which group of data used as comparison?", 
-                       choices = GroupList6(), multiple = F)}
-      else if (FactorLength3() < 2) {
-        Warning_sentence <- paste("See instructions for details")
-        return(Warning_sentence)
-      }
-    } else if (input$StatsMethod == "Wilcox test"){
-      if(FactorLength3() >= 2){
-        selectizeInput("Compset2_GR", label = "Which group of data used as comparison?", 
-                       choices = GroupList6(), multiple = F)}
-      else if (FactorLength3() < 2) {
-        Warning_sentence <- paste("See instructions for details")
-        return(Warning_sentence)
-      }
-    } else if (input$StatsMethod == "Kruskal-Wallis"){
-      return(NULL)
-    } else if (input$StatsMethod == "One-way ANOVA"){
-      return(NULL)
-    }
-  })
-  
-  ### define selected groups
-  list_of_comp <-  reactive(if(is.null(Growth_rate_table())){
-    return(NULL)} else {
-      if(input$StatsMethod == "T-test"){
-        list_of_comp <- c(input$Compset1_GR,input$Compset2_GR)
-      } else if (input$StatsMethod == "Wilcox test"){
-        list_of_comp <- c(input$Compset1_GR,input$Compset2_GR)
-      } else if (input$StatsMethod == "Kruskal-Wallis"){
-        list_of_comp <- GroupList()
-      } else if (input$StatsMethod == "One-way ANOVA"){
-        list_of_comp <- GroupList()
-      } else if (input$StatsMethod == "Two-way ANOVA"){
-        list_of_comp <- GroupList()
-      }
-      return(list_of_comp)
-    })
-  
-  ########################################################## Plot the stats graph ########################################################## 
-  
-  GR_stats_plot <- reactive(if(input$GoStats==FALSE){return(NULL)}else{
-    
-    ### For PhenoRig
-    if(input$expType == "PhenoRig"){
-      
-      my_data <- unique(Growth_rate_table())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
-      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
-      my_data$GR <- as.numeric(as.character(my_data$GR))
-      my_data$min <- as.numeric(as.character(my_data$min))
-      
-      GR_stats_plot <- 
-        ggplot(data = my_data, aes(x= min, y=GR, color = col.sorting)) + 
-        geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
-        geom_point(alpha = 0.3,size = 0.2, aes(group= Plant.ID)) + 
-        theme_classic() +
-        ylab("Growth Rate (GR)") +
-        xlab("Time (minutes)") + 
-        stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
-        stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
-        if(input$StatsMethod == "T-test"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
-        } else if (input$StatsMethod == "Wilcox test"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
-        } else if (input$StatsMethod == "Kruskal-Wallis"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
-        } else if (input$StatsMethod == "One-way ANOVA"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
-        } else if (input$StatsMethod == "Two-way ANOVA"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
-        }
-      
-    } else if (input$expType == "PhenoCage"){
-      
-      my_data <- unique(Growth_rate_table())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
-      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
-      my_data$GR <- as.numeric(as.character(my_data$GR))
-      my_data$day <- as.numeric(as.character(my_data$day))
-      
-      GR_stats_plot <- 
-        ggplot(data = my_data, aes(x= day, y=GR, color = col.sorting)) + 
-        geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
-        geom_point(alpha = 0.3,size = 0.2, aes(group= POT)) + 
-        theme_classic() +
-        ylab("Growth Rate (GR)") +
-        xlab("Time (days)") + 
-        stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
-        stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
-        
-        if(input$StatsMethod == "T-test"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
-        } else if (input$StatsMethod == "Wilcox test"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
-        } else if (input$StatsMethod == "Kruskal-Wallis"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
-        } else if (input$StatsMethod == "One-way ANOVA"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
-        } else if (input$StatsMethod == "Two-way ANOVA"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
-        }
-    }
-    
-    return(GR_stats_plot)
-    #
-  })
-  
-  output$GR_comp_graph <- renderPlotly({
-    if(input$GoStats == FALSE){
-      Plot_sentence <- paste0("Please Click the Launch statistical analysis button in the sidebar")
-      return(Plot_sentence)
-    } else {ggplotly(GR_stats_plot())}
-  })
   
   # Cant touch this! 
 }
