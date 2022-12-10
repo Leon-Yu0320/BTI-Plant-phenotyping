@@ -26,9 +26,9 @@ ui <- fluidPage(
                          
                          h3(strong("About the APP")),
                          strong("RasPiPheno App"), "is developed by Stress Architecture & RNA Biology Lab at the Boyce Thompson Institute, Cornell University.",br(),br(),
-                        "The App is a part of high-throughput phenotypic data processing system and it aimed to streamline the downstream phenotypic data collected by
+                         "The App is a part of high-throughput phenotypic data processing system and it aimed to streamline the downstream phenotypic data collected by
                         customized phenotypic facilities which include", strong("PhenoRig"), "and",strong("PhenoCage")
-
+                         
                          # end of sidebar panel
                        ),
                        
@@ -49,15 +49,15 @@ ui <- fluidPage(
                          
                          tabPanel("Vizual Curation", icon=icon("eye"),
                                   fluidRow(
-                                  column(6,uiOutput("Choose_alpha")),
-                                  column(6,uiOutput("X_tickUI1")), 
-                                  column(6,uiOutput("color_original")),
-                                  column(6,uiOutput("Y_tickUI1"))),
+                                    column(6,uiOutput("Choose_alpha")),
+                                    column(6,uiOutput("X_tickUI1")), 
+                                    column(6,uiOutput("color_original")),
+                                    column(6,uiOutput("Y_tickUI1"))),
                                   hr(),
                                   checkboxInput("facet1_check", "facet variables of overall plot"),
                                   uiOutput("facet_wrap1"),
                                   mainPanel(plotlyOutput("graph_over_time")))
-                                  ))
+                       ))
                        # end of Tab1
               ),
               
@@ -72,7 +72,7 @@ ui <- fluidPage(
                                      max = 3.0,
                                      step = 0.5,
                                      value = 1.5),
-
+                         
                          
                          selectizeInput(
                            inputId = "outlier",
@@ -84,7 +84,7 @@ ui <- fluidPage(
                          uiOutput("spanUI"),
                          uiOutput("degreeUI"),
                          uiOutput("SmoothGo"),
-                  
+                         
                          h3(strong("Note")),
                          "This App provides smoothing and cleaning option for data processing:",br(),br(),
                          strong("Data smoothing:"),br(),
@@ -139,7 +139,7 @@ ui <- fluidPage(
                        ))
                        # end of Tab2
               ),              
-
+              
               
               # # # # # # # # # # # # # # # # # # # # # # # # TAB 3 # # # # # # # # # # # # # # # # # # # # # # # # 
               
@@ -153,7 +153,7 @@ ui <- fluidPage(
                          uiOutput("step"),
                          actionButton("GoGrowth", icon("file-import"),label = "Calculate Growth Rate")
                          # end of sidebar panel
-                         ),
+                       ),
                        
                        mainPanel(navbarPage("Plant Growth",
                                             tabPanel("Growth Table",
@@ -166,7 +166,7 @@ ui <- fluidPage(
                                                        column(4, checkboxInput("Rtoolow", "Exclude samples with low R2"),
                                                               uiOutput("Rhowlowui"))),
                                                      hr(),
-                                                  
+                                                     
                                                      mainPanel(plotOutput(outputId = "Growth_Graph")),
                                                      uiOutput("Growth_graph_button"))
                        ))
@@ -179,8 +179,8 @@ ui <- fluidPage(
                          uiOutput("SelectPrimaryFactor"),
                          checkboxInput("FactorCheck", "My experiment has more than one factor to be tested"),
                          uiOutput("SelectOtherFactor"),
-                         
                          uiOutput("SelectMethod"),
+                         
                          actionButton("GoStats", icon("file-import"),label = "Launch the statistical analysis"),
                          
                          ### adding note information
@@ -192,30 +192,45 @@ ui <- fluidPage(
                          "This is the input to check influencens of multiple independent variables to dependent variable "
                          # end of sidebar panel
                        ),
-
-                      mainPanel(navbarPage("Growth comparison",
-                                   tabPanel("Smooth data statistics",
-                                            verbatimTextOutput("Smooth_data_stats_report"),
-                                            fluidRow(
-                                              column(6,uiOutput("SelectCompSet1")),
-                                              column(6,uiOutput("SelectCompSet2"))),
-                                            hr(),
-                                            plotlyOutput(outputId = "Comp_graph1"),
-                                            uiOutput("Comp_graph_button1"),
+                       
+                       mainPanel(navbarPage("Growth comparison",
+                                            tabPanel("Smooth data statistics",
+                                                     verbatimTextOutput("Smooth_data_stats_report"),
+                                                     fluidRow(
+                                                       column(6,uiOutput("SelectsmoothSet1")),
+                                                       column(6,uiOutput("SelectsmoothSet2"))),
+                                                     hr(),
+                                                     plotlyOutput(outputId = "Comp_graph1"),
+                                                     hr(),
+                                                     uiOutput("smooth_stats_button"),
+                                                     dataTableOutput("Comp_table1")),
                                             
-                                            dataTableOutput("Comp_table1")),
-                                   
-                                   tabPanel("Clean data statistics",
-                                            mainPanel(plotOutput(outputId = "Comp_graph2")),
-                                            uiOutput("Comp_graph_button2")),
-                                   tabPanel("Growth rate statistics",
-                                            mainPanel(plotOutput(outputId = "Comp_graph3")),
-                                            uiOutput("Comp_graph_button3"))
+                                            tabPanel("Clean data statistics",
+                                                     verbatimTextOutput("Clean_data_stats_report"),
+                                                     fluidRow(
+                                                       column(6,uiOutput("SelectCleanSet1")),
+                                                       column(6,uiOutput("SelectCleanSet2"))),
+                                                     hr(),
+                                                     plotlyOutput(outputId = "clean_graph_comp"),
+                                                     hr(),
+                                                     uiOutput("clean_stats_button"),
+                                                     dataTableOutput("Clean_stats_table")),
+                                            
+                                            tabPanel("Growth rate statistics",
+                                                     verbatimTextOutput("GR_data_stats_report"),
+                                                     fluidRow(
+                                                       column(6,uiOutput("SelectGRSet1")),
+                                                       column(6,uiOutput("SelectGRSet2"))),
+                                                     hr(),
+                                                     plotlyOutput(outputId = "GR_comp_graph"),
+                                                     hr(),
+                                                     uiOutput("GR_stats_button"),
+                                                     dataTableOutput("GR_stats_table"))
                        ))
                        # end of Tab4
               )
               
-             
+              
               
               # end of App - do not move!
   ))
