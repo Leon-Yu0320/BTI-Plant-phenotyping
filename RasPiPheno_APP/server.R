@@ -2633,18 +2633,20 @@ server <- function(input, output) {
   
   output$SelectsmoothSet1 <- renderUI({
     if(input$StatsMethod == "T-test"){
-      if(FactorLength() > 2){
+      if(FactorLength() >= 2){
         selectizeInput("Compset1", label = "Which group of data used as refenrece?", 
                        choices = GroupList(), multiple = F)} 
-      else {
-        return(NULL)
+      else if (FactorLength() < 2) {
+        Warning_sentence <- paste("Please select the variable with at least 2 levels")
+        return(Warning_sentence)
         }
     } else if (input$StatsMethod == "Wilcox test"){
-      if(FactorLength() > 2){
+      if(FactorLength() >= 2){
         selectizeInput("Compset1", label = "Which group of data used as refenrece?", 
                        choices = GroupList(), multiple = F)}
-      else {
-        return(NULL)
+      else if (FactorLength() < 2) {
+        Warning_sentence <- paste("Please select the variable with at least 2 levels.")
+        return(Warning_sentence)
       }
     } else if (input$StatsMethod == "Kruskal-Wallis"){
       return(NULL)
@@ -2663,18 +2665,20 @@ server <- function(input, output) {
   
   output$SelectsmoothSet2 <- renderUI({
     if(input$StatsMethod == "T-test"){
-      if(FactorLength() > 2){
+      if(FactorLength() >= 2){
         selectizeInput("Compset2", label = "Which group of data used as comparison?", 
                        choices = GroupList2(), multiple = F)}
-      else {
-        return(NULL)
+      else if (FactorLength() < 2) {
+        Warning_sentence <- paste("See instructions for more details")
+        return(Warning_sentence)
       }
     } else if (input$StatsMethod == "Wilcox test"){
-      if(FactorLength() > 2){
+      if(FactorLength() >= 2){
         selectizeInput("Compset2", label = "Which group of data used as comparison?", 
                        choices = GroupList2(), multiple = F)}
-      else {
-        return(NULL)
+      else if (FactorLength() < 2) {
+        Warning_sentence <- paste("See instructions for more details")
+        return(Warning_sentence)
       }
     } else if (input$StatsMethod == "Kruskal-Wallis"){
       return(NULL)
@@ -2702,7 +2706,9 @@ server <- function(input, output) {
   
   ########################################################## Plot the stats graph ########################################################## 
   
-  smooth_comp_graph <- reactive(if(input$GoStats==FALSE){return(NULL)}else{
+  smooth_comp_graph <- reactive(if(input$GoStats==FALSE){
+    Plot_sentence <- paste0("Please Click the Launch statistical analysis button in the sidebar")
+    return(Plot_sentence)}else{
     
     ### For PhenoRig
     if(input$expType == "PhenoRig"){
@@ -2718,7 +2724,7 @@ server <- function(input, output) {
       geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
       geom_point(alpha = 0.3,size = 0.2, aes(group= Plant.ID)) + 
       theme_classic() +
-      ylab("Cummulative Shoot Area (pixels)") +
+      ylab("Cummulative Shoot Area (Smooth data)") +
       xlab("Time (minutes)") + 
       stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
       stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
@@ -2747,7 +2753,7 @@ server <- function(input, output) {
         geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
         geom_point(alpha = 0.3,size = 0.2, aes(group= POT)) + 
         theme_classic() +
-        ylab("Cummulative Shoot Area (pixels)") +
+        ylab("Cummulative Shoot Area (Smooth data)") +
         xlab("Time (days)") + 
         stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
         stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
@@ -2769,8 +2775,11 @@ server <- function(input, output) {
     #
   })
   
-  output$Comp_graph1 <- renderPlotly({
-    ggplotly(smooth_comp_graph())
+  output$smooth_graph_comp <- renderPlotly({
+    if(input$GoStats == FALSE){
+      Plot_sentence <- paste0("Please Click the Launch statistical analysis button in the sidebar")
+      return(Plot_sentence)
+    } else {ggplotly(smooth_comp_graph())}
   })
   
   
@@ -2963,7 +2972,416 @@ server <- function(input, output) {
     }
   )
   
+  
+  ### TAB 4.2 Perform the stats for clean data ###
+  ########################################################## Define UI variables ########################################################## 
+  
+  output$SelectPrimaryFactor <- renderUI({
+    if(is.null(clean_all())){return()} else {
+      tagList(
+        selectizeInput(
+          inputId = "PrimaryFactor",
+          label = "Select the experimental independent variable",
+          choices = metaList(),
+          multiple = F
+        )
+      )
+    }
+  })
+  
+  
+  FactorLength <-  reactive(if(is.null(clean_all())){
+    return(NULL)} else {
+      temp <- clean_all()
+      return(length(unique(temp[,input$PrimaryFactor])))
+    })
  
+  
+  output$clean_stats_button <- renderUI({
+    if (is.null(clean_all())) {
+      return()
+    }
+    else{
+      downloadButton("clean_stats_download_button", label = "Download the statistics of clean data")
+    }
+  })
+  
+  ########################################################## Send the report information ########################################################## 
+  
+  output$Clean_data_stats_report <- renderText({
+    if(input$FactorCheck == FALSE){
+      if(is.null(clean_all())){
+        return(NULL)}
+      else{
+        data <- clean_all()
+        data_var <- input$PrimaryFactor
+        no_var <- length(unique(data[,input$PrimaryFactor]))
+        
+        sentence_stats1 <- paste("Your selected independent variable is", data_var,
+                                 "and the level of the this variable is",no_var)
+        return(sentence_stats1)
+      }
+    } else {
+      if(is.null(clean_all())){
+        return(NULL)}
+      else{
+        data <- clean_all()
+        data_var1 <- input$PrimaryFactor
+        data_var2 <- input$OtherFactor
+        
+        sentence_stats2 <- paste("Your selected two independent variables are", data_var1,
+                                 "and ",data_var2)
+        return(sentence_stats2)
+      }
+      
+    }
+  })
+  
+
+  ########################################################## Define each of the stats comparison ########################################################## 
+  GroupList3 <-  reactive(if(is.null(clean_all())){
+    return(NULL)} else {
+      data <- clean_all()
+      return(unique(data[,input$PrimaryFactor]))
+    })
+
+  output$SelectCleanSet1 <- renderUI({
+    if(input$StatsMethod == "T-test"){
+      if(FactorLength() >= 2){
+        selectizeInput("Compset1_clean", label = "Which group of data used as refenrece?", 
+                       choices = GroupList3(), multiple = F)}
+      else if (FactorLength() < 2) {
+        Warning_sentence <- paste("Please select the variable with at least 2 levels")
+        return(Warning_sentence)
+      }
+    } else if (input$StatsMethod == "Wilcox test"){
+      if(FactorLength() >= 2){
+        selectizeInput("Compset1_clean", label = "Which group of data used as refenrece?", 
+                       choices = GroupList3(), multiple = F)}
+      else if (FactorLength() < 2) {
+        Warning_sentence <- paste("Please select the variable with at least 2 levels")
+        return(Warning_sentence)
+      }
+    } else if (input$StatsMethod == "Kruskal-Wallis"){
+      return(NULL)
+    } else if (input$StatsMethod == "One-way ANOVA"){
+      return(NULL)
+    }
+  })
+  
+  GroupList4 <-  reactive(if(is.null(clean_all())){
+    return(NULL)} else {
+      data <- clean_all()
+      list_of_things <- unique(data[,input$PrimaryFactor])
+      list_of_comparisons <- subset(list_of_things, !(list_of_things %in% input$Compset1_clean))
+      return(list_of_comparisons)
+    })
+  
+  output$SelectCleanSet2 <- renderUI({
+    if(input$StatsMethod == "T-test"){
+      if(FactorLength() >= 2){
+        selectizeInput("Compset2_clean", label = "Which group of data used as comparison?", 
+                       choices = GroupList4(), multiple = F)}
+      else if (FactorLength() < 2) {
+        Warning_sentence <- paste("See instructions for details")
+        return(Warning_sentence)
+      }
+    } else if (input$StatsMethod == "Wilcox test"){
+      if(FactorLength() >= 2){
+        selectizeInput("Compset2_clean", label = "Which group of data used as comparison?", 
+                       choices = GroupList4(), multiple = F)}
+      else if (FactorLength() < 2) {
+        Warning_sentence <- paste("See instructions for details")
+        return(Warning_sentence)
+      }
+    } else if (input$StatsMethod == "Kruskal-Wallis"){
+      return(NULL)
+    } else if (input$StatsMethod == "One-way ANOVA"){
+      return(NULL)
+    }
+  })
+  
+  ### define selected groups
+  list_of_comp <-  reactive(if(is.null(clean_all())){
+    return(NULL)} else {
+      if(input$StatsMethod == "T-test"){
+        list_of_comp <- c(input$Compset1_clean,input$Compset2_clean)
+      } else if (input$StatsMethod == "Wilcox test"){
+        list_of_comp <- c(input$Compset1_clean,input$Compset2_clean)
+      } else if (input$StatsMethod == "Kruskal-Wallis"){
+        list_of_comp <- GroupList()
+      } else if (input$StatsMethod == "One-way ANOVA"){
+        list_of_comp <- GroupList()
+      } else if (input$StatsMethod == "Two-way ANOVA"){
+        list_of_comp <- GroupList()
+      }
+      return(list_of_comp)
+    })
+  
+  ########################################################## Plot the clean stats graph ########################################################## 
+  
+  clean_stats_plot <- reactive(if(input$GoStats==FALSE){return(NULL)}else{
+    
+    ### For PhenoRig
+    if(input$expType == "PhenoRig"){
+      
+      my_data <- unique(clean_all())
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+      my_data$area <- as.numeric(as.character(my_data$area))
+      my_data$time.min <- as.numeric(as.character(my_data$time.min))
+      
+      clean_stats_plot <- 
+        ggplot(data = my_data, aes(x= time.min, y=area, color = col.sorting)) + 
+        geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
+        geom_point(alpha = 0.3,size = 0.2, aes(group= Plant.ID)) + 
+        theme_classic() +
+        ylab("Cummulative Shoot Area (Clean data)") +
+        xlab("Time (minutes)") + 
+        stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+        stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+        if(input$StatsMethod == "T-test"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = T)
+        } else if (input$StatsMethod == "Wilcox test"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = T)
+        } else if (input$StatsMethod == "Kruskal-Wallis"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = T)
+        } else if (input$StatsMethod == "One-way ANOVA"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = T)
+        } else if (input$StatsMethod == "Two-way ANOVA"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = T)
+        }
+      
+    } else if (input$expType == "PhenoCage"){
+      
+      my_data <- unique(clean_all())
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+      my_data$area.total <- as.numeric(as.character(my_data$area.total))
+      my_data$time.days <- as.numeric(as.character(my_data$time.days))
+      
+      clean_stats_plot <- 
+        ggplot(data = my_data, aes(x= time.days, y=area.total, color = col.sorting)) + 
+        geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
+        geom_point(alpha = 0.3,size = 0.2, aes(group= POT)) + 
+        theme_classic() +
+        ylab("Cummulative Shoot Area (Clean data)") +
+        xlab("Time (days)") + 
+        stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+        stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+        
+        if(input$StatsMethod == "T-test"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
+        } else if (input$StatsMethod == "Wilcox test"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
+        } else if (input$StatsMethod == "Kruskal-Wallis"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
+        } else if (input$StatsMethod == "One-way ANOVA"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+        } else if (input$StatsMethod == "Two-way ANOVA"){
+          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+        }
+    }
+    
+    return(clean_stats_plot)
+    #
+  })
+  
+  output$clean_graph_comp <- renderPlotly({
+    if(input$GoStats == FALSE){
+      Plot_sentence <- paste0("Please Click the Launch statistical analysis button in the sidebar")
+      return(Plot_sentence)
+    } else {ggplotly(clean_stats_plot())}
+  })
+  
+  ########################################################## Generate the stats comparison table ########################################################## 
+  
+  output$Clean_stats_table <- renderDataTable(if(input$GoStats==FALSE){return(NULL)}else{
+    
+    ### For PhenoRig
+    if(input$expType == "PhenoRig"){
+      
+      my_data <- unique(clean_all())
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+      my_data$area <- as.numeric(my_data$area)
+      time.vector <- my_data$time.min %>% sort() %>% unique() 
+      test_table <- data.frame(matrix(ncol = 2 , nrow = length(time.vector)))
+      colnames(test_table) <- c("Timepoint",input$PrimaryFactor)
+      test_table$Timepoint <- time.vector
+      select_name <- input$PrimaryFactor
+      
+      if(input$StatsMethod == "T-test"){
+        attach(my_data)
+        for (i in (1:length(time.vector))){
+          y1 <- my_data[ which(time.min==time.vector[i] & get(select_name)== input$Compset1_clean),"area"]
+          if (length(y1) == 0) {
+            test_table[i,2] <- "NA"
+          } else {
+            y2 <- my_data[ which(time.min==time.vector[i] & get(select_name)== input$Compset2_clean),"area"]
+            if (length(y2) == 0) {
+              test_table[i,2] <- "NA"
+            } else {
+              test.result <- t.test(y1, y2)
+              test_table[i,2] <- test.result$p.value
+            }
+          }
+        }
+        
+      } else if (input$StatsMethod == "Wilcox test"){
+        attach(my_data)
+        for (i in (1:length(time.vector))){
+          y1 <- my_data[ which(time.min==time.vector[i] & get(select_name)== input$Compset1_clean),"area"]
+          if (length(y1) == 0) {
+            test_table[i,2] <- "NA"
+          } else {
+            y2 <- my_data[ which(time.min==time.vector[i] & get(select_name)== input$Compset2_clean),"area"]
+            if (length(y2) == 0) {
+              test_table[i,2] <- "NA"
+            } else {
+              test.result <- wilcox.test(y1, y2)
+              test_table[i,2] <- test.result$p.value
+            }
+          }
+        }
+        
+      } else if (input$StatsMethod == "Kruskal-Wallis") {
+        time.vector <- my_data$time.min %>% sort() %>% unique() 
+        test_table <- data.frame(matrix(ncol = 2 , nrow = length(time.vector)))
+        colnames(test_table) <- c("Timepoint",input$PrimaryFactor)
+        test_table$Timepoint <- time.vector
+        select_name <- input$PrimaryFactor
+        attach(my_data)
+        for (i in (1:length(time.vector))){
+          sub_data <- my_data[my_data$time.min == time.vector[i],]
+          test.result <- kruskal.test(area ~ col.sorting, data = sub_data)
+          test_table[i,2] <- test.result$p.value
+        }
+        
+      } else if (input$StatsMethod == "One-way ANOVA") {
+        attach(my_data)
+        for (i in 1:length(time.vector)){
+          sub_data <- my_data[my_data$time.min == time.vector[i],]
+          test.result <- aov(area ~ col.sorting, data = sub_data)
+          aov_result <- summary(test.result)
+          test_table[i,2] <- aov_result[[1]]$`Pr(>F)`[1]
+        }
+        
+      } else if (input$StatsMethod == "Two-way ANOVA") {
+        
+        my_data$col.sorting2 <- as.factor(my_data[,input$OtherFactor])
+        test_table <- data.frame(matrix(ncol = 4 , nrow = length(time.vector)))
+        colnames(test_table) <- c("Timepoint",input$PrimaryFactor,input$OtherFactor,"interaction")
+        test_table$Timepoint <- time.vector
+        attach(my_data)
+        
+        for (i in 1:length(time.vector)){
+          sub_data <- my_data[my_data$time.min == time.vector[i],]
+          test.result <- aov(area ~ get(input$PrimaryFactor) * get(input$OtherFactor), data = sub_data)
+          aov_result <- summary(test.result)
+          test_table[i,2:4] <- aov_result[[1]]$`Pr(>F)`[1:3]
+        }
+      }
+      
+      ### For PhenoCage
+    } else if (input$expType == "PhenoCage"){
+      
+      my_data <- unique(clean_all())
+      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp()))
+      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+      my_data$area.total <- as.numeric(my_data$area.total)
+      time.vector <- my_data$time.days %>% sort() %>% unique() 
+      test_table <- data.frame(matrix(ncol = 2 , nrow = length(time.vector)))
+      colnames(test_table) <- c("Timepoint",input$PrimaryFactor)
+      test_table$Timepoint <- time.vector
+      select_name <- input$PrimaryFactor
+      
+      if(input$StatsMethod == "T-test"){
+        attach(my_data)
+        for (i in (1:length(time.vector))){
+          y1 <- my_data[ which(time.days==time.vector[i] & get(select_name)== input$Compset1_clean),"area.total"]
+          if (length(y1) == 0) {
+            test_table[i,2] <- "NA"
+          } else {
+            y2 <- my_data[ which(time.days==time.vector[i] & get(select_name)== input$Compset2_clean),"area.total"]
+            if (length(y2) == 0) {
+              test_table[i,2] <- "NA"
+            } else {
+              test.result <- t.test(y1, y2)
+              test_table[i,2] <- test.result$p.value
+            }
+          }
+        }
+        
+      } else if (input$StatsMethod == "Wilcox test"){
+        attach(my_data)
+        for (i in (1:length(time.vector))){
+          y1 <- my_data[ which(time.days==time.vector[i] & get(select_name)== input$Compset1_clean),"area.total"]
+          if (length(y1) == 0) {
+            test_table[i,2] <- "NA"
+          } else {
+            y2 <- my_data[ which(time.days==time.vector[i] & get(select_name)== input$Compset2_clean),"area.total"]
+            if (length(y2) == 0) {
+              test_table[i,2] <- "NA"
+            } else {
+              test.result <- wilcox.test(y1, y2)
+              test_table[i,2] <- test.result$p.value
+            }
+          }
+        }
+        
+      } else if (input$StatsMethod == "Kruskal-Wallis") {
+        time.vector <- my_data$time.days %>% sort() %>% unique() 
+        test_table <- data.frame(matrix(ncol = 2 , nrow = length(time.vector)))
+        colnames(test_table) <- c("Timepoint",input$PrimaryFactor)
+        test_table$Timepoint <- time.vector
+        select_name <- input$PrimaryFactor
+        attach(my_data)
+        for (i in (1:length(time.vector))){
+          sub_data <- my_data[my_data$time.days == time.vector[i],]
+          test.result <- kruskal.test(area.total ~ col.sorting, data = sub_data)
+          test_table[i,2] <- test.result$p.value
+        }
+        
+      } else if (input$StatsMethod == "One-way ANOVA") {
+        attach(my_data)
+        for (i in 1:length(time.vector)){
+          sub_data <- my_data[my_data$time.days == time.vector[i],]
+          test.result <- aov(area.total ~ col.sorting, data = sub_data)
+          aov_result <- summary(test.result)
+          test_table[i,2] <- aov_result[[1]]$`Pr(>F)`[1]
+        }
+        
+      } else if (input$StatsMethod == "Two-way ANOVA") {
+        
+        my_data$col.sorting2 <- as.factor(my_data[,input$OtherFactor])
+        test_table <- data.frame(matrix(ncol = 4 , nrow = length(time.vector)))
+        colnames(test_table) <- c("Timepoint",input$PrimaryFactor,input$OtherFactor,"interaction")
+        test_table$Timepoint <- time.vector
+        attach(my_data)
+        
+        for (i in 1:length(time.vector)){
+          sub_data <- my_data[my_data$time.days == time.vector[i],]
+          test.result <- aov(area.total ~ get(input$PrimaryFactor) * get(input$OtherFactor), data = sub_data)
+          aov_result <- summary(test.result)
+          test_table[i,2:4] <- aov_result[[1]]$`Pr(>F)`[1:3]
+        }
+      }
+    }
+    
+    return(test_table)
+  })
+  
+  ########################################################## download stats table for clean data ########################################################## 
+  
+  output$clean_stats_download_button <- downloadHandler(
+    filename = paste("clean_data-statistics.RasPiPhenoApp.csv"),
+    content <- function(file) {
+      result <- Clean_stats_table()
+      write.csv(result, file, row.names = FALSE)
+    }
+  )
+  
   
   
   # Cant touch this! 
