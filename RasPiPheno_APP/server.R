@@ -3517,67 +3517,112 @@ server <- function(input, output) {
   
   GR_comp_plot <- reactive(if(input$GoStats==FALSE){return(NULL)}else{
     
-    ### For PhenoRig
-    if(input$expType == "PhenoRig"){
-      
+    if(input$GrowthType == "Over whole experiment"){
       my_data <- unique(Growth_rate_table())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
-      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
-      my_data$GR <- as.numeric(as.character(my_data$GR))
-      my_data$min <- as.numeric(as.character(my_data$min))
-      
-      GR_stats_plot <- 
-        ggplot(data = my_data, aes(x= min, y=GR, color = col.sorting)) + 
-        geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
-        geom_point(alpha = 0.3,size = 0.2, aes(group= Plant.ID)) + 
-        theme_classic() +
-        ylab("Growth Rate (GR)") +
-        xlab("Time (minutes)") + 
-        stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
-        stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
-        if(input$StatsMethod == "T-test"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
-        } else if (input$StatsMethod == "Wilcox test"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
-        } else if (input$StatsMethod == "Kruskal-Wallis"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
-        } else if (input$StatsMethod == "One-way ANOVA"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
-        } else if (input$StatsMethod == "Two-way ANOVA"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
-        }
-      
-    } else if (input$expType == "PhenoCage"){
-      
-      my_data <- unique(Growth_rate_table())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
-      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
-      my_data$GR <- as.numeric(as.character(my_data$GR))
-      my_data$day <- as.numeric(as.character(my_data$day))
-      
-      GR_stats_plot <- 
-        ggplot(data = my_data, aes(x= day, y=GR, color = col.sorting)) + 
-        geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
-        geom_point(alpha = 0.3,size = 0.2, aes(group= POT)) + 
-        theme_classic() +
-        ylab("Growth Rate (GR)") +
-        xlab("Time (days)") + 
-        stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
-        stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
-        
-        if(input$StatsMethod == "T-test"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
-        } else if (input$StatsMethod == "Wilcox test"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
-        } else if (input$StatsMethod == "Kruskal-Wallis"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
-        } else if (input$StatsMethod == "One-way ANOVA"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
-        } else if (input$StatsMethod == "Two-way ANOVA"){
-          stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
-        }
-    }
+      sub_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
+      sub_data$col.sorting <- as.factor(sub_data[,input$PrimaryFactor])
+      sub_data$GR <- as.numeric(as.character(sub_data$GR))
     
+      if(input$expType == "PhenoRig"){
+
+        GR_stats_plot <- ggplot(data = sub_data, aes(x= col.sorting, y=GR, color = col.sorting)) + 
+          geom_boxplot(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
+          theme_classic() +
+          ylab("Growth Rate (GR)") +
+          if(input$StatsMethod == "T-test"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
+          } else if (input$StatsMethod == "Wilcox test"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
+          } else if (input$StatsMethod == "Kruskal-Wallis"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
+          } else if (input$StatsMethod == "One-way ANOVA"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+          } else if (input$StatsMethod == "Two-way ANOVA"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+          }
+        
+      } else if (input$expType == "PhenoCage"){
+        
+        GR_stats_plot <- ggplot(data = sub_data, aes(x= col.sorting, y=GR, color = col.sorting)) + 
+          geom_boxplot(alpha = 0.3,size = 0.4, aes(group= POT)) +  
+          theme_classic() +
+          ylab("Growth Rate (GR)") +
+          if(input$StatsMethod == "T-test"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
+          } else if (input$StatsMethod == "Wilcox test"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
+          } else if (input$StatsMethod == "Kruskal-Wallis"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
+          } else if (input$StatsMethod == "One-way ANOVA"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+          } else if (input$StatsMethod == "Two-way ANOVA"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+          }
+        
+      }
+    } else if(input$GrowthType == "Step-wise"){
+      ### For PhenoRig
+      if(input$expType == "PhenoRig"){
+        
+        my_data <- unique(Growth_rate_table())
+        my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
+        my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+        my_data$GR <- as.numeric(as.character(my_data$GR))
+        my_data$min <- as.numeric(as.character(my_data$min))
+        
+        GR_stats_plot <- 
+          ggplot(data = my_data, aes(x= min, y=GR, color = col.sorting)) + 
+          geom_line(alpha = 0.3,size = 0.4, aes(group= Plant.ID)) +  
+          geom_point(alpha = 0.3,size = 0.2, aes(group= Plant.ID)) + 
+          theme_classic() +
+          ylab("Growth Rate (GR)") +
+          xlab("Time (minutes)") + 
+          stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+          stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+          if(input$StatsMethod == "T-test"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
+          } else if (input$StatsMethod == "Wilcox test"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
+          } else if (input$StatsMethod == "Kruskal-Wallis"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
+          } else if (input$StatsMethod == "One-way ANOVA"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+          } else if (input$StatsMethod == "Two-way ANOVA"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+          }
+        
+      } else if (input$expType == "PhenoCage"){
+        
+        my_data <- unique(Growth_rate_table())
+        my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
+        my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+        my_data$GR <- as.numeric(as.character(my_data$GR))
+        my_data$day <- as.numeric(as.character(my_data$day))
+        
+        GR_stats_plot <- 
+          ggplot(data = my_data, aes(x= day, y=GR, color = col.sorting)) + 
+          geom_line(alpha = 0.3,size = 0.4, aes(group= POT)) +  
+          geom_point(alpha = 0.3,size = 0.2, aes(group= POT)) + 
+          theme_classic() +
+          ylab("Growth Rate (GR)") +
+          xlab("Time (days)") + 
+          stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
+          stat_summary(fun=mean, aes(group= col.sorting),  size=0.7, geom="line", linetype = "dashed") +
+          
+          if(input$StatsMethod == "T-test"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "t.test", hide.ns = F)
+          } else if (input$StatsMethod == "Wilcox test"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "wilcox.test", hide.ns = F)
+          } else if (input$StatsMethod == "Kruskal-Wallis"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "kruskal.test", hide.ns = F)
+          } else if (input$StatsMethod == "One-way ANOVA"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+          } else if (input$StatsMethod == "Two-way ANOVA"){
+            stat_compare_means(aes(group = col.sorting), label = "p.signif", method = "aov", hide.ns = F)
+          }
+      }
+    }
+
     return(GR_stats_plot)
     #
   })
@@ -3594,193 +3639,246 @@ server <- function(input, output) {
   
   output$GR_stats_table <- renderDataTable(if(input$GoStats==FALSE){return(NULL)}else{
     
-    ### For PhenoRig
-    if(input$expType == "PhenoRig"){
-      
-      my_data <- unique(Growth_rate_table())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
-      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
-      my_data$GR <- as.numeric(as.character(my_data$GR))
-      time.vector <- my_data$min %>% sort() %>% unique() 
-      test_table <- data.frame(matrix(ncol = 2 , nrow = length(time.vector)))
-      colnames(test_table) <- c("Timepoint",input$PrimaryFactor)
-      test_table$Timepoint <- time.vector
-      select_name <- input$PrimaryFactor
-      
-      if(input$StatsMethod == "T-test"){
-        attach(my_data)
-        for (i in (1:length(time.vector))){
-          y1 <- my_data[ which(min==time.vector[i] & get(select_name)== input$Compset1_GR),"GR"]
-          if (length(y1) <= 1) {
-            test_table[i,2] <- "NA"
-          } else {
-            y2 <- my_data[ which(min==time.vector[i] & get(select_name)== input$Compset2_GR),"GR"]
-            if (length(y2) <= 1) {
-              test_table[i,2] <- "NA"
-            } else {
-              test.result <- t.test(y1, y2)
-              test_table[i,2] <- test.result$p.value
-            }
-          }
-        }
+    if(input$GrowthType == "Over whole experiment"){
+  
+        my_data <- unique(Growth_rate_table())
+        my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
+        my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+        my_data$GR <- as.numeric(as.character(my_data$GR))
+        select_name <- input$PrimaryFactor
         
-      } else if (input$StatsMethod == "Wilcox test"){
-        attach(my_data)
-        for (i in (1:length(time.vector))){
-          y1 <- my_data[ which(min==time.vector[i] & get(select_name)== input$Compset1_GR),"GR"]
-          if (length(y1) <= 1) {
-            test_table[i,2] <- "NA"
-          } else {
-            y2 <- my_data[ which(min==time.vector[i] & get(select_name)== input$Compset2_GR),"GR"]
-            if (length(y2) <=1) {
-              test_table[i,2] <- "NA"
-            } else {
-              test.result <- wilcox.test(y1, y2)
-              test_table[i,2] <- test.result$p.value
-            }
-          }
-        }
+        test_table <- data.frame(matrix(ncol = 2 , nrow = 1))
+        colnames(test_table) <- c("Variable", "P_value")
+        test_table$Variable <- select_name
         
-      } else if (input$StatsMethod == "Kruskal-Wallis") {
-        attach(my_data)
-        for (i in (1:length(time.vector))){
-          sub_data <- my_data[my_data$min == time.vector[i],]
-          if(nrow(sub_data) < 2 | unique(sub_data$col.sorting) %>% length() < 2){
-            test_table[i,2] <- "NA"
-          } else {
-            test.result <- kruskal.test(GR ~ col.sorting, data = sub_data)
-            test_table[i,2] <- test.result$p.value
-          }
-        }
-        
-      } else if (input$StatsMethod == "One-way ANOVA") {
-        attach(my_data)
-        for (i in 1:length(time.vector)){
-          sub_data <- my_data[my_data$min == time.vector[i],]
-          
-          if(nrow(sub_data) < 4 | unique(sub_data$col.sorting) %>% length() < 2){
-            test_table[i,2] <- "NA"
-          } else {
-            test.result <- aov(GR ~ col.sorting, data = sub_data)
-            aov_result <- summary(test.result)
-            test_table[i,2] <- aov_result[[1]]$`Pr(>F)`[1]
-          }
-        }
-        
-      } else if (input$StatsMethod == "Two-way ANOVA") {
-        
-        my_data$col.sorting2 <- as.factor(my_data[,input$OtherFactor])
-        test_table <- data.frame(matrix(ncol = 4 , nrow = length(time.vector)))
-        colnames(test_table) <- c("Timepoint",input$PrimaryFactor,input$OtherFactor,"interaction")
-        test_table$Timepoint <- time.vector
-        attach(my_data)
-        
-        for (i in 1:length(time.vector)){
-          sub_data <- my_data[my_data$min == time.vector[i],]
-          if(nrow(sub_data) < 4 | unique(sub_data$col.sorting) %>% length() < 2){
-            test_table[i,2:4] <- c("NA", "NA", "NA")
-          } else {
-            test.result <- aov(GR ~ get(input$PrimaryFactor) * get(input$OtherFactor), data = sub_data)
-            aov_result <- summary(test.result)
-            test_table[i,2:4] <- aov_result[[1]]$`Pr(>F)`[1:3]
-          }
-        }
-      }
-      
-      ### For PhenoCage
-    } else if (input$expType == "PhenoCage"){
-      
-      my_data <- unique(Growth_rate_table())
-      my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
-      my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
-      my_data$GR <- as.numeric(my_data$GR)
-      time.vector <- my_data$day %>% sort() %>% unique() 
-      test_table <- data.frame(matrix(ncol = 2 , nrow = length(time.vector)))
-      colnames(test_table) <- c("Timepoint",input$PrimaryFactor)
-      test_table$Timepoint <- time.vector
-      select_name <- input$PrimaryFactor
-      
-      if(input$StatsMethod == "T-test"){
-        attach(my_data)
-        for (i in (1:length(time.vector))){
-          y1 <- my_data[ which(day==time.vector[i] & get(select_name)== input$Compset1_GR),"GR"]
-          if (length(y1) <= 1) {
-            test_table[i,2] <- "NA"
-          } else {
-            y2 <- my_data[ which(day==time.vector[i] & get(select_name)== input$Compset2_GR),"GR"]
-            if (length(y2) <= 1) {
-              test_table[i,2] <- "NA"
-            } else {
-              test.result <- t.test(y1, y2)
-              test_table[i,2] <- test.result$p.value
-            }
-          }
-        }
-        
-      } else if (input$StatsMethod == "Wilcox test"){
-        attach(my_data)
-        for (i in (1:length(time.vector))){
-          y1 <- my_data[ which(day==time.vector[i] & get(select_name)== input$Compset1_GR),"GR"]
-          if (length(y1) <= 1) {
-            test_table[i,2] <- "NA"
-          } else {
-            y2 <- my_data[ which(day==time.vector[i] & get(select_name)== input$Compset2_GR),"GR"]
-            if (length(y2) <= 1) {
-              test_table[i,2] <- "NA"
-            } else {
-              test.result <- wilcox.test(y1, y2)
-              test_table[i,2] <- test.result$p.value
-            }
-          }
-        }
-        
-      } else if (input$StatsMethod == "Kruskal-Wallis") {
+        if(input$StatsMethod == "T-test"){
+          attach(my_data)
+            y1 <- my_data[ which(get(select_name)== input$Compset1_GR),"GR"]
+            y2 <- my_data[ which(get(select_name)== input$Compset2_GR),"GR"]
+            test.result <- t.test(y1, y2)
+            test_table$P_value <- test.result$p.value
 
-        attach(my_data)
-        for (i in (1:length(time.vector))){
-          sub_data <- my_data[my_data$day == time.vector[i],]
-          if(nrow(sub_data) < 2 | unique(sub_data$col.sorting) %>% length() < 2){
-            test_table[i,2] <- "NA"
-          } else {
-            test.result <- kruskal.test(GR ~ col.sorting, data = sub_data)
-            test_table[i,2] <- test.result$p.value
-          }
-        }
-        
-      } else if (input$StatsMethod == "One-way ANOVA") {
-        attach(my_data)
-        for (i in 1:length(time.vector)){
-          sub_data <- my_data[my_data$day == time.vector[i],]
-          if(nrow(sub_data) < 2 | unique(sub_data$col.sorting) %>% length() < 2){
-            test_table[i,2] <- "NA"
-          } else {
-          test.result <- aov(GR ~ col.sorting, data = sub_data)
+        } else if (input$StatsMethod == "Wilcox test"){
+          attach(my_data)
+          y1 <- my_data[ which(get(select_name)== input$Compset1_GR),"GR"]
+          y2 <- my_data[ which(get(select_name)== input$Compset2_GR),"GR"]
+          test.result <- wilcox.test(y1, y2)
+          test_table$P_value <- test.result$p.value
+          
+        } else if (input$StatsMethod == "Kruskal-Wallis") {
+          attach(my_data)
+          test.result <- kruskal.test(GR ~ col.sorting, data = my_data)
+          test_table$P_value <- test.result$p.value
+
+          
+        } else if (input$StatsMethod == "One-way ANOVA") {
+          attach(my_data)
+          test.result <- aov(GR ~ col.sorting, data = my_data)
           aov_result <- summary(test.result)
-          test_table[i,2] <- aov_result[[1]]$`Pr(>F)`[1]
-          }
+          test_table$P_value <- aov_result[[1]]$`Pr(>F)`[1]
+          
+        } else if (input$StatsMethod == "Two-way ANOVA") {
+          
+          my_data$col.sorting2 <- as.factor(my_data[,input$OtherFactor])
+          test_table <- data.frame(matrix(ncol = 4 , nrow = 1))
+          colnames(test_table) <- c("Variable",input$PrimaryFactor,input$OtherFactor,"interaction")
+          test_table$Variable <- select_name
+          attach(my_data)
+          test.result <- aov(GR ~ get(input$PrimaryFactor) * get(input$OtherFactor), data = my_data)
+          aov_result <- summary(test.result)
+          test_table[,2:4] <- aov_result[[1]]$`Pr(>F)`[1:3]
         }
+
+
+    } else if(input$GrowthType == "Step-wise"){
+      
+      if(input$expType == "PhenoRig"){
         
-      } else if (input$StatsMethod == "Two-way ANOVA") {
-        
-        my_data$col.sorting2 <- as.factor(my_data[,input$OtherFactor])
-        test_table <- data.frame(matrix(ncol = 4 , nrow = length(time.vector)))
-        colnames(test_table) <- c("Timepoint",input$PrimaryFactor,input$OtherFactor,"interaction")
+        my_data <- unique(Growth_rate_table())
+        my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
+        my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+        my_data$GR <- as.numeric(as.character(my_data$GR))
+        time.vector <- my_data$min %>% sort() %>% unique() 
+        test_table <- data.frame(matrix(ncol = 2 , nrow = length(time.vector)))
+        colnames(test_table) <- c("Timepoint",input$PrimaryFactor)
         test_table$Timepoint <- time.vector
-        attach(my_data)
+        select_name <- input$PrimaryFactor
         
-        for (i in 1:length(time.vector)){
-          sub_data <- my_data[my_data$day == time.vector[i],]
-          if(nrow(sub_data) < 2 | unique(sub_data$col.sorting) %>% length() < 2){
-            test_table[i,2:4] <- c("NA", "NA", "NA")
-          } else {
-          test.result <- aov(GR ~ get(input$PrimaryFactor) * get(input$OtherFactor), data = sub_data)
-          aov_result <- summary(test.result)
-          test_table[i,2:4] <- aov_result[[1]]$`Pr(>F)`[1:3]
+        if(input$StatsMethod == "T-test"){
+          attach(my_data)
+          for (i in (1:length(time.vector))){
+            y1 <- my_data[ which(min==time.vector[i] & get(select_name)== input$Compset1_GR),"GR"]
+            if (length(y1) <= 1) {
+              test_table[i,2] <- "NA"
+            } else {
+              y2 <- my_data[ which(min==time.vector[i] & get(select_name)== input$Compset2_GR),"GR"]
+              if (length(y2) <= 1) {
+                test_table[i,2] <- "NA"
+              } else {
+                test.result <- t.test(y1, y2)
+                test_table[i,2] <- test.result$p.value
+              }
+            }
+          }
+          
+        } else if (input$StatsMethod == "Wilcox test"){
+          attach(my_data)
+          for (i in (1:length(time.vector))){
+            y1 <- my_data[ which(min==time.vector[i] & get(select_name)== input$Compset1_GR),"GR"]
+            if (length(y1) <= 1) {
+              test_table[i,2] <- "NA"
+            } else {
+              y2 <- my_data[ which(min==time.vector[i] & get(select_name)== input$Compset2_GR),"GR"]
+              if (length(y2) <=1) {
+                test_table[i,2] <- "NA"
+              } else {
+                test.result <- wilcox.test(y1, y2)
+                test_table[i,2] <- test.result$p.value
+              }
+            }
+          }
+          
+        } else if (input$StatsMethod == "Kruskal-Wallis") {
+          attach(my_data)
+          for (i in (1:length(time.vector))){
+            sub_data <- my_data[my_data$min == time.vector[i],]
+            if(nrow(sub_data) < 2 | unique(sub_data$col.sorting) %>% length() < 2){
+              test_table[i,2] <- "NA"
+            } else {
+              test.result <- kruskal.test(GR ~ col.sorting, data = sub_data)
+              test_table[i,2] <- test.result$p.value
+            }
+          }
+          
+        } else if (input$StatsMethod == "One-way ANOVA") {
+          attach(my_data)
+          for (i in 1:length(time.vector)){
+            sub_data <- my_data[my_data$min == time.vector[i],]
+            
+            if(nrow(sub_data) < 4 | unique(sub_data$col.sorting) %>% length() < 2){
+              test_table[i,2] <- "NA"
+            } else {
+              test.result <- aov(GR ~ col.sorting, data = sub_data)
+              aov_result <- summary(test.result)
+              test_table[i,2] <- aov_result[[1]]$`Pr(>F)`[1]
+            }
+          }
+          
+        } else if (input$StatsMethod == "Two-way ANOVA") {
+          
+          my_data$col.sorting2 <- as.factor(my_data[,input$OtherFactor])
+          test_table <- data.frame(matrix(ncol = 4 , nrow = length(time.vector)))
+          colnames(test_table) <- c("Timepoint",input$PrimaryFactor,input$OtherFactor,"interaction")
+          test_table$Timepoint <- time.vector
+          attach(my_data)
+          
+          for (i in 1:length(time.vector)){
+            sub_data <- my_data[my_data$min == time.vector[i],]
+            if(nrow(sub_data) < 4 | unique(sub_data$col.sorting) %>% length() < 2){
+              test_table[i,2:4] <- c("NA", "NA", "NA")
+            } else {
+              test.result <- aov(GR ~ get(input$PrimaryFactor) * get(input$OtherFactor), data = sub_data)
+              aov_result <- summary(test.result)
+              test_table[i,2:4] <- aov_result[[1]]$`Pr(>F)`[1:3]
+            }
+          }
+        }
+        
+        ### For PhenoCage
+      } else if (input$expType == "PhenoCage"){
+        
+        my_data <- unique(Growth_rate_table())
+        my_data <- subset(my_data, (my_data[,input$PrimaryFactor] %in% list_of_comp3()))
+        my_data$col.sorting <- as.factor(my_data[,input$PrimaryFactor])
+        my_data$GR <- as.numeric(my_data$GR)
+        time.vector <- my_data$day %>% sort() %>% unique() 
+        test_table <- data.frame(matrix(ncol = 2 , nrow = length(time.vector)))
+        colnames(test_table) <- c("Timepoint",input$PrimaryFactor)
+        test_table$Timepoint <- time.vector
+        select_name <- input$PrimaryFactor
+        
+        if(input$StatsMethod == "T-test"){
+          attach(my_data)
+          for (i in (1:length(time.vector))){
+            y1 <- my_data[ which(day==time.vector[i] & get(select_name)== input$Compset1_GR),"GR"]
+            if (length(y1) <= 1) {
+              test_table[i,2] <- "NA"
+            } else {
+              y2 <- my_data[ which(day==time.vector[i] & get(select_name)== input$Compset2_GR),"GR"]
+              if (length(y2) <= 1) {
+                test_table[i,2] <- "NA"
+              } else {
+                test.result <- t.test(y1, y2)
+                test_table[i,2] <- test.result$p.value
+              }
+            }
+          }
+          
+        } else if (input$StatsMethod == "Wilcox test"){
+          attach(my_data)
+          for (i in (1:length(time.vector))){
+            y1 <- my_data[ which(day==time.vector[i] & get(select_name)== input$Compset1_GR),"GR"]
+            if (length(y1) <= 1) {
+              test_table[i,2] <- "NA"
+            } else {
+              y2 <- my_data[ which(day==time.vector[i] & get(select_name)== input$Compset2_GR),"GR"]
+              if (length(y2) <= 1) {
+                test_table[i,2] <- "NA"
+              } else {
+                test.result <- wilcox.test(y1, y2)
+                test_table[i,2] <- test.result$p.value
+              }
+            }
+          }
+          
+        } else if (input$StatsMethod == "Kruskal-Wallis") {
+          
+          attach(my_data)
+          for (i in (1:length(time.vector))){
+            sub_data <- my_data[my_data$day == time.vector[i],]
+            if(nrow(sub_data) < 4 | unique(sub_data$col.sorting) %>% length() < 2){
+              test_table[i,2] <- "NA"
+            } else {
+              test.result <- kruskal.test(GR ~ col.sorting, data = sub_data)
+              test_table[i,2] <- test.result$p.value
+            }
+          }
+          
+        } else if (input$StatsMethod == "One-way ANOVA") {
+          attach(my_data)
+          for (i in 1:length(time.vector)){
+            sub_data <- my_data[my_data$day == time.vector[i],]
+            if(nrow(sub_data) < 4 | unique(sub_data$col.sorting) %>% length() < 2){
+              test_table[i,2] <- "NA"
+            } else {
+              test.result <- aov(GR ~ col.sorting, data = sub_data)
+              aov_result <- summary(test.result)
+              test_table[i,2] <- aov_result[[1]]$`Pr(>F)`[1]
+            }
+          }
+          
+        } else if (input$StatsMethod == "Two-way ANOVA") {
+          
+          my_data$col.sorting2 <- as.factor(my_data[,input$OtherFactor])
+          test_table <- data.frame(matrix(ncol = 4 , nrow = length(time.vector)))
+          colnames(test_table) <- c("Timepoint",input$PrimaryFactor,input$OtherFactor,"interaction")
+          test_table$Timepoint <- time.vector
+          attach(my_data)
+          
+          for (i in 1:length(time.vector)){
+            sub_data <- my_data[my_data$day == time.vector[i],]
+            if(nrow(sub_data) < 4 | unique(sub_data$col.sorting) %>% length() < 2){
+              test_table[i,2:4] <- c("NA", "NA", "NA")
+            } else {
+              test.result <- aov(GR ~ get(input$PrimaryFactor) * get(input$OtherFactor), data = sub_data)
+              aov_result <- summary(test.result)
+              test_table[i,2:4] <- aov_result[[1]]$`Pr(>F)`[1:3]
+            }
           }
         }
       }
     }
-    
+     
     return(test_table)
   })
   
