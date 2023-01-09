@@ -30,8 +30,7 @@ def main():
 
     # STEP 1: Adjust images
     img1 = pcv.white_balance(img, roi=(white_Xwhite_Ywhite_Wwhite_H))
-    img1 = img
-    #img1 = pcv.transform.rotate(img=img1, rotation_deg=, crop=False)
+    img1 = pcv.transform.rotate(img=img1, rotation_deg=, crop=False)
     imgs = pcv.shift_img(img=img1, number=shift1, side=dir1)
     img1 = pcv.shift_img(img=imgs, number=shift2, side=dir2)
 
