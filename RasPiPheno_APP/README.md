@@ -8,6 +8,7 @@ The App is a part of high-throughput phenotypic data processing system and it ai
 To use the APP, please visit our [**host server**](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/edit/main/RasPiPheno_APP/) or download all files under the current repository to excute the program, more details and instruction of APP usage can be reached at [**Shiny R**](https://shiny.rstudio.com/articles/running.html) website.
 
 ### Load phenotype worksheet and the metadata table
+The phenotype worksheets are derived from results of RaspiPheno Pipe. Other metadata information can be customized by creating a metatable. See an [**example**](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/tree/main/Results_example) for format requirement.
 <img width="1874" alt="image" src="https://user-images.githubusercontent.com/69836931/214944332-3273ff64-c6be-47b5-ac13-14cde44af6d6.png">
 
 ### Merge phenotype data and meta data for visulization
