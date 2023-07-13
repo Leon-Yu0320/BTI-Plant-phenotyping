@@ -2,25 +2,25 @@
 
 RasPiPheno App is developed by [**Julkowska**](https://btiscience.org/magda-julkowska/) and [**Nelson**](https://btiscience.org/andrew-nelson/) lab at the [**Boyce Thompson Institute, Cornell University**](https://btiscience.org/).
 
-The App is a part of high-throughput phenotypic data processing system and it aimed to streamline the downstream phenotypic data collected by customized phenotypic facilities which include [**PhenoRig and PhenoCage**](https://www.protocols.io/edit/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46)
+The App is a part of a high-throughput phenotypic data processing system and it aimed to streamline the downstream phenotypic data collected by customized phenotypic facilities which include [**PhenoRig and PhenoCage**](https://www.protocols.io/edit/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46)
 
 ## User manual
-To use the APP, please visit our [**host server**](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/edit/main/RasPiPheno_APP/) or download all files under the current repository to excute the program, more details and instruction of APP usage can be reached at [**Shiny R**](https://shiny.rstudio.com/articles/running.html) website.
+To use the APP, please download all files under the current repository to execute the program, more details and instructions of APP usage can be reached at [**Shiny R**](https://shiny.rstudio.com/articles/running.html) website. Video instructions of the usage will be available on our Youtube channel in the near future. 
 
-### Load phenotype worksheet and the metadata table
-The phenotype worksheets are derived from results of RaspiPheno Pipe. Other metadata information can be customized by creating a metatable. See an [**example**](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/tree/main/Results_example) for the format requirement.
+### Load the phenotype worksheet and the metadata table
+The phenotype worksheets are derived from the results of the RaspiPheno Pipe. Other metadata information can be customized by creating a metatable. See an [**example**](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/tree/main/Results_example) for the format requirement.
 <img width="1874" alt="image" src="https://user-images.githubusercontent.com/69836931/214944332-3273ff64-c6be-47b5-ac13-14cde44af6d6.png">
 
-### Merge phenotype data and meta data for visulization
-A identifier which includes the phenotyping rig (cage), camera ID, and plant ID is used to match meta-features under the meta table. 
+### Merge phenotype data and metadata for visualization
+An identifier that includes the phenotyping rig (cage), camera ID, and plant ID is used to match meta-features under the meta table. 
 <img width="1874" alt="image" src="https://user-images.githubusercontent.com/69836931/214946358-42923002-7d99-48b7-babe-9b2d81f14bb7.png">
 
 ### Browse plant leaf area by selected grouping criteria
-Users can customized plot options interactively to grap the overall data representation. 
+Users can customized plot options interactively to grasp the overall data representation. 
 <img width="1890" alt="image" src="https://user-images.githubusercontent.com/69836931/214946643-d51b8a9d-6fb9-4a3a-9919-08296a3b0826.png">
 
 ### Curate the data using statistical methods
-Three types of data curation methods were provided for data smoothing, including [**smooth spline**](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/smooth.spline), [**Loess fit**](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/loess.html), and [**Polynomial regression fit**](https://search.r-project.org/CRAN/refmans/polyreg/html/polyFit.html). Users can select parameters to curate individual plants and remove plants with unexpected pattern. 
+Three types of data curation methods were provided for data smoothing, including [**smooth spline**](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/smooth.spline), [**Loess fit**](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/loess.html), and [**Polynomial regression fit**](https://search.r-project.org/CRAN/refmans/polyreg/html/polyFit.html). Users can select parameters to curate individual plants and remove plants with unexpected patterns. 
 
 <img width="1889" alt="image" src="https://user-images.githubusercontent.com/69836931/214946807-923da2ec-d208-402c-b0f2-f133b44344db.png">
 <img width="1877" alt="image" src="https://user-images.githubusercontent.com/69836931/214946943-0140848f-33a6-4ae5-945f-c222b3f186b3.png">
@@ -30,8 +30,8 @@ Three types of data curation methods were provided for data smoothing, including
 <img width="1889" alt="image" src="https://user-images.githubusercontent.com/69836931/214947249-aa872a38-6fbc-4619-a77f-5a751bfc4d54.png">
 <img width="1889" alt="image" src="https://user-images.githubusercontent.com/69836931/214947500-04884663-aa0e-44e2-861b-74b6317cc4f6.png">
 
-### Calcualte the growth rate (GR)
-We provided two options to calcualte the GR, including calculate the rate over the entire experiment, as well as customized step-wise selection and window size selection to estimated the rate over certain intervals. 
+### Calculate the growth rate (GR)
+We provided two options to calculate the GR, including calculating the rate over the entire experiment, as well as customized step-wise selection and window size selection to estimate the rate over certain intervals. 
 <img width="1883" alt="image" src="https://user-images.githubusercontent.com/69836931/214947661-ff93f93d-4e83-42c8-85a7-64332d8a10c3.png">
 <img width="1879" alt="image" src="https://user-images.githubusercontent.com/69836931/214947782-dc96162c-95d7-4420-8d25-2066db7fd34c.png">
 
