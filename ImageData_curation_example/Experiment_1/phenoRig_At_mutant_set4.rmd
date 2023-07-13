@@ -1,0 +1,801 @@
+---
+title: "PhenoRig workflow for At_mutant images Batch 4"
+date: "2023-06-08"
+author: "Liang.Yu, Magda.Julkowska" 
+output:
+  html_document:
+    df_print: paged  
+    toc: true
+    theme: united
+---
+The experiment is aimed to test the growth rate (GR) and total leaf area variation of Arabidopsis mutant allele selection based on top candidate genes using GWAS output for the data collected over [**360 Arabidopsis accessions in HapMap population**](https://rpubs.com/mjulkowska/GWAS-root-shoot-Arabidopsis-salt-250kSNPs). This markdown file includes the second batch (from 20223-05-18 to 2023-05-31) with 4 Raspi PhenoRigs and 8 cameras. 
+
+### load packages
+```{r Library, message=FALSE, paged.print=TRUE}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(ggpubr)
+library(tidyverse)
+library(reshape2)
+library(corrplot)
+library(plotly)
+library(cowplot)
+library(npreg)
+library(ggformula)
+```
+
+
+### Load batch 2 experimental dataset
+```{r}
+#import list containing samples
+sample.list2 <- read.table("/Users/Leon/OneDrive - Cornell University/3_Manuscript/Manuscript10/Experiments/At_mutant/Batch_4/3_Results/At_mutant_set4_Rig.list", sep ="\t", header = F)
+
+### import each samples
+for (i in 1:nrow(sample.list2)){
+  sample.df <- read.csv(paste0("/Users/Leon/OneDrive - Cornell University/3_Manuscript/Manuscript10/Experiments/At_mutant/Batch_4/3_Results/",sample.list2[i,1]), header = T)
+  
+  ### check types of the "in_bound" column
+  sample.df$in_bounds <- as.character(sample.df$in_bounds)
+  sample.df$object_in_frame <- as.character(sample.df$object_in_frame)
+  assign(sample.list2[i,1], sample.df)
+}
+
+#Create Meta phenotype sheet by combining multiple files
+Set2_list <- lapply(ls(pattern = "At_mutant_set4.result-single-value"), get)
+Raspi_At_mutant2 <- bind_rows(Set2_list)
+```
+
+
+### Reformat the phenotyPlant_individualc data spreadsheet
+```{r}
+Raspi <- Raspi_At_mutant2
+
+### clean the file contatning plantID and plant are information
+Raspi_clean <- Raspi[,c(31,18:30)]
+Raspi_clean <- Raspi_clean %>% separate(plantID, c("Raspi.ID","Cam.ID", "Year", "Month", "Date","Hour", "Minute", "Second", "PlantID"))
+
+# Fisrt - make sure that EVERYTHING is as numeric
+numeric_list <- c("Year", "Month", "Date", "Hour", "Minute", "Second")
+for (num in numeric_list){
+  Raspi_clean [, num] <- as.numeric(as.character(Raspi_clean [, num]))
+}
+
+Raspi_clean <- Raspi_clean[
+  order(Raspi_clean[,"Raspi.ID"], 
+        Raspi_clean[,"Cam.ID"], 
+        Raspi_clean[,"Year"], 
+        Raspi_clean[,"Month"], 
+        Raspi_clean[,"Date"], 
+        Raspi_clean[,"Hour"], 
+        Raspi_clean[,"Minute"], 
+        Raspi_clean[,"PlantID"]),]
+
+Raspi_clean$ID <- paste(Raspi_clean$Raspi.ID, Raspi_clean$Cam.ID, Raspi_clean$PlantID, sep="_")
+```
+
+
+### Calculate the accumulative minutes for each plant
+```{r paged.print=TRUE}
+# Transform all timestamps into minutes (where we have to also integrate the month):
+Raspi_clean$month.min <- (Raspi_clean[,"Month"] - Raspi_clean[1,"Month"])*31*24*60
+Raspi_clean$day.min <- (Raspi_clean[,"Date"]- Raspi_clean[1,"Date"])*24*60
+Raspi_clean$hour.min <- (Raspi_clean[,"Hour"]-Raspi_clean[1,"Hour"])*60
+
+### calculate the total minutes
+Raspi_clean$all.min <- Raspi_clean$month.min + Raspi_clean$day.min + Raspi_clean$hour.min  + Raspi_clean$Minute
+
+head(Raspi_clean, 100)
+```
+
+
+### Load decoding file
+Note: decoding file should be in a correct column settings:
+
+1: Raspi\
+2: Camera\
+3: Position\
+4: Treatment
+
+```{r}
+###load decoding information
+decoding <- read.csv("/Users/Leon/OneDrive - Cornell University/3_Manuscript/Manuscript10/Experiments/At_mutant/Batch_4/AccessionMap-info.csv", header = T)
+decoding$ID <- paste(decoding[,"Raspi"], decoding[,"Camera"], decoding[,"position"], sep="_")
+
+### check if decoding information matched the plant ID 
+decoding$ID %in% unique(Raspi_clean$ID)
+
+### merge decode information with phenotype dataset
+deco_data <- na.omit(right_join(Raspi_clean, decoding, by = "ID"))
+write.csv(deco_data,
+          "/Users/Leon/OneDrive - Cornell University/3_Manuscript/Manuscript10/Experiments/At_mutant/Batch_4/deco_Mergedata.csv", row.names = F)
+
+```
+
+### Remove plants with trivial growth through entire growth session
+```{r fig.height=6, fig.width=10}
+### remove data points associated with no plants
+deco_data <- deco_data[deco_data$area > 200,]
+### define a cutoff of plant pixel ranges
+Plant_pixel_limit <- 5000
+
+### remove the plant with limited growth
+Plant_individual <- unique(deco_data[,"ID"])
+length(unique(deco_data[,"ID"]))
+deco_data$Range <- "fill"
+
+for (i in 1:length(Plant_individual)){
+  temp <- deco_data[deco_data$ID == Plant_individual[i],]
+  ### calculate the range of area 
+  Plant_pixel_range <- (max(temp$area)-min(temp$area))
+  if(Plant_pixel_range < Plant_pixel_limit){
+  ### Mark plants to be removed
+   deco_data[deco_data$ID == Plant_individual[i],"Range"] <- "FALSE"
+  } else {
+  ### Mark plants to be retained
+  deco_data[deco_data$ID == Plant_individual[i],"Range"] <- "TRUE"
+  }
+}
+
+### remove small plants
+deco_data_clean <- deco_data[deco_data$Range == "TRUE",] 
+  
+### Check numbers of plants been removed
+length(unique(deco_data_clean[,"ID"]))
+
+### remove time point at the final stage
+deco_plot <- deco_data_clean[deco_data_clean$all.min < 14400,]
+```
+
+
+### First glance of all plants
+```{r}
+### Define Rig inforamtion 
+rig_list <- c("raspiK","raspiL","raspiM", "raspiR",
+              "raspiS","raspiT","raspiU", "raspiV")
+
+for (i in 1:length(rig_list)){
+  temp <- deco_plot[deco_plot$Raspi.ID == rig_list[i],]
+  
+    ### Plot clean deco_data
+    temp_plot <- ggplot(temp, aes(x= all.min, y=area, group = ID, color = Genotype)) +
+      geom_line(alpha = 0.2) +
+      geom_point(alpha = 0.2, size = 0.2) +
+      ylab("Rosette Area of individual plant") +
+      xlab("Total Time (minutes)")+
+      stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Treatment), alpha=0.3)+
+      stat_summary(fun=mean, aes(group=Treatment),  size=0.7, geom="line", linetype = "dashed") +
+      theme_classic() 
+      
+    #print(ggplotly(temp_plot))
+    assign(paste0(rig_list[i],"_graph"),temp_plot)
+}
+
+#(raspiK_graph)
+#ggplotly(raspiL_graph)
+#ggplotly(raspiM_graph)
+#ggplotly(raspiR_graph)
+#ggplotly(raspiS_graph)
+#ggplotly(raspiT_graph)
+#ggplotly(raspiU_graph)
+#ggplotly(raspiV_graph)
+
+```
+
+### Plot results at the first glance before curating data
+```{r}
+### Genrate the removal list
+Remove_list <- c("raspiK_cameraB_8","raspiK_cameraA_12","raspiK_cameraB_4",
+                 "raspiL_cameraB_15",
+                 "raspiR_cameraA_9","raspiR_cameraA_10","raspiR_cameraA_13","raspiR_cameraB_13",
+                 "raspiR_cameraA_3","raspiR_cameraB_9",
+                 "raspiT_cameraB_13",
+                 "raspiU_cameraA_11",
+                 "raspiV_cameraB_11","raspiV_cameraB_9","raspiV_cameraB_5")
+
+### remove plants with unexpected data
+deco_plot_clean  <- deco_plot[! deco_plot $ID %in% Remove_list,]
+
+for (i in 1:length(rig_list)){
+  temp <- deco_plot_clean[deco_plot_clean$Raspi.ID == rig_list[i],]
+  
+    ### Plot clean deco_data
+    temp_plot <- ggplot(temp, aes(x= all.min, y=area, group = ID, color = Genotype)) +
+      geom_line(alpha = 0.2) +
+      geom_point(alpha = 0.2, size = 0.2) +
+      ylab("Rosette Area of individual plant") +
+      xlab("Total Time (minutes)")+
+      stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Treatment), alpha=0.3)+
+      stat_summary(fun=mean, aes(group=Treatment),  size=0.7, geom="line", linetype = "dashed") +
+      theme_classic()
+
+    assign(paste0(rig_list[i],"_graph"),temp_plot)
+}
+
+raspiK_graph
+raspiL_graph
+raspiM_graph
+raspiR_graph
+raspiS_graph
+raspiT_graph
+raspiU_graph
+raspiV_graph
+```
+
+
+### Plot for all plants under the drought and control condition
+```{r fig.height=10, fig.width=10}
+  
+### Plot clean deco_data
+clean_graph <- ggplot(deco_plot_clean, aes(x= all.min, y=area, group = ID, color = Treatment)) +
+  geom_line(alpha = 0.2) +
+  geom_point(alpha = 0.2, size = 0.2) +
+  facet_wrap( ~ Genotype) +
+  ylab("Rosette Area of individual plant") +
+  xlab("Total Time (minutes)")+
+  stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Treatment), alpha=0.3)+
+  stat_summary(fun=mean, aes(group=Treatment),  size=0.7, geom="line", linetype = "dashed") +
+  scale_color_manual(values = c(Drought="tomato", Control="steelblue")) +
+  theme_classic()
+
+clean_graph
+```
+
+### Use smooth.spline to to curate the dataset
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+### import data
+test_data <- deco_plot_clean
+Plant_individual <- unique(deco_plot_clean[,"ID"])
+
+##Parameter settings
+Range1 = 1
+Range2 = 1.5
+Range3 = 2
+Range4 = 3
+
+### define the nknots for curation
+nknots = 4
+Fit_night = "Yes"
+
+### non-linear model with smooth.spline (ss function)
+for (i in 1:length(Plant_individual)){
+  temp <- test_data[test_data$ID == Plant_individual[i], ]
+  mod.ss <- ss(temp$all.min, temp$area, nknots = nknots)
+  mod.sum <- summary(mod.ss)
+  temp$sigma1 <- Range1 * mod.sum$sigma
+  temp$sigma2 <- Range2 * mod.sum$sigma
+  temp$sigma3 <- Range3 * mod.sum$sigma
+  temp$sigma4 <- Range4 * mod.sum$sigma
+  temp$residual <- abs(mod.sum$residuals)
+  temp_clean <- temp[temp$residual < temp$sigma2,]
+
+  ### Regression model before removal of outliers
+  Predict_matrix1 <- predict(mod.ss, temp$all.min)
+  P1 <- ggplot(temp, aes(x=all.min, y=area) ) + 
+    geom_point(aes(y = area), size=1.5, shape = 21) +
+    geom_spline(aes(x = all.min, y = area), nknots = nknots, size=1, color = "blue") +
+    geom_ribbon(aes(ymin = Predict_matrix1$y - unique(temp$sigma1), 
+                    ymax = Predict_matrix1$y + unique(temp$sigma1)), alpha = 0.2, fill = "#542788") +
+    theme_classic() +
+    xlab("Total Time (minutes)") +
+    ylab(paste0("Leaf area of ",Plant_individual[i]))
+  
+  
+  ### plot after removal of outliers
+  Predict_matrix2 <- predict(mod.ss, temp_clean$all.min)
+  P2 <- ggplot(temp_clean, aes(x=all.min, y=area) ) + 
+    geom_point(aes(y = area), size=1.5, shape = 21) +
+    geom_spline(aes(x = all.min, y = area), nknots = nknots, size=1, color = "blue") +
+    geom_ribbon(aes(ymin = Predict_matrix2$y - unique(temp$sigma2), 
+                    ymax = Predict_matrix2$y + unique(temp$sigma2)), alpha = 0.2, fill = "#8073AC") +
+    theme_classic() +
+    xlab("Total Time (minutes)") +
+    ylab(paste0("Leaf area of ",Plant_individual[i]))
+  
+  ### Combine and output the plots 
+  #print(plot_grid(P1, P2, labels = c('A', 'B'), label_size = 12))
+    
+  if (Fit_night == "Yes"){
+    ### Generate the timpoint during night
+    timeline <- seq(0, max(temp$all.min), 30)
+    Predict_matrix <- predict(mod.ss, timeline)
+    Predict_matrix$ID <- unique(temp$ID)
+    colnames(Predict_matrix) <- c("all.min", "Fit", "se", "ID")
+    
+    ### Extract all predicted values across time-point (Using the temp file)
+    smooth_matrix <- predict(mod.ss, temp$all.min)
+    temp$Fit <- smooth_matrix$y
+    
+  } else {
+    ### Extract all predicted values across time-point (Using the temp file)
+    smooth_matrix <- predict(mod.ss, temp$all.min)
+    temp$Fit <- smooth_matrix$y
+  }
+    ### export clean data-sheet (without night interval fit)
+    assign(paste0("Smooth_raw", Plant_individual[i]), temp_clean)
+    assign(paste0("Smooth_fit", Plant_individual[i]), temp)
+    
+    ### export clean data-sheet (with night interval fit)
+    assign(paste0("Smooth_night", Plant_individual[i]), Predict_matrix)
+}
+
+###Combined the curated data using raw data for plot 
+Smooth_list_raw <- lapply(ls(pattern = "Smooth_raw"), get)
+deco_Smooth_raw <- bind_rows(Smooth_list_raw )
+
+###Combined the curated data using fitted data for plot (without night point)
+Smooth_list_fit <- lapply(ls(pattern = "Smooth_fit"), get)
+deco_Smooth_fit <- bind_rows(Smooth_list_fit)
+deco_Smooth_fit
+
+###Combined the curated data using fitted data for plot (with night point)
+Smooth_list_night_fit <- lapply(ls(pattern = "Smooth_night"), get)
+deco_Smooth_night_fit <- bind_rows(Smooth_list_night_fit)
+
+write.csv(deco_Smooth_fit,"/Users/Leon/OneDrive - Cornell University/3_Manuscript/Manuscript10/Experiments/At_mutant/Batch_4/Raspi_At_mutant4_smoothspline.csv")
+
+```
+
+### Plot the predicted data derived from curation process
+```{r fig.height=30, fig.width=30, warning=FALSE}
+### Replot the curation dataset
+mydata=deco_Smooth_fit
+
+curation_graph <- ggplot(data=mydata, aes(x= all.min, y=Fit, group = ID, color = Treatment)) + 
+  theme_classic() +
+  geom_line(alpha = 0.2) +
+  geom_point(alpha = 0.1, size = 0.5) +
+  ylab("Smoothed rosette area of individual plant") + xlab("Total Time (minutes)") +
+  stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Treatment), alpha=0.3)  +
+  stat_summary(fun=mean, aes(group= Treatment),  size=0.7, geom="line", linetype = "dashed") +
+  stat_compare_means(aes(group = Treatment), label = "p.signif", method = "t.test") +
+  scale_x_continuous(breaks=seq(0,max(deco_data_clean$area),by=2500)) +
+  facet_wrap( ~ Genotype) +
+  scale_color_manual(values = c(Drought="tomato", Control="steelblue"))
+
+curation_graph 
+```
+
+
+
+### Reformat the genotype information for reference
+```{r fig.height=20, fig.width=30, warning=FALSE}
+### extract the accession information
+Genotype <- unique(deco_Smooth_fit$Genotype)
+Genotype <- Genotype[Genotype!= "Col-0"]
+```
+
+### Pairwise comparison relative to the Col-0 genotype using smooth data
+```{r fig.height=15, fig.width=22.5, warning=FALSE}
+### extract the control dataset
+deco_Smooth_fit_control <- deco_Smooth_fit[deco_Smooth_fit$Treatment == "Control",]
+
+for(i in 1:length(Genotype)){
+  smooth_temp <- deco_Smooth_fit_control[deco_Smooth_fit_control$Genotype == "Col-0" | deco_Smooth_fit_control$Genotype == Genotype[i],]
+  temp_graph <- ggplot(data=smooth_temp, aes(x= all.min, y=Fit, group = ID, color = Genotype)) + 
+                theme_classic() +
+                geom_line(alpha = 0.2) +
+                geom_point(alpha = 0.1, size = 0.5) +
+                ylab("Smoothed rosette area of individual plant (Control)") + xlab("Total Time (minutes)") +
+                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Genotype), alpha=0.3)  +
+                stat_summary(fun=mean, aes(group= Genotype),  size=0.7, geom="line", linetype = "dashed") +
+                stat_compare_means(aes(group = Genotype), label = "p.signif", method = "t.test") +
+                scale_x_continuous(breaks=seq(0,max(deco_data_clean$area),by=2500)) +
+                scale_color_manual(values = c("black","steelblue"))
+  assign(paste0("Graph_Control_",str_replace(Genotype[i], "-","_")),temp_graph)
+}
+
+plot_grid(Graph_Control_CP.EVT2_1, Graph_Control_CP.EVT2_2, Graph_Control_CP.EVT3_1,
+          Graph_Control_CP.EVT3_2, Graph_Control_CP.EVT6_1, Graph_Control_CP.EVT6_2,
+          Graph_Control_CP.EVT8, Graph_Control_CP.GR4_1, Graph_Control_CP.GR4_2,
+          Graph_Control_CP.NPQ6_1, Graph_Control_CP.NPQ6_2,Graph_Control_CP.NPQ6_3,
+          Graph_Control_CP.NPQ6_4, Graph_Control_CP.NPQ6_5)
+```
+
+```{r fig.height=15, fig.width=22.5, warning=FALSE}
+### extract the drought dataset
+deco_Smooth_fit_drought <- deco_Smooth_fit[deco_Smooth_fit$Treatment == "Drought",]
+
+for(i in 1:length(Genotype)){
+  smooth_temp <- deco_Smooth_fit_drought[deco_Smooth_fit_drought$Genotype == "Col-0" | deco_Smooth_fit_drought$Genotype == Genotype[i],]
+  temp_graph <- ggplot(data=smooth_temp, aes(x= all.min, y=Fit, group = ID, color = Genotype)) + 
+                theme_classic() +
+                geom_line(alpha = 0.2) +
+                geom_point(alpha = 0.1, size = 0.5) +
+                ylab("Smoothed rosette area of individual plant (Drought)") + xlab("Total Time (minutes)") +
+                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Genotype), alpha=0.3)  +
+                stat_summary(fun=mean, aes(group= Genotype),  size=0.7, geom="line", linetype = "dashed") +
+                stat_compare_means(aes(group = Genotype), label = "p.signif", method = "t.test") +
+                scale_x_continuous(breaks=seq(0,max(deco_data_clean$area),by=2500)) +
+                scale_color_manual(values = c("black","tomato"))
+  assign(paste0("Graph_Drought_",str_replace(Genotype[i], "-","_")),temp_graph)
+}
+
+plot_grid(Graph_Drought_CP.EVT2_1, Graph_Drought_CP.EVT2_2, Graph_Drought_CP.EVT3_1,
+          Graph_Drought_CP.EVT3_2, Graph_Drought_CP.EVT6_1, Graph_Drought_CP.EVT6_2,
+          Graph_Drought_CP.EVT8, Graph_Drought_CP.GR4_1, Graph_Drought_CP.GR4_2,
+          Graph_Drought_CP.NPQ6_1, Graph_Drought_CP.NPQ6_2,Graph_Drought_CP.NPQ6_3,
+          Graph_Drought_CP.NPQ6_4, Graph_Drought_CP.NPQ6_5)
+```
+
+
+### Calcualte the growth rate overtime using a sliding window
+window size defined by number of minutes (unit: Minutes)\
+step size by minutes (unit: Minutes)
+
+```{r, warning = FALSE}
+### define numbers of hour in a certain interval
+window_size <- 300
+step_size <- 300
+data_source <- deco_Smooth_night_fit
+```
+
+### Calcualte the growth rate (GR) under the certain window size and step
+```{r, warning = FALSE}
+### define interval using the numbers of hours and total minutes of experiments
+timeline <- seq(0, max(data_source$all.min), step_size)
+Plant_individual_clean <- Plant_individual
+
+### Calculate the plant-wise growth rate (GR) across defined window above
+for (NUMBER in 1:length(Plant_individual_clean)){
+  ### Subset data for each Plant
+  Sub_plant <- na.omit((data_source[data_source$ID == Plant_individual_clean[NUMBER], ]))
+    
+  if (nrow(Sub_plant) != 0) {
+    ### Create plant-wise statistical table
+    Sub_plant_stats <- data.frame(matrix(ncol = 5 , nrow = length(timeline)))
+    colnames(Sub_plant_stats) <- c("Starttime","Endtime", "Intercept","Slope",  "R.square")
+    Sub_plant_stats$Starttime <- timeline
+    Sub_plant_stats$Endtime <- timeline + window_size
+    
+    for (i in 1:length(timeline)){
+    ## Subset data for each window under the same plant
+    Window <- na.omit(Sub_plant[Sub_plant$all.min > Sub_plant_stats[i,1] & Sub_plant$all.min <= Sub_plant_stats[i,2],])
+    
+      if (nrow(Window) >= 3){
+      ### generate the linear model
+      linear_model <- lm(Window$Fit~ Window$all.min)
+      linear_summary <- summary(linear_model)
+      
+      ### extract intercept
+      Sub_plant_stats[i,4] <- linear_summary$coefficients[2]
+      ### extract the slope
+      Sub_plant_stats[i,3] <- linear_summary$coefficients[1]
+      ### extract the R.square
+      Sub_plant_stats[i,5] <- linear_summary$r.squared
+        
+      ### Plot the linear regression fit
+      ggplot(Window, aes(x = all.min, y = area)) +
+        geom_point() + theme_classic() +
+        geom_smooth(method = "lm", alpha = .15)
+      } else {
+      Sub_plant_stats[i,4] <- NA
+      ### extract the slope
+      Sub_plant_stats[i,3] <- NA
+      ### extract the R.square
+      Sub_plant_stats[i,5] <- NA
+        
+      }
+    }
+  Sub_plant_stats$ID <- Plant_individual_clean[NUMBER]
+  assign(paste0(Plant_individual_clean[NUMBER], "_GR_summary"), Sub_plant_stats)
+  }
+}
+
+### Combine GR for all plants 
+GR_list <- lapply(ls(pattern = "_GR_summary"), get)
+Total_GR <- na.omit(bind_rows(GR_list))
+```
+
+### Plot the GR over timepoint with windows and step specified
+```{r fig.height=10, fig.width=10, warning=FALSE}
+### join decoding file and the total_GR file
+growth_data <- left_join(Total_GR, decoding, by = "ID")
+#growth_data <- growth_data[growth_data$Slope < 20,]
+growth_data$Point <- (growth_data$Starttime + growth_data$Endtime)/2
+
+GR_lgraph <- ggplot(data=growth_data, aes(x= Point, y=Slope, group = ID, color = Treatment)) + 
+            geom_line(alpha = 0.2)  +
+            stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group= Treatment), alpha=0.3) +
+            stat_summary(fun=mean, aes(group= Treatment),  size=0.7, geom="line", linetype = "dashed") +
+            stat_compare_means(aes(group = Treatment), label = "p.signif", method = "t.test", hide.ns = T) +
+            ylab(paste0("Growth Rate under ",window_size,"window_size")) + xlab("Minutes After Experiments") +
+            theme_classic() +
+            facet_wrap( ~ Genotype) +
+            scale_color_manual(values = c(Drought="tomato", Control="steelblue"))
+
+GR_lgraph
+```
+
+# Calcualte the daily growth rate (DGR)
+```{r, warning = FALSE}
+### determine the input data
+data_source <- deco_Smooth_fit
+Plant_individual_clean <- unique(deco_Smooth_fit$ID) 
+
+### define interval using the numbers of hours and total minutes of experiments
+timeline <- unique(data_source[,c("Year", "Month", "Date")])
+
+### Calculate the plant-wise growth rate (GR) across defined window above
+for (NUMBER in 1:length(Plant_individual_clean)){
+  ### Subset data for each Plant
+  Sub_plant <- na.omit((data_source[data_source$ID == Plant_individual_clean[NUMBER], ]))
+    
+  if (nrow(Sub_plant) != 0) {
+    ### Create plant-wise statistical table
+    Sub_plant_stats <- data.frame(matrix(ncol = 7 , nrow = nrow(timeline)))
+    colnames(Sub_plant_stats) <- c("Year","Month","Date","Intercept",  "Slope","R.square", "Index")
+    Sub_plant_stats[,1:3] <- timeline[,1:3]
+    Sub_plant_stats$Index <- rownames(Sub_plant_stats)
+    
+    for (i in 1:nrow(timeline)){
+    ## Subset data for each window under the same plant
+    Window <- na.omit(Sub_plant[Sub_plant$Year == timeline[i,1] & Sub_plant$Month == timeline[i,2] & Sub_plant$Date == timeline[i,3],])
+    
+      if (nrow(Window) >= 3){
+      ### generate the linear model
+      linear_model <- lm(Window$Fit ~ Window$all.min)
+      linear_summary <- summary(linear_model)
+      
+      ### extract intercept
+      Sub_plant_stats[i,4] <- linear_summary$coefficients[1]
+      ### extract the slope
+      Sub_plant_stats[i,5] <- linear_summary$coefficients[2]
+      ### extract the R.square
+      Sub_plant_stats[i,6] <- linear_summary$r.squared
+
+      } else {
+      Sub_plant_stats[i,5] <- NA
+      ### extract the slope
+      Sub_plant_stats[i,4] <- NA
+      ### extract the R.square
+      Sub_plant_stats[i,6] <- NA
+        
+      }
+    }
+  Sub_plant_stats$ID <- Plant_individual_clean[NUMBER]
+  assign(paste0(Plant_individual_clean[NUMBER], "_DGR_summary"), Sub_plant_stats)
+  }
+}
+
+### Combine GR for all plants 
+DGR_list <- lapply(ls(pattern = "_DGR_summary"), get)
+Total_DGR <- na.omit(bind_rows(DGR_list))
+```
+
+### Plot the daily growth rate (DGR)
+```{r fig.height=10, fig.width=10, warning=FALSE}
+### join decoding file and the total_GR file
+growth_data <- left_join(Total_DGR , decoding, by = "ID")
+growth_data$Index <- as.integer(growth_data$Index)
+
+### Plot DGR
+DGR_lgraph <- ggplot(data=growth_data, aes(x= Index, y=Slope, group = ID, color = Treatment)) + 
+              theme_classic() +
+              geom_line(alpha = 0.2) +
+              geom_point(alpha = 0.1, size = 0.5) +
+              ylab("Smoothed rosette area of individual plant") + xlab("Total Time (minutes)") +
+              stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Treatment), alpha=0.3)  +
+              stat_summary(fun=mean, aes(group= Treatment),  size=0.7, geom="line", linetype = "dashed") +
+              stat_compare_means(aes(group = Treatment), label = "p.signif", method = "t.test", hide.ns = T) +
+              scale_x_continuous(breaks=seq(0,max(deco_data_clean$area),by=1)) +
+              facet_wrap( ~ Genotype) +
+              scale_color_manual(values = c(Drought="tomato", Control="steelblue"))
+DGR_lgraph
+```
+
+### Reformat the DGR table for pairwise comparison
+```{r fig.height=15, fig.width=15, warning=FALSE}
+### join decoding file and the total_GR file
+growth_data <- left_join(Total_DGR , decoding, by = "ID")
+growth_data$Index <- as.integer(growth_data$Index)
+```
+
+### Pairwise comparison of DGR relative to the Col-0 genotype under the control condition
+```{r fig.height=15, fig.width=22.5, warning=FALSE}
+### extract the drought dataset
+growth_data_control <- growth_data[growth_data$Treatment == "Control",]
+growth_data_control
+```
+
+```{r fig.height=15, fig.width=22.5, warning=FALSE}
+for(i in 1:length(Genotype)){
+  DGR_temp <- growth_data_control[growth_data_control$Genotype == "Col-0" | growth_data_control$Genotype == Genotype[i],]
+  tempDGR_graph <- ggplot(data=DGR_temp, aes(x= Index, y=Slope, group = ID, color = Genotype)) + 
+                theme_classic() +
+                geom_line(alpha = 0.2) +
+                geom_point(alpha = 0.1, size = 0.5) +
+                ylab("DGR of individual plant (Control)") + xlab("Total Time (days)") +
+                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Genotype), alpha=0.3)  +
+                stat_summary(fun=mean, aes(group= Genotype),  size=0.7, geom="line", linetype = "dashed") +
+                stat_compare_means(aes(group = Genotype), label = "p.signif", method = "t.test") +
+                scale_x_continuous(breaks=seq(0,max(deco_data_clean$area),by=1)) +
+                scale_color_manual(values = c("black","blue"))
+  assign(paste0("DGR_Control_",str_replace(Genotype[i], "-","_")),tempDGR_graph)
+}
+
+plot_grid(DGR_Control_CP.EVT2_1, DGR_Control_CP.EVT2_2, DGR_Control_CP.EVT3_1,
+          DGR_Control_CP.EVT3_2, DGR_Control_CP.EVT6_1, DGR_Control_CP.EVT6_2,
+          DGR_Control_CP.EVT8, DGR_Control_CP.GR4_1, DGR_Control_CP.GR4_2,
+          DGR_Control_CP.NPQ6_1, DGR_Control_CP.NPQ6_2,DGR_Control_CP.NPQ6_3,
+          DGR_Control_CP.NPQ6_4, DGR_Control_CP.NPQ6_5)
+```
+
+### Pairwise comparison of DGR relative to the Col-0 genotype under the drought condition
+```{r fig.height=15, fig.width=22.5, warning=FALSE}
+### extract the drought dataset
+growth_data_drought <- growth_data[growth_data$Treatment == "Drought",]
+growth_data_drought 
+```
+
+```{r fig.height=15, fig.width=22.5, warning=FALSE}
+for(i in 1:length(Genotype)){
+  DGR_temp <- growth_data_drought[growth_data_drought$Genotype == "Col-0" | growth_data_drought$Genotype == Genotype[i],]
+  tempDGR_graph <- ggplot(data=DGR_temp, aes(x= Index, y=Slope, group = ID, color = Genotype)) + 
+                theme_classic() +
+                geom_line(alpha = 0.2) +
+                geom_point(alpha = 0.1, size = 0.5) +
+                ylab("DGR of individual plant (Drought)") + xlab("Total Time (days)") +
+                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Genotype), alpha=0.3)  +
+                stat_summary(fun=mean, aes(group= Genotype),  size=0.7, geom="line", linetype = "dashed") +
+                stat_compare_means(aes(group = Genotype), label = "p", method = "t.test") +
+                scale_x_continuous(breaks=seq(0,max(deco_data_clean$area),by=1)) +
+                scale_color_manual(values = c("black","red")) +
+                ylim(0,9)
+  assign(paste0("DGR_Drought_",str_replace(Genotype[i], "-","_")),tempDGR_graph)
+}
+
+plot_grid(DGR_Drought_CP.EVT2_1, DGR_Drought_CP.EVT2_2, DGR_Drought_CP.EVT3_1,
+          DGR_Drought_CP.EVT3_2, DGR_Drought_CP.EVT6_1, DGR_Drought_CP.EVT6_2,
+          DGR_Drought_CP.EVT8, DGR_Drought_CP.GR4_1, DGR_Drought_CP.GR4_2,
+          DGR_Drought_CP.NPQ6_1, DGR_Drought_CP.NPQ6_2,DGR_Drought_CP.NPQ6_3,
+          DGR_Drought_CP.NPQ6_4, DGR_Drought_CP.NPQ6_5)
+
+```
+
+
+### Calculate the drought stress indices (DSI) for each two genotype comparisons under the drought condition
+This DSI is calculated by using the DGR per plant under the drought condition divided by the AVERAGE SCORE of DGR of plant under condition \
+We further make a comparison between col-0 to each genotypes using the DSI score
+
+```{r paged.print=TRUE}
+Index <- unique(growth_data$Index)
+genotype <- unique(growth_data$Genotype)
+
+growth_data$control_meanSlope <- 1
+
+for (x in 1:length(genotype)){
+    DGR_data <- growth_data[growth_data$Genotype == genotype[x],]
+    for (i in 1:length(Index)){
+    
+    Control_mean <- DGR_data[DGR_data$Index == Index[i] & DGR_data$Treatment == "Control","Slope"] %>% mean()
+    DGR_data[DGR_data$Index == Index[i], "control_meanSlope"] <- Control_mean
+    DGR_data$DSI <- DGR_data$Slope/DGR_data$control_meanSlope
+    DGR_data_drought <- DGR_data[DGR_data$Treatment == "Drought",]
+    }
+    assign(paste0("DSI_", genotype[x]), DGR_data_drought )
+}
+
+### combine the DSI dataset together
+DSI_list <- lapply(ls(pattern = "DSI_"), get)
+DSI_combine <- na.omit(bind_rows(DSI_list))
+DSI_combine
+```
+
+### Plot the DSI (col-0 vs genotypes) 
+
+```{r fig.height=15, fig.width=15, warning=FALSE}
+for(i in 1:length(Genotype)){
+  DSI_temp <- DSI_combine[DSI_combine $Genotype == "Col-0" | DSI_combine$Genotype == Genotype[i],]
+  tempDSI_graph <- ggplot(data=DSI_temp, aes(x= Index, y=DSI, group = ID, color = Genotype)) + 
+                theme_classic() +
+                geom_line(alpha = 0.2) +
+                geom_point(alpha = 0.1, size = 0.5) +
+                ylab("DSI of individual plants of two genotypes") + xlab("Total Time (days)") +
+                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=Genotype), alpha=0.3)  +
+                stat_summary(fun=mean, aes(group= Genotype),  size=0.7, geom="line", linetype = "dashed") +
+                stat_compare_means(aes(group = Genotype), label = "p.signif", method = "t.test") +
+                scale_x_continuous(breaks=seq(0,max(deco_data_clean$area),by=1)) +
+                scale_color_manual(values = c("black","red")) +
+                ylim(0,3)
+  assign(paste0("DSI_",str_replace(Genotype[i], "-","_")),tempDSI_graph)
+}
+
+
+plot_grid(DSI_CP.EVT2_1, DSI_CP.EVT2_2, DSI_CP.EVT3_1,
+          DSI_CP.EVT3_2, DSI_CP.EVT6_1, DSI_CP.EVT6_2,
+          DSI_CP.EVT8, DSI_CP.GR4_1, DSI_CP.GR4_2,
+          DSI_CP.NPQ6_1, DSI_CP.NPQ6_2,DSI_CP.NPQ6_3,
+          DSI_CP.NPQ6_4, DSI_CP.NPQ6_5)
+
+```
+
+### Import evapotranspiration dataset
+```{r}
+### load dataset 
+
+EVTData <- read.csv("/Users/Leon/OneDrive - Cornell University/3_Manuscript/Manuscript10/Experiments/At_mutant/Batch_4/EVT_comparison-Col-0VSMutants.csv", header = T)
+```
+
+### Plot the evapotranspiration rate over time under control condition 
+```{r}
+### load dataset 
+
+EVTData_control <- EVTData[EVTData$treatment == "Control",]
+GenotypeEVT <- EVTData$mutant %>% unique()
+GenotypeEVT <- GenotypeEVT[ !GenotypeEVT == 'Col-0']
+GenotypeEVT 
+
+for (i in 1:length(GenotypeEVT )){
+  EVT_temp <- EVTData_control[EVTData_control$mutant == "Col-0" | EVTData_control$mutant== GenotypeEVT[i],]
+  
+  tempEVT_graph <- ggplot(data=EVT_temp, aes(x= day, y=evapotranspiration, group = plant.id, color = mutant)) + 
+                theme_classic() +
+                geom_line(alpha = 0.2) +
+                geom_point(alpha = 0.1, size = 0.5) +
+                ylab("evapotranspiration") + xlab("Total Time (days)") +
+                stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=mutant), alpha=0.3)  +
+                stat_summary(fun=mean, aes(group= mutant),  size=0.7, geom="line", linetype = "dashed") +
+                stat_compare_means(aes(group = mutant), label = "p.signif", method = "t.test", hide.ns = TRUE) +
+                scale_x_continuous(breaks=seq(0,max(EVT_temp$day),by=2)) +
+                scale_color_manual(values = c("black","steelblue")) +
+                ylim(0,25) +
+                theme(legend.position = "bottom")
+  assign(paste0("EVT_Control_",str_replace(GenotypeEVT[i], "-","_")),tempEVT_graph)
+}
+
+Control_EVT <- plot_grid(EVT_Control_CP.EVT2_1, EVT_Control_CP.EVT2_2, EVT_Control_CP.EVT3_1,
+                EVT_Control_CP.EVT3_2, EVT_Control_CP.EVT6_1, EVT_Control_CP.EVT6_2,
+                EVT_Control_CP.EVT8, EVT_Control_CP.GR4_1, EVT_Control_CP.GR4_2,
+                EVT_Control_CP.NPQ6_1, EVT_Control_CP.NPQ6_2,EVT_Control_CP.NPQ6_3,
+                EVT_Control_CP.NPQ6_4, EVT_Control_CP.NPQ6_5, ncol = 2)
+
+```
+
+
+### Plot the evapotranspiration rate over time under Drought condition 
+```{r}
+### load dataset 
+
+EVTData_drought <- EVTData[EVTData$treatment == "Drought",]
+GenotypeEVT <- EVTData$mutant %>% unique()
+GenotypeEVT <- GenotypeEVT[ !GenotypeEVT == 'Col-0']
+GenotypeEVT 
+
+for (i in 1:length(GenotypeEVT )){
+  EVT_temp <- EVTData_drought[EVTData_drought$mutant == "Col-0" | EVTData_drought$mutant== GenotypeEVT[i],]
+  
+  tempEVT_graph <- ggplot(data=EVT_temp, aes(x= day, y=evapotranspiration, group = plant.id, color = mutant)) + 
+    theme_classic() +
+    geom_line(alpha = 0.2) +
+    geom_point(alpha = 0.1, size = 0.5) +
+    ylab("evapotranspiration") + xlab("Total Time (days)") +
+    stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=mutant), alpha=0.3)  +
+    stat_summary(fun=mean, aes(group= mutant),  size=0.7, geom="line", linetype = "dashed") +
+    stat_compare_means(aes(group = mutant), label = "p.signif", method = "t.test", hide.ns = TRUE) +
+    scale_x_continuous(breaks=seq(0,max(EVT_temp$day),by=2)) +
+    scale_color_manual(values = c("black","tomato")) +
+    ylim(0,25) +
+    theme(legend.position = "bottom")
+  assign(paste0("EVT_drought_",str_replace(GenotypeEVT[i], "-","_")),tempEVT_graph)
+}
+
+
+drought_EVT <- plot_grid(EVT_drought_CP.EVT2_1, EVT_drought_CP.EVT2_2, EVT_drought_CP.EVT3_1,
+                         EVT_drought_CP.EVT3_2, EVT_drought_CP.EVT6_1, EVT_drought_CP.EVT6_2,
+                         EVT_drought_CP.EVT8, EVT_drought_CP.GR4_1, EVT_drought_CP.GR4_2,
+                         EVT_drought_CP.NPQ6_1, EVT_drought_CP.NPQ6_2,EVT_drought_CP.NPQ6_3,
+                         EVT_drought_CP.NPQ6_4, EVT_drought_CP.NPQ6_5, ncol = 2)
+
+```
+
+### Combine panels
+```{r}
+EVT_panel <- plot_grid(Control_EVT, drought_EVT, ncol = 2,  labels = c("A","B"))
+```
+
+
+
+
+
