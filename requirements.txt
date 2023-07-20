@@ -1,4 +1,4 @@
 plantcv
 opencv-python
 numpy
-
+libgl1-mesa-glx
