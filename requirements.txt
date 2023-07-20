@@ -8,6 +8,6 @@ scikit-learn
 plotnine
 dask
 dask-jobqueue
-opencv-python
+opencv-python-headless
 statsmodels
 plantcv==3.14.2
