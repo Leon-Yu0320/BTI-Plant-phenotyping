@@ -1,5 +1,5 @@
 numpy
 pandas
-plantcv==3.10.1
+plantcv==3.12.1
 opencv-python==3.4.11.45
 
