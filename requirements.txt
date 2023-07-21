@@ -3,6 +3,10 @@ numpy>=1.11,<1.23
 pandas<2
 python-dateutil
 scipy
-plantcv==3.12.1
-opencv-python==3.4.11.45
-
+scikit-image>=0.19
+scikit-learn
+plotnine
+dask
+dask-jobqueue
+opencv-python
+statsmodels
