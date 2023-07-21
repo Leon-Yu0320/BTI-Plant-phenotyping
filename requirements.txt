@@ -1,4 +1,4 @@
 plantcv==3.10.1
 opencv-python==3.4.11.45
-numpy
+numpy==1.22.3
 
