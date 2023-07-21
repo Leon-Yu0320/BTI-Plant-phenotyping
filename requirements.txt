@@ -10,3 +10,4 @@ dask
 dask-jobqueue
 opencv-python
 statsmodels
+plantcv==3.10.1
