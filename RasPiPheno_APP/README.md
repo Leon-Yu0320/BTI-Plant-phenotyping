@@ -30,8 +30,11 @@ We provided two options to calculate the GR, including calculating the rate over
 
 
 ### Perform statistical analysis of leaf area and GR data
-<img width="1863" alt="image" src="https://user-images.githubusercontent.com/69836931/214948019-bcc41730-991d-44ad-b826-7033aa3629be.png">
-<img width="1895" alt="image" src="https://user-images.githubusercontent.com/69836931/214948229-6c3946c5-8bc8-4dc9-8c2e-d43c4585d3dc.png">
+Different statistical methods can be applied to perform a statistical comparison of plant leaf area at different time points. It includes the one-factor comparison (T-test, Wilcox test, Kruskal Wallis, and One-way ANOVA), also the two-factor comparison by two-way ANOVA. 
 
+![ShinyApp-Page5](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/assets/69836931/444c11ef-16bd-4c71-880c-95839d63f23b)
 
+We can also compare the differences of growth rate using the similar approaches as did for leaf area comparison. 
+
+![ShinyApp-Page6](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/assets/69836931/295562e0-8181-461f-b5df-ff2bf989e68d)
 
