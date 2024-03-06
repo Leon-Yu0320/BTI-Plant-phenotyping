@@ -11,15 +11,10 @@ To use the APP, please download all files under the current repository to execut
 ### Load the phenotype worksheet and the metadata table
 The phenotype worksheets are derived from the results of the RaspiPheno Pipe. Other metadata information can be customized by creating a metatable. See an [**example**](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/tree/main/Results_example) for the format requirement.
 
-![ShinyApp-Page1](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/assets/69836931/a066484e-a279-4fd5-93b4-a97b154654f9)
-
 ### Merge phenotype data and metadata for visualization
-An identifier that includes the phenotyping rig (cage), camera ID, and plant ID is used to match meta-features under the meta table. 
-<img width="1874" alt="image" src="https://user-images.githubusercontent.com/69836931/214946358-42923002-7d99-48b7-babe-9b2d81f14bb7.png">
+An identifier that includes the phenotyping rig (cage), camera ID, and plant ID is used to match meta-features under the meta table. After this step, Users can customized plot options interactively to grasp the overall data representation. 
 
-### Browse plant leaf area by selected grouping criteria
-Users can customized plot options interactively to grasp the overall data representation. 
-<img width="1890" alt="image" src="https://user-images.githubusercontent.com/69836931/214946643-d51b8a9d-6fb9-4a3a-9919-08296a3b0826.png">
+![ShinyApp-Page1](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/assets/69836931/a066484e-a279-4fd5-93b4-a97b154654f9)
 
 ### Curate the data using statistical methods
 Three types of data curation methods were provided for data smoothing, including [**smooth spline**](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/smooth.spline), [**Loess fit**](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/loess.html), and [**Polynomial regression fit**](https://search.r-project.org/CRAN/refmans/polyreg/html/polyFit.html). Users can select parameters to curate individual plants and remove plants with unexpected patterns. 
