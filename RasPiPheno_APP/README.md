@@ -4,12 +4,14 @@ RasPiPheno App is developed by [**Julkowska**](https://btiscience.org/magda-julk
 
 The App is a part of a high-throughput phenotypic data processing system and it aimed to streamline the downstream phenotypic data collected by customized phenotypic facilities which include [**PhenoRig and PhenoCage**](https://www.protocols.io/edit/bti-mobile-plant-phenotyping-system-phenotyping-fa-cavmse46)
 
+
 ## User manual
 To use the APP, please download all files under the current repository to execute the program, more details and instructions of APP usage can be reached at [**Shiny R**](https://shiny.rstudio.com/articles/running.html) website. Video instructions of the usage will be available on our Youtube channel in the near future. 
 
 ### Load the phenotype worksheet and the metadata table
 The phenotype worksheets are derived from the results of the RaspiPheno Pipe. Other metadata information can be customized by creating a metatable. See an [**example**](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/tree/main/Results_example) for the format requirement.
-<img width="1874" alt="image" src="https://user-images.githubusercontent.com/69836931/214944332-3273ff64-c6be-47b5-ac13-14cde44af6d6.png">
+
+![ShinyApp-Page1](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/assets/69836931/a066484e-a279-4fd5-93b4-a97b154654f9)
 
 ### Merge phenotype data and metadata for visualization
 An identifier that includes the phenotyping rig (cage), camera ID, and plant ID is used to match meta-features under the meta table. 
