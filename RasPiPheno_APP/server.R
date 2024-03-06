@@ -289,7 +289,7 @@ server <- function(input, output) {
           theme_classic() +
           stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
           stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
-          facet_wrap(~ facet.sorting, ncol=(length(unique(my_data$facet.sorting)))) +
+          facet_wrap(vars(facet.sorting), ncol=(length(unique(my_data$facet.sorting)))) +
           ylab("Rosette Area (pixels)") + xlab("Time (minutes)") +
           scale_x_continuous(breaks=seq(0,max(my_data$time.min),by=input$minX_tickUI1)) +
           scale_y_continuous(breaks=seq(0,max(my_data$area),by=input$minY_tickUI1))
@@ -319,7 +319,7 @@ server <- function(input, output) {
           geom_line(alpha = input$alpha) +
           stat_summary(fun.data = mean_se, geom="ribbon", linetype=0, aes(group=col.sorting), alpha=0.3) +
           stat_summary(fun=mean, aes(group=col.sorting),  size=0.7, geom="line", linetype = "dashed") +
-          facet_wrap(~ facet.sorting, ncol=(length(unique(my_data$facet.sorting)))) +
+          facet_wrap(vars(facet.sorting), ncol=(length(unique(my_data$facet.sorting)))) +
           theme_classic() +
           ylab("Cummulative Shoot Area (pixels)") + xlab("Time (days)") +
           scale_x_continuous(breaks=seq(0,max(my_data$time.days),by=input$dayX_tickUI1)) +
