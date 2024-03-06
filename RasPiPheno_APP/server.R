@@ -272,11 +272,12 @@ server <- function(input, output) {
   
   ########################################################## plot the area graph ########################################################## 
   
+
   TimeGraph <- reactive(if(is.null(Raspi_unique())){return(NULL)}else{  
     my_data <- Raspi_unique()
     
     if(input$expType == "PhenoRig"){
-      my_data$col.sorting <- select(my_data, input$ColorAreaGG)
+      my_data$col.sorting <-  as.factor(my_data[,input$ColorAreaGG])
       my_data$time.min <- as.numeric(my_data$time.min)
       my_data$area <- as.numeric(my_data$area)
       
@@ -339,9 +340,10 @@ server <- function(input, output) {
     return(Area_graph)
   })
   
-  output$graph_over_time <- renderPlotly({
+  output$graph_over_time <- renderPlotly(
     ggplotly(TimeGraph())
-  })
+  )
+  
   
   
   
