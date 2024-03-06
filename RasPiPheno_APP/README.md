@@ -19,18 +19,15 @@ An identifier that includes the phenotyping rig (cage), camera ID, and plant ID 
 ### Curate the data using statistical methods
 Three types of data curation methods were provided for data smoothing, including [**smooth spline**](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/smooth.spline), [**Loess fit**](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/loess.html), and [**Polynomial regression fit**](https://search.r-project.org/CRAN/refmans/polyreg/html/polyFit.html). Users can select parameters to curate individual plants and remove plants with unexpected patterns. 
 
-<img width="1889" alt="image" src="https://user-images.githubusercontent.com/69836931/214946807-923da2ec-d208-402c-b0f2-f133b44344db.png">
-<img width="1877" alt="image" src="https://user-images.githubusercontent.com/69836931/214946943-0140848f-33a6-4ae5-945f-c222b3f186b3.png">
-<img width="1877" alt="image" src="https://user-images.githubusercontent.com/69836931/214947338-336c2bbc-99eb-4e48-a88f-d3f5dae59702.png">
+![ShinyApp-Page2](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/assets/69836931/3708e7a3-85d6-4f3e-a7a5-20e8740ef937)
 
-### Plot the curated and cleaned dataset by selected grouping criteria
-<img width="1889" alt="image" src="https://user-images.githubusercontent.com/69836931/214947249-aa872a38-6fbc-4619-a77f-5a751bfc4d54.png">
-<img width="1889" alt="image" src="https://user-images.githubusercontent.com/69836931/214947500-04884663-aa0e-44e2-861b-74b6317cc4f6.png">
+![ShinyApp-Page3](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/assets/69836931/3b1be0fb-c428-49a6-9f96-f61ab4498a98)
+
 
 ### Calculate the growth rate (GR)
 We provided two options to calculate the GR, including calculating the rate over the entire experiment, as well as customized step-wise selection and window size selection to estimate the rate over certain intervals. 
-<img width="1883" alt="image" src="https://user-images.githubusercontent.com/69836931/214947661-ff93f93d-4e83-42c8-85a7-64332d8a10c3.png">
-<img width="1879" alt="image" src="https://user-images.githubusercontent.com/69836931/214947782-dc96162c-95d7-4420-8d25-2066db7fd34c.png">
+![ShinyApp-Page4](https://github.com/Leon-Yu0320/BTI-Plant-phenotyping/assets/69836931/7aac7162-1c24-4572-92d6-ff3e72006145)
+
 
 ### Perform statistical analysis of leaf area and GR data
 <img width="1863" alt="image" src="https://user-images.githubusercontent.com/69836931/214948019-bcc41730-991d-44ad-b826-7033aa3629be.png">
