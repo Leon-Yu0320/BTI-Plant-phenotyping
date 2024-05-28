@@ -299,12 +299,12 @@ Usage : sh code/BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 
 
 ## Reference
-### Citation
-Workflow and facilities
+**Citation**
 1. Yu, L. A., Sussman, H., Khmelnitsky, O., Rahmati Ishka, M., Srinivasan, A., Nelson, A. D., & Julkowska, M. M. (2024). Development of a mobile, high-throughput, and low-cost image-based plant growth phenotyping system. ***Plant Physiology***, kiae237 (https://doi.org/10.1093/plphys/kiae237)
-
-3-D printed components
+   
 3. Ohlsson, J. A., Leong, J. X., Elander, P. H., Ballhaus, F., Holla, S., Dauphinee, A. N., ... & Minina, E. A. (2024). SPIRO–the automated Petri plate imaging platform designed by biologists, for biologists. ***The Plant Journal***, 118(2), 584-600.(https://doi.org/10.1111/tpj.16587)
+
+**Acknowledgement**
 
 We acknowledge the orginal design of 3-D printer components used for PhenoCage and PhenoRig facilities derived from [**Ohlsson et al., 2024**](https://doi.org/10.1111/tpj.16587) : 
 1. The 3D model for camera hold - PhenoCage - modified from original SPIRO [**design**](https://github.com/AlyonaMinina/SPIRO.Hardware)
