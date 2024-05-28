@@ -13,7 +13,7 @@ Integrated workflow for phenotyping data analysis using images
     - [1. Experimental setup and photo collections](#1-experimental-setup-and-photo-collections)
     - [2. Image-processing parameter selection](#2-image-processing-parameter-selection)
     - [3. Image batch processes](#3-image-batch-processes)
-  - [References](#references)
+  - [Reference](#reference)
  
 ## Introduction
 Image-based phenotyping provides a powerful avenue to characterize plant growth from different genetic backgrounds in response to biotic and abiotic stresses. We developed a high-throughput streamlined phenotyping workflow based on [**PlantCV**](https://plantcv.readthedocs.io/en/stable/), as well as two sets of facilities for plant growth and phenotyping data collections. This workflow covers step-by-step photo collection, data pre-processing, image processing, and downstream analysis. The integrated streamline effectively pairs with the lightweight phenotyping facilities and largely reduce the gap between phenotypic data collections and interpretation of biological questions based on phenotypic data. Operation of this pipeline along with facilities can be applied with the high-throughput manner and low cost. 
@@ -298,12 +298,15 @@ Usage : sh code/BULK_IMAGES.sh -d DESIGN_TABLE -t EXPERIMENT_TYPE -m MODE
 | /home/User/code | home/image | raspiX | Mike | 2022 | 2022 | 02 | 02 | 09 | 27 | /data/results |
 
 
-## References
-1. Yu, L. A., Sussman, H., Khmelnitsky, O., Rahmati Ishka, M., Srinivasan, A., Nelson, A. D., & Julkowska, M. M. (2024). Development of a mobile, high-throughput, and low-cost image-based plant growth phenotyping system. Plant Physiology, kiae237
-   
-3. Ohlsson, J. A., Leong, J. X., Elander, P. H., Ballhaus, F., Holla, S., Dauphinee, A. N., ... & Minina, E. A. (2024). SPIRO–the automated Petri plate imaging platform designed by biologists, for biologists. The Plant Journal, 118(2), 584-600.
+## Reference
+### Citation
+Workflow and facilities
+1. Yu, L. A., Sussman, H., Khmelnitsky, O., Rahmati Ishka, M., Srinivasan, A., Nelson, A. D., & Julkowska, M. M. (2024). Development of a mobile, high-throughput, and low-cost image-based plant growth phenotyping system. ***Plant Physiology***, kiae237 (https://doi.org/10.1093/plphys/kiae237)
 
-We also acknowledge the orginal design of 3-D printer components used for PhenoCage and PhenoRig facilities derived from [**Ohlsson et al., 2024**](https://doi.org/10.1111/tpj.16587) : 
+3-D printed components
+3. Ohlsson, J. A., Leong, J. X., Elander, P. H., Ballhaus, F., Holla, S., Dauphinee, A. N., ... & Minina, E. A. (2024). SPIRO–the automated Petri plate imaging platform designed by biologists, for biologists. ***The Plant Journal***, 118(2), 584-600.(https://doi.org/10.1111/tpj.16587)
+
+We acknowledge the orginal design of 3-D printer components used for PhenoCage and PhenoRig facilities derived from [**Ohlsson et al., 2024**](https://doi.org/10.1111/tpj.16587) : 
 1. The 3D model for camera hold - PhenoCage - modified from original SPIRO [**design**](https://github.com/AlyonaMinina/SPIRO.Hardware)
 2. Raspberry Pi holder for PhenoCage - modified from original Raspberry Pi Case for 5 inch HDMI [**touchscreen**](https://www.thingiverse.com/thing:4020018)
 3. Raspberry Pi holder for PhenoRig - modified from original raspberry Pi Zero [**case**](https://www.thingiverse.com/thing:1167846)
